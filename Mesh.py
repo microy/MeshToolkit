@@ -5,7 +5,7 @@
 #                             -------------------
 #    update               : 2013-06-03
 #    copyright            : (C) 2013 by Michaël Roy
-#    email                : michael.roy@u-bourgogne.fr
+#    email                : microygt@gmail.com
 # ***************************************************************************
 
 # ***************************************************************************
@@ -85,6 +85,9 @@ class Mesh :
 		for i in range( self.FaceNumber() ) :
 			norm = numpy.linalg.norm(self.face_normals[i])
 			if norm != 0 : self.face_normals[i] *= 1 / norm
+#		lengths = numpy.apply_along_axis( numpy.linalg.norm, self.face_normals.ndim - 1, self.face_normals )
+#		lengths = lengths.repeat( self.face_normals.shape[-1] ).reshape( self.face_normals.shape )
+#		face_normals /= lengths
 		return self
 
 	#
@@ -104,6 +107,7 @@ class Mesh :
 		for i in range( self.VertexNumber() ) :
 			norm = numpy.linalg.norm(self.vertex_normals[i])
 			if norm != 0 : self.vertex_normals[i] *= 1/norm
+
 		return self
 
 	#
