@@ -83,7 +83,7 @@ class Mesh :
 						self.vertices[self.faces[:,2]] - self.vertices[self.faces[:,0]] )
 		# Normalize the normal vectors
 		for i in range( self.FaceNumber() ) :
-			norm = numpy.linalg.norm(self.face_normals[i])
+			norm = numpy.linalg.norm( self.face_normals[i] )
 			if norm != 0 : self.face_normals[i] *= 1 / norm
 #		lengths = numpy.apply_along_axis( numpy.linalg.norm, self.face_normals.ndim - 1, self.face_normals )
 #		lengths = lengths.repeat( self.face_normals.shape[-1] ).reshape( self.face_normals.shape )
@@ -105,7 +105,7 @@ class Mesh :
 			self.vertex_normals[self.faces[i,2]] += self.face_normals[i]
 		# Normalize the normal vectors
 		for i in range( self.VertexNumber() ) :
-			norm = numpy.linalg.norm(self.vertex_normals[i])
+			norm = numpy.linalg.norm( self.vertex_normals[i] )
 			if norm != 0 : self.vertex_normals[i] *= 1/norm
 
 		return self
@@ -132,33 +132,24 @@ class Mesh :
 	# CollectNeighbors
 	#
 	def CollectNeighbors( self ) :
-		# Data access
 		faces = getattr( self, 'faces' )
-		neighbor_vertices = getattr( self, 'neighbor_vertices' )
-		neighbor_faces = getattr( self, 'neighbor_faces' )
-		# Initialize the list of the neighbor lists
-		neighbor_vertices = [None] * self.VertexNumber()
-		neighbor_faces = [None] * self.VertexNumber()
-		# Initialize the neighbor list for every vertex
-		for i in range( self.VertexNumber() ) :
-			neighbor_vertices[i] = []
-			neighbor_faces[i] = []
+		neighbor_vertices = [ [] for i in xrange(self.VertexNumber()) ]
+		neighbor_faces = [ [] for i in xrange(self.VertexNumber()) ]
 		# Create a list of faces and vertices in the neighborhood
 		# for every vertex of the mesh
 		for i in range( self.FaceNumber() ) :
-			neighbor_faces[faces[i,0]].append( i )
-			neighbor_faces[faces[i,1]].append( i )
-			neighbor_faces[faces[i,2]].append( i )
-			neighbor_vertices[faces[i,0]].append( faces[i,1] )
-			neighbor_vertices[faces[i,0]].append( faces[i,2] )
-			neighbor_vertices[faces[i,1]].append( faces[i,0] )
-			neighbor_vertices[faces[i,1]].append( faces[i,2] )
-			neighbor_vertices[faces[i,2]].append( faces[i,0] )
-			neighbor_vertices[faces[i,2]].append( faces[i,1] )
-		# Remove duplicates		
-		for i in range( self.VertexNumber() ) :
-			neighbor_vertices[i] = list( set( neighbor_vertices[i] ) )
-			neighbor_faces[i] = list( set( neighbor_faces[i] ) )
+			neighbor_faces[ faces[i,0] ].append( i )
+			neighbor_faces[ faces[i,1] ].append( i )
+			neighbor_faces[ faces[i,2] ].append( i )
+			neighbor_vertices[ faces[i,0] ].append( faces[i,1] )
+			neighbor_vertices[ faces[i,0] ].append( faces[i,2] )
+			neighbor_vertices[ faces[i,1] ].append( faces[i,0] )
+			neighbor_vertices[ faces[i,1] ].append( faces[i,2] )
+			neighbor_vertices[ faces[i,2] ].append( faces[i,0] )
+			neighbor_vertices[ faces[i,2] ].append( faces[i,1] )
+		# Remove duplicates
+		self.neighbor_vertices = [ list( set( i ) ) for i in neighbor_vertices ]
+		self.neighbor_faces = [ list( set( i ) ) for i in neighbor_faces ]
 		return self
 
 
