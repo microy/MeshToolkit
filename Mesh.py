@@ -36,7 +36,6 @@ class Mesh :
 	# Initialisation
 	#
 	def __init__( self, name="", vertices=[], faces=[], colors=[], textures=[], face_normals=[], vertex_normals=[], texture_name="" ) :
-
 		self.name = name
 		self.vertices = vertices
 		self.faces = faces
@@ -53,13 +52,14 @@ class Mesh :
 	#
 	def __repr__( self ) :
 		string = "Mesh " + self.name + "\n"\
-			"  Vertices : " + `self.VertexNumber()` + "\n"\
-			"  Faces    : " + `self.FaceNumber()` + "\n"\
-			"  Colors   : " + `len(self.colors)` + "\n"\
-			"  FNormals : " + `len(self.face_normals)` + "\n"\
-			"  VNormals : " + `len(self.vertex_normals)` + "\n"\
-			"  Textures : " + `len(self.textures)` + "\n"\
-			"  TextFile : " + self.texture_name
+			"  Vertices  : " + `self.VertexNumber()` + "\n"\
+			"  Faces     : " + `self.FaceNumber()` + "\n"\
+			"  Colors    : " + `len(self.colors)` + "\n"\
+			"  FNormals  : " + `len(self.face_normals)` + "\n"\
+			"  VNormals  : " + `len(self.vertex_normals)` + "\n"\
+			"  Textures  : " + `len(self.textures)` + "\n"\
+			"  TextFile  : " + self.texture_name + "\n"\
+			"  Neighbors : " + `len( self.neighbor_vertices )`
 	        return string
 
 	#
@@ -75,63 +75,49 @@ class Mesh :
 		return len( self.faces )
 
 	#
-	# ComputeFaceNormals
+	# UpdateNormals
 	#
-	def ComputeFaceNormals( self ) :
+	def UpdateNormals( self ) :
+		# Get data
+		vertices = getattr( self, 'vertices' )
+		faces = getattr( self, 'faces' )
+		vertex_normals = getattr( self, 'vertex_normals' )
+		face_normals = getattr( self, 'face_normals' )
 		# Calculate the normal for all the triangles, by taking the cross product of the vectors v1-v0, and v2-v0 in each triangle             
-		self.face_normals = numpy.cross( self.vertices[self.faces[:,1]] - self.vertices[self.faces[:,0]],
-						self.vertices[self.faces[:,2]] - self.vertices[self.faces[:,0]] )
+		face_normals = numpy.cross( vertices[ faces[:,1] ] - vertices[ faces[:,0] ],
+						vertices[ faces[:,2] ] - vertices[ faces[:,0] ] )
 		# Normalize the normal vectors
-		for i in range( self.FaceNumber() ) :
-			norm = numpy.linalg.norm( self.face_normals[i] )
-			if norm != 0 : self.face_normals[i] *= 1 / norm
+		for i in range( len ( faces ) ) :
+			norm = numpy.linalg.norm( face_normals[i] )
+			if norm != 0 : face_normals[i] *= 1 / norm
+# TODO:
 #		lengths = numpy.apply_along_axis( numpy.linalg.norm, self.face_normals.ndim - 1, self.face_normals )
 #		lengths = lengths.repeat( self.face_normals.shape[-1] ).reshape( self.face_normals.shape )
 #		face_normals /= lengths
-		return self
-
-	#
-	# ComputeVertexNormals
-	#
-	def ComputeVertexNormals( self ) :
-		# Compute face normals if necessary
-		if len(self.face_normals) != len(self.faces) : self.ComputeFaceNormals()
 		# Create a zeroed array
-		self.vertex_normals = numpy.zeros( (self.VertexNumber(), 3), dtype=float )
+		vertex_normals = numpy.zeros( (len( vertices ), 3), dtype=float )
 		# Add face normals
-		for i in range( self.FaceNumber() ) :
-			self.vertex_normals[self.faces[i,0]] += self.face_normals[i]
-			self.vertex_normals[self.faces[i,1]] += self.face_normals[i]
-			self.vertex_normals[self.faces[i,2]] += self.face_normals[i]
+		for i in range( len( faces ) ) :
+			vertex_normals[ faces[i,0] ] += face_normals[ i ]
+			vertex_normals[ faces[i,1] ] += face_normals[ i ]
+			vertex_normals[ faces[i,2] ] += face_normals[ i ]
 		# Normalize the normal vectors
-		for i in range( self.VertexNumber() ) :
-			norm = numpy.linalg.norm( self.vertex_normals[i] )
-			if norm != 0 : self.vertex_normals[i] *= 1/norm
-
+		for i in range( len( vertices ) ) :
+			norm = numpy.linalg.norm( vertex_normals[i] )
+			if norm != 0 : vertex_normals[i] *= 1/norm
+# TODO:
+#		for (i,face) in enumerate(faces):
+#			vertex_normals[face]+=face_normals[i]            
+#		div=np.sqrt(np.sum(normals**2,axis=1))     
+#		div=div.reshape(len(div),1)
+#		normals=(normals/div)
 		return self
 
 	#
-	# ComputeSmoothVertexNormals
+	# UpdateNeighbors
 	#
-	def ComputeSmoothVertexNormals( self, smoothing_angle=90.0 ) :
-		# 
-		# Taken from "Smooth Normal Generation with Preservation of Edges" by Nate Robins
-		# http://user.xmission.com/~nate/smooth.html
-		# 
-		# Compute face normals
-		self.ComputeFaceNormals()
-		# Collect vertex neighborhood informations
-		self.CollectNeighbors()
-		# Create a zeroed array
-		self.vertex_normals = numpy.zeros( (self.VertexNumber(), 3), dtype=float )
-		# Crease angle
-		cos_angle = math.cos(smoothing_angle * math.pi / 180.0)
-		return self
-
-	#
-	# CollectNeighbors
-	#
-	def CollectNeighbors( self ) :
+	def UpdateNeighbors( self ) :
+		# Get data
 		faces = getattr( self, 'faces' )
 		neighbor_vertices = [ [] for i in xrange(self.VertexNumber()) ]
 		neighbor_faces = [ [] for i in xrange(self.VertexNumber()) ]

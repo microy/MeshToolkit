@@ -5,7 +5,7 @@
 #                             -------------------
 #    update               : 2013-06-03
 #    copyright            : (C) 2013 by Michaël Roy
-#    email                : michael.roy@u-bourgogne.fr
+#    email                : microygt@gmail.com
 # ***************************************************************************
 
 # ***************************************************************************
@@ -27,6 +27,8 @@ OpenGL.ERROR_LOGGING = False
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
+from Mesh import *
+
 
 
 class Visualizer :
@@ -35,7 +37,7 @@ class Visualizer :
 	#
 	# Initialisation
 	#
-	def __init__( self, title="Untitled Window", width=500, height=500 ):
+	def __init__( self, title="Untitled Window", width=640, height=480 ):
 		self.width  = width
 		self.height = height
 		self.keybindings = {chr(27):exit}
@@ -50,10 +52,22 @@ class Visualizer :
 		glutMouseFunc( self.Mouse )
 		glShadeModel( GL_FLAT )
 
+	#
+	# Load mesh
+	#
+	def LoadMesh( mesh ) :
+		pass
+
+	#
+	# Keyboard
+	#
 	def Keyboard( self, key, mouseX, mouseY ):
 #		self.keybindings.get(key, noop)()
 		glutPostRedisplay()
 
+	#
+	# Mouse
+	#
 	def Mouse( self, button, state, x, y ):
 		if button == GLUT_LEFT_BUTTON:
 			self.MouseLeftClick(x, y)
@@ -65,15 +79,27 @@ class Visualizer :
 			raise ValueError(button)
 		glutPostRedisplay()
 
+	#
+	# MouseLeftClick
+	#
 	def MouseLeftClick( self, x, y ):
 		pass
 
+	#
+	# MouseMiddleClick
+	#
 	def MouseMiddleClick( self, x, y ):
 		pass
 
+	#
+	# MouseRightClick
+	#
 	def MouseRightClick( self, x, y ):
 		pass
 
+	#
+	# Reshape
+	#
 	def Reshape( self, width, height ):
 		self.width  = width
 		self.height = height
@@ -85,10 +111,24 @@ class Visualizer :
 		glMatrixMode( GL_MODELVIEW )
 		glLoadIdentity()
 
+	#
+	# Display
+	#
 	def Display( self ):
-		raise NotImplementedError
+		# Clear all pixels
+		glClear(GL_COLOR_BUFFER_BIT)
+		# Draw white polygon (rectangle) with corners at (0.25, 0.25, 0) and (0.75, 0.75, 0)
+		glColor3f(1, 1, 1)
+		glLoadIdentity()
+		gluLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0)
+		glScalef(1, 2, 1)
+		glutWireCube(1)
+		glFlush()
 
+	#
+	# Run
+	#
 	@staticmethod
-	def run():
+	def Run():
 		# Start up the main loop
 		glutMainLoop()
