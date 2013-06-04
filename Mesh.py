@@ -83,37 +83,17 @@ class Mesh :
 #
 #--
 def UpdateNormals( mesh ) :
-	# Get data
-	vertices = m.vertices
-	faces = m.faces
 	# Calculate the normal for all the triangles, by taking the cross product of the vectors v1-v0, and v2-v0 in each triangle             
-	mesh.face_normals = numpy.cross( vertices[ faces[:,1] ] - vertices[ faces[:,0] ],
-					vertices[ faces[:,2] ] - vertices[ faces[:,0] ] )
+	mesh.face_normals = numpy.cross( mesh.vertices[ mesh.faces[:,1] ] - mesh.vertices[ mesh.faces[:,0] ],
+					mesh.vertices[ mesh.faces[:,2] ] - mesh.vertices[ mesh.faces[:,0] ] )
+	# Initialize the vertex normal array
+	mesh.vertex_normals = numpy.zeros( (len(mesh.vertices), 3) )
+	# Add face normals to the normal of their respective vertices
+	for ( i, face ) in enumerate( mesh.faces ) :
+		mesh.vertex_normals[face] += mesh.face_normals[i]            
 	# Normalize the normal vectors
-	for i in range( len ( faces ) ) :
-		norm = numpy.linalg.norm( mesh.face_normals[i] )
-		if norm != 0 : mesh.face_normals[i] *= 1 / norm
-# TODO:
-#	lengths = numpy.apply_along_axis( numpy.linalg.norm, self.face_normals.ndim - 1, self.face_normals )
-#	lengths = lengths.repeat( self.face_normals.shape[-1] ).reshape( self.face_normals.shape )
-#	face_normals /= lengths
-	# Create a zeroed array
-	mesh.vertex_normals = numpy.zeros( (len( vertices ), 3), dtype=float )
-	# Add face normals
-	for i in range( len( faces ) ) :
-		mesh.vertex_normals[ faces[i,0] ] += mesh.face_normals[ i ]
-		mesh.vertex_normals[ faces[i,1] ] += mesh.face_normals[ i ]
-		mesh.vertex_normals[ faces[i,2] ] += mesh.face_normals[ i ]
-	# Normalize the normal vectors
-	for i in range( len( vertices ) ) :
-		norm = numpy.linalg.norm( mesh.vertex_normals[i] )
-		if norm != 0 : mesh.vertex_normals[i] *= 1/norm
-# TODO:
-#	for (i,face) in enumerate(faces):
-#		vertex_normals[face]+=face_normals[i]            
-#	div=np.sqrt(np.sum(normals**2,axis=1))     
-#	div=div.reshape(len(div),1)
-#	normals=(normals/div)
+	mesh.face_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.face_normals ).repeat( 3 ).reshape( mesh.face_normals.shape )
+	mesh.vertex_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.vertex_normals ).repeat( 3 ).reshape( mesh.vertex_normals.shape )
 	return mesh
 
 #--
@@ -122,25 +102,24 @@ def UpdateNormals( mesh ) :
 #
 #--
 def UpdateNeighbors( mesh ) :
-	# Get data
-	faces = m.faces
-	neighbor_vertices = [ [] for i in xrange(mesh.VertexNumber()) ]
-	neighbor_faces = [ [] for i in xrange(mesh.VertexNumber()) ]
+	# Initialization
+	mesh.neighbor_vertices = [ [] for i in xrange(mesh.VertexNumber()) ]
+	mesh.neighbor_faces = [ [] for i in xrange(mesh.VertexNumber()) ]
 	# Create a list of faces and vertices in the neighborhood
 	# for every vertex of the mesh
-	for i in range( self.FaceNumber() ) :
-		neighbor_faces[ faces[i,0] ].append( i )
-		neighbor_faces[ faces[i,1] ].append( i )
-		neighbor_faces[ faces[i,2] ].append( i )
-		neighbor_vertices[ faces[i,0] ].append( faces[i,1] )
-		neighbor_vertices[ faces[i,0] ].append( faces[i,2] )
-		neighbor_vertices[ faces[i,1] ].append( faces[i,0] )
-		neighbor_vertices[ faces[i,1] ].append( faces[i,2] )
-		neighbor_vertices[ faces[i,2] ].append( faces[i,0] )
-		neighbor_vertices[ faces[i,2] ].append( faces[i,1] )
+	for i in range( mesh.FaceNumber() ) :
+		mesh.neighbor_faces[ mesh.faces[i,0] ].append( i )
+		mesh.neighbor_faces[ mesh.faces[i,1] ].append( i )
+		mesh.neighbor_faces[ mesh.faces[i,2] ].append( i )
+		mesh.neighbor_vertices[ mesh.faces[i,0] ].append( mesh.faces[i,1] )
+		mesh.neighbor_vertices[ mesh.faces[i,0] ].append( mesh.faces[i,2] )
+		mesh.neighbor_vertices[ mesh.faces[i,1] ].append( mesh.faces[i,0] )
+		mesh.neighbor_vertices[ mesh.faces[i,1] ].append( mesh.faces[i,2] )
+		mesh.neighbor_vertices[ mesh.faces[i,2] ].append( mesh.faces[i,0] )
+		mesh.neighbor_vertices[ mesh.faces[i,2] ].append( mesh.faces[i,1] )
 	# Remove duplicates
-	mesh.neighbor_vertices = [ list( set( i ) ) for i in neighbor_vertices ]
-	mesh.neighbor_faces = [ list( set( i ) ) for i in neighbor_faces ]
+	mesh.neighbor_vertices = [ list( set( i ) ) for i in mesh.neighbor_vertices ]
+	mesh.neighbor_faces = [ list( set( i ) ) for i in mesh.neighbor_faces ]
 	return mesh
 
 

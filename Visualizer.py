@@ -28,7 +28,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from Mesh import *
-
+import math
+import numpy
 
 
 class Visualizer :
@@ -38,11 +39,11 @@ class Visualizer :
 	# Initialisation
 	#
 	def __init__( self, mesh=None, title="Untitled Window", width=640, height=480 ) :
-		self.mesh = mesh
+		self.LoadMesh( mesh )
 		self.width  = width
 		self.height = height
 		self.keybindings = {chr(27):exit}
-		if mesh is not None : LoadMesh( mesh )
+		self.trackball_transform = numpy.identity( 4 )
 		glutInit()
 		glutInitWindowSize( self.width, self.height )
 		glutCreateWindow( title )
@@ -57,8 +58,9 @@ class Visualizer :
 	#
 	# Load mesh
 	#
-	def LoadMesh( mesh ) :
+	def LoadMesh( self, mesh ) :
 		self.mesh = mesh
+		if mesh is None : pass
 		pass
 
 	#
@@ -127,6 +129,22 @@ class Visualizer :
 		glScalef(1, 2, 1)
 		glutWireCube(1)
 		glFlush()
+
+	#--
+	#
+	# TrackballMapping
+	#
+	#--
+	# Adapted from Nate Robins programs
+	# http://www.xmission.com/~nate
+	def TrackballMapping( x, y ) :
+		v = numpy.zeros( 3 )
+		v[0] = ( 2.0 * float(x) - float(self.width) ) / float(self.width)
+		v[1] = ( float(self.height) - 2.0 * float(y) ) / float(self.height)
+		d = numpy.linalg.norm( v )
+		if d > 1.0 : d = 1.0
+		v[2] = math.cos( math.pi / 2.0 * d );
+		return v / numpy.linalg.norm(v)
 
 	#
 	# Run
