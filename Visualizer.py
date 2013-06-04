@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Visualizer.py
 #                             -------------------
-#    update               : 2013-06-03
+#    update               : 2013-06-04
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygt@gmail.com
 # ***************************************************************************
@@ -37,10 +37,12 @@ class Visualizer :
 	#
 	# Initialisation
 	#
-	def __init__( self, title="Untitled Window", width=640, height=480 ):
+	def __init__( self, mesh=None, title="Untitled Window", width=640, height=480 ) :
+		self.mesh = mesh
 		self.width  = width
 		self.height = height
 		self.keybindings = {chr(27):exit}
+		if mesh is not None : LoadMesh( mesh )
 		glutInit()
 		glutInitWindowSize( self.width, self.height )
 		glutCreateWindow( title )
@@ -56,6 +58,7 @@ class Visualizer :
 	# Load mesh
 	#
 	def LoadMesh( mesh ) :
+		self.mesh = mesh
 		pass
 
 	#

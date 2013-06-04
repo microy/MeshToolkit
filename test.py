@@ -7,7 +7,7 @@ from Visualizer import *
 if __name__ == "__main__":
 
 	m = ReadSmfFile("swirl.smf")
-	m.UpdateNormals()
-	m.UpdateNeighbors()
+	UpdateNormals( m )
+	UpdateNeighbors( m )
 	print m
-	Visualizer().Run()
+	Visualizer( mesh=m, title="Test" ).Run()

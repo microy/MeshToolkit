@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2013-06-03
+#    update               : 2013-06-04
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygt@gmail.com
 # ***************************************************************************
@@ -74,68 +74,73 @@ class Mesh :
 	def FaceNumber( self ) :
 		return len( self.faces )
 
-	#
-	# UpdateNormals
-	#
-	def UpdateNormals( self ) :
-		# Get data
-		vertices = getattr( self, 'vertices' )
-		faces = getattr( self, 'faces' )
-		vertex_normals = getattr( self, 'vertex_normals' )
-		face_normals = getattr( self, 'face_normals' )
-		# Calculate the normal for all the triangles, by taking the cross product of the vectors v1-v0, and v2-v0 in each triangle             
-		face_normals = numpy.cross( vertices[ faces[:,1] ] - vertices[ faces[:,0] ],
-						vertices[ faces[:,2] ] - vertices[ faces[:,0] ] )
-		# Normalize the normal vectors
-		for i in range( len ( faces ) ) :
-			norm = numpy.linalg.norm( face_normals[i] )
-			if norm != 0 : face_normals[i] *= 1 / norm
-# TODO:
-#		lengths = numpy.apply_along_axis( numpy.linalg.norm, self.face_normals.ndim - 1, self.face_normals )
-#		lengths = lengths.repeat( self.face_normals.shape[-1] ).reshape( self.face_normals.shape )
-#		face_normals /= lengths
-		# Create a zeroed array
-		vertex_normals = numpy.zeros( (len( vertices ), 3), dtype=float )
-		# Add face normals
-		for i in range( len( faces ) ) :
-			vertex_normals[ faces[i,0] ] += face_normals[ i ]
-			vertex_normals[ faces[i,1] ] += face_normals[ i ]
-			vertex_normals[ faces[i,2] ] += face_normals[ i ]
-		# Normalize the normal vectors
-		for i in range( len( vertices ) ) :
-			norm = numpy.linalg.norm( vertex_normals[i] )
-			if norm != 0 : vertex_normals[i] *= 1/norm
-# TODO:
-#		for (i,face) in enumerate(faces):
-#			vertex_normals[face]+=face_normals[i]            
-#		div=np.sqrt(np.sum(normals**2,axis=1))     
-#		div=div.reshape(len(div),1)
-#		normals=(normals/div)
-		return self
 
-	#
-	# UpdateNeighbors
-	#
-	def UpdateNeighbors( self ) :
-		# Get data
-		faces = getattr( self, 'faces' )
-		neighbor_vertices = [ [] for i in xrange(self.VertexNumber()) ]
-		neighbor_faces = [ [] for i in xrange(self.VertexNumber()) ]
-		# Create a list of faces and vertices in the neighborhood
-		# for every vertex of the mesh
-		for i in range( self.FaceNumber() ) :
-			neighbor_faces[ faces[i,0] ].append( i )
-			neighbor_faces[ faces[i,1] ].append( i )
-			neighbor_faces[ faces[i,2] ].append( i )
-			neighbor_vertices[ faces[i,0] ].append( faces[i,1] )
-			neighbor_vertices[ faces[i,0] ].append( faces[i,2] )
-			neighbor_vertices[ faces[i,1] ].append( faces[i,0] )
-			neighbor_vertices[ faces[i,1] ].append( faces[i,2] )
-			neighbor_vertices[ faces[i,2] ].append( faces[i,0] )
-			neighbor_vertices[ faces[i,2] ].append( faces[i,1] )
-		# Remove duplicates
-		self.neighbor_vertices = [ list( set( i ) ) for i in neighbor_vertices ]
-		self.neighbor_faces = [ list( set( i ) ) for i in neighbor_faces ]
-		return self
+
+
+#--
+#
+# UpdateNormals
+#
+#--
+def UpdateNormals( mesh ) :
+	# Get data
+	vertices = m.vertices
+	faces = m.faces
+	# Calculate the normal for all the triangles, by taking the cross product of the vectors v1-v0, and v2-v0 in each triangle             
+	mesh.face_normals = numpy.cross( vertices[ faces[:,1] ] - vertices[ faces[:,0] ],
+					vertices[ faces[:,2] ] - vertices[ faces[:,0] ] )
+	# Normalize the normal vectors
+	for i in range( len ( faces ) ) :
+		norm = numpy.linalg.norm( mesh.face_normals[i] )
+		if norm != 0 : mesh.face_normals[i] *= 1 / norm
+# TODO:
+#	lengths = numpy.apply_along_axis( numpy.linalg.norm, self.face_normals.ndim - 1, self.face_normals )
+#	lengths = lengths.repeat( self.face_normals.shape[-1] ).reshape( self.face_normals.shape )
+#	face_normals /= lengths
+	# Create a zeroed array
+	mesh.vertex_normals = numpy.zeros( (len( vertices ), 3), dtype=float )
+	# Add face normals
+	for i in range( len( faces ) ) :
+		mesh.vertex_normals[ faces[i,0] ] += mesh.face_normals[ i ]
+		mesh.vertex_normals[ faces[i,1] ] += mesh.face_normals[ i ]
+		mesh.vertex_normals[ faces[i,2] ] += mesh.face_normals[ i ]
+	# Normalize the normal vectors
+	for i in range( len( vertices ) ) :
+		norm = numpy.linalg.norm( mesh.vertex_normals[i] )
+		if norm != 0 : mesh.vertex_normals[i] *= 1/norm
+# TODO:
+#	for (i,face) in enumerate(faces):
+#		vertex_normals[face]+=face_normals[i]            
+#	div=np.sqrt(np.sum(normals**2,axis=1))     
+#	div=div.reshape(len(div),1)
+#	normals=(normals/div)
+	return mesh
+
+#--
+#
+# UpdateNeighbors
+#
+#--
+def UpdateNeighbors( mesh ) :
+	# Get data
+	faces = m.faces
+	neighbor_vertices = [ [] for i in xrange(mesh.VertexNumber()) ]
+	neighbor_faces = [ [] for i in xrange(mesh.VertexNumber()) ]
+	# Create a list of faces and vertices in the neighborhood
+	# for every vertex of the mesh
+	for i in range( self.FaceNumber() ) :
+		neighbor_faces[ faces[i,0] ].append( i )
+		neighbor_faces[ faces[i,1] ].append( i )
+		neighbor_faces[ faces[i,2] ].append( i )
+		neighbor_vertices[ faces[i,0] ].append( faces[i,1] )
+		neighbor_vertices[ faces[i,0] ].append( faces[i,2] )
+		neighbor_vertices[ faces[i,1] ].append( faces[i,0] )
+		neighbor_vertices[ faces[i,1] ].append( faces[i,2] )
+		neighbor_vertices[ faces[i,2] ].append( faces[i,0] )
+		neighbor_vertices[ faces[i,2] ].append( faces[i,1] )
+	# Remove duplicates
+	mesh.neighbor_vertices = [ list( set( i ) ) for i in neighbor_vertices ]
+	mesh.neighbor_faces = [ list( set( i ) ) for i in neighbor_faces ]
+	return mesh
 
 
