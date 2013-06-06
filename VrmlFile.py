@@ -40,7 +40,7 @@ def ReadVrml( filename ) :
 	nrbrack = 0
 	level = 0
 	ixyz = 0
-	nodes = []
+	nodes = [""]
 	vec2d = [0., 0.]
 	vec3d = [0., 0., 0.]
 	vec3i = [0, 0, 0]
@@ -97,7 +97,7 @@ def ReadVrml( filename ) :
 					vec3d[ixyz] = map( float, word )
 					# Complete coordinate ?
 					if ixyz == 2 :
-						vertices.append( vec3d )
+						vertices.append( vec3d[:] )
 						ixyz = 0
 					else :
 						ixyz += 1
@@ -107,11 +107,66 @@ def ReadVrml( filename ) :
 					vec2d[ixyz] = map( float, word )
 					# Complete coordinate ?
 					if ixyz == 1
-						texcoords.append( vec2d ) 
+						texcoords.append( vec2d[:] ) 
 						ixyz = 0
-					else
+					else :
 						ixyz += 1
+			# DIFFUSECOLOR
+			else if node[level] == "color" :
+				if node[level-1] == "Color" :
+					# Get current value
+					vec3d[ixyz] = map( float, word )
+					# Complete coordinate ?
+					if ixyz == 2 :
+						colors.append( vec3d[:] )
+						ixyz = 0
+					else :
+						# Next coordinate
+						ixyz += 1
+			# VECTOR
+			else if node[level] == "vector" :
+				if node[level-1] == "Normal" :
+					# Get current value
+					vec3d[ixyz] = map( float, word )
+					# Complete coordinate ?
+					if ixyz == 2 :
+						normals.append( vec3d[:] )
+						ixyz = 0
+					else :
+						# Next coordinate
+						ixyz += 1
+			# ImageTexture
+			else if node[level] == "ImageTexture" :
+				if previous_word == "url" :
+					if len(word) > 2 :
+						# Remove quotes in filename
+						# TODO:
+						# Remove quotes
+#						word.erase( word.begin() );
+#						word.erase( word.end()-1 );
+						# Get texture filename
+						material = word
+			# COORDINDEX
+			else if node[level] == "coordIndex" :
+				if node[level-1] == "IndexedFaceSet" :
+					# -1 value
+					if ixyz == 3 :
+						# Next face
+						ixyz = 0
+						continue
+					# Get value
+					vec3i[ixyz] = map( int, word )
+					# Complete coordinate ?
+					if ixyz == 2 
+						faces.append( vec3d[:] )
+					# Next coordinate
+					ixyz += 1
 			
+			# Save current word
+			previous_word = word
+
+	# Close the file
+	vrmlfile.close()
 
 	# Return the final mesh
 	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
