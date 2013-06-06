@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 VrmlFile.py
 #                             -------------------
-#    update               : 2013-06-06
+#    update               : 2013-06-07
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygt@gmail.com
 # ***************************************************************************
@@ -111,7 +111,7 @@ def ReadVrml( filename ) :
 						ixyz = 0
 					else :
 						ixyz += 1
-			# DIFFUSECOLOR
+			# Color
 			else if node[level] == "color" :
 				if node[level-1] == "Color" :
 					# Get current value
@@ -123,7 +123,7 @@ def ReadVrml( filename ) :
 					else :
 						# Next coordinate
 						ixyz += 1
-			# VECTOR
+			# Normal
 			else if node[level] == "vector" :
 				if node[level-1] == "Normal" :
 					# Get current value
@@ -135,18 +135,17 @@ def ReadVrml( filename ) :
 					else :
 						# Next coordinate
 						ixyz += 1
-			# ImageTexture
+			# Texture filename
 			else if node[level] == "ImageTexture" :
 				if previous_word == "url" :
 					if len(word) > 2 :
-						# Remove quotes in filename
+						# Get texture filename
 						# TODO:
-						# Remove quotes
+						# Remove quotes around the filename
 #						word.erase( word.begin() );
 #						word.erase( word.end()-1 );
-						# Get texture filename
-						material = word
-			# COORDINDEX
+						material = word[ 1 : -1 ]
+			# Face
 			else if node[level] == "coordIndex" :
 				if node[level-1] == "IndexedFaceSet" :
 					# -1 value
