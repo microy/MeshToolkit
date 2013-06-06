@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 VrmlFile.py
 #                             -------------------
-#    update               : 2013-06-05
+#    update               : 2013-06-06
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygt@gmail.com
 # ***************************************************************************
@@ -23,7 +23,6 @@
 #
 from Mesh import Mesh
 from numpy import array
-from string import maketrans
 
 
 #
@@ -60,16 +59,11 @@ def ReadVrml( filename ) :
 		# Comment
 		if line.startswith( '#' ) : continue
 		# Remove comma
-		line = line.translate(maketrans( ",", " " ))
-		# Buffer
-		newline = ""
-		for c in line :
-			if c in [ '[', ']', '{', '}' ] :
-				newline += ' ' + c + ' '
-			else :
-				newline += c
+		line = line.replace( ",", " " )
+		# Add buffer space around brackets and braces
+		line = line.replace( "[", " [ " ).replace( "{", " { " ).replace( "]", " ] " ).replace( "}", " } " )
 		# Split values in the line
-		for word in newline.split() :
+		for word in line.split() :
 			# Left bracket or brace
 			if word in [ "[", "{" ] :
 				# Increment left deliminter number
@@ -77,7 +71,7 @@ def ReadVrml( filename ) :
 				# Get level number
 				level = nlbrack - nrbrack
 				# Save level name
-				if level > len(node) : node.append( previous_word )
+				if level >= len(node) : node.append( previous_word )
 				else : node[level] = previous_word
 				# Initialize coordinate index
 				ixyz = 0
@@ -119,26 +113,6 @@ def ReadVrml( filename ) :
 						ixyz += 1
 			
 
-
-
-		# Vertex
-		if values[0] == 'v' :
-			vertices.append( map( float, values[1:4] ) )
-		# Face (index starts at 1)
-		elif values[0] == 'f' :
-			faces.append( [ x-1 for x in map( int, values[1:4] ) ] )
-		# Normal
-		elif values[0] == 'n' :
-			normals.append( map( float, values[1:4] ) )
-		# Color
-		elif values[0] == 'c' :
-			colors.append( map( float, values[1:4] ) )
-		# Texture
-		elif values[0] == 'r' :
-			texcoords.append( map( float, values[1:3] ) )
-		# Texture filename
-		elif values[0] == 'text' :
-			material = values[1]
 	# Return the final mesh
 	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
 		vertex_normals=array(normals), colors=array(colors),
