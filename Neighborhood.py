@@ -32,10 +32,10 @@ import Mesh
 #--
 def UpdateNeighbors( mesh ) :
 	# Initialization
-	mesh.neighbor_vertices = [ [] for i in xrange(mesh.VertexNumber()) ]
-	mesh.neighbor_faces = [ [] for i in xrange(mesh.VertexNumber()) ]
+	mesh.neighbor_vertices = [ [] for i in xrange(len(mesh.vertices)) ]
+	mesh.neighbor_faces = [ [] for i in xrange(len(mesh.vertices)) ]
 	# Create a list of neighbor vertices and faces for every vertex of the mesh
-	for i in range( mesh.FaceNumber() ) :
+	for i in range( len(mesh.faces) ) :
 		mesh.neighbor_faces[ mesh.faces[i,0] ].append( i )
 		mesh.neighbor_faces[ mesh.faces[i,1] ].append( i )
 		mesh.neighbor_faces[ mesh.faces[i,2] ].append( i )

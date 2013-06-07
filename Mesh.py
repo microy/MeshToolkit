@@ -26,6 +26,11 @@
 # Mesh
 #
 #--
+#
+# Define a class representing a triangular mesh
+# This class only contains member variables
+# All processing functions are elsewhere
+#
 class Mesh :
 
 	#
@@ -37,9 +42,9 @@ class Mesh :
 		self.faces = faces
 		self.colors = colors
 		self.textures = textures
+		self.texture_name = texture_name
 		self.face_normals = face_normals
 		self.vertex_normals = vertex_normals
-		self.texture_name = texture_name
 		self.neighbor_faces = []
 		self.neighbor_vertices = []
 
@@ -48,8 +53,8 @@ class Mesh :
 	#
 	def __repr__( self ) :
 		string = "Mesh " + self.name + "\n"\
-			"  Vertices  : " + `self.VertexNumber()` + "\n"\
-			"  Faces     : " + `self.FaceNumber()` + "\n"\
+			"  Vertices  : " + `len(self.vertices)` + "\n"\
+			"  Faces     : " + `len(self.faces)` + "\n"\
 			"  Colors    : " + `len(self.colors)` + "\n"\
 			"  FNormals  : " + `len(self.face_normals)` + "\n"\
 			"  VNormals  : " + `len(self.vertex_normals)` + "\n"\
@@ -57,17 +62,5 @@ class Mesh :
 			"  TextFile  : " + self.texture_name + "\n"\
 			"  Neighbors : " + `len( self.neighbor_vertices )`
 	        return string
-
-	#
-	# VertexNumber
-	#
-	def VertexNumber( self ) :
-		return len( self.vertices )
-
-	#
-	# FaceNumber
-	#
-	def FaceNumber( self ) :
-		return len( self.faces )
 
 
