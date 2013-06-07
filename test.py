@@ -3,6 +3,8 @@
 from Mesh import *
 from SmfFile import *
 from Visualizer import *
+from Normal import *
+from Neighborhood import *
 
 if __name__ == "__main__":
 
