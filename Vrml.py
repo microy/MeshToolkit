@@ -30,7 +30,7 @@ from numpy import array
 #
 #--
 #
-# Import mesh from a VRML 1.0/2.0 file
+# Import mesh from a file in Inventor / VRML / X3D format
 #
 # TODO: Check bindings
 #
@@ -53,9 +53,9 @@ def ReadVrmlFile( filename ) :
 	previous_word = ''
 	# Open the file
 	vrmlfile = open( filename, 'r' )
-	# Check the first line
-	line = vrmlfile.readline()
-	if '#VRML' not in line :
+	# Check the header
+	header = vrmlfile.readline().split()
+	if header[0] not in [ '#VRML', '#X3D', '#Inventor' ] :
 		vrmlfile.close()
 		return None
 	# Read each line in the file
@@ -189,6 +189,10 @@ def ReadVrmlFile( filename ) :
 	# Close the file
 	vrmlfile.close()
 
+	#
+	# TODO: Check mesh
+	#
+
 	# Return the final mesh
 	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
 		vertex_normals=array(normals), colors=array(colors),
@@ -201,7 +205,7 @@ def ReadVrmlFile( filename ) :
 #
 #--
 #
-# Export mesh to a VRML 2.0 file
+# Export mesh to a VRML V2.0 file
 #
 def WriteVrmlFile( mesh, filename ) :
 
@@ -217,32 +221,38 @@ def WriteVrmlFile( mesh, filename ) :
 	vrmlfile.write( '#VRML V2.0 utf8\n\n' );
 
 	# Write vertex number (comment)
-	vrmlfile.write( '# Vertices: {}\n'.format(len(mesh.vertices)) )
+	vrmlfile.write( '# Vertices:  {}\n'.format(len(mesh.vertices)) )
 	# Write face number (comment)
-	vrmlfile.write( '# Faces: {}\n\n'.format(len(mesh.faces)) )
+	vrmlfile.write( '# Faces:     {}\n\n'.format(len(mesh.faces)) )
 
 	# Begin description
-	vrmlfile.write( 'Shape {\n' )
-	vrmlfile.write( '  geometry IndexedFaceSet {\n' )
+	vrmlfile.write( 'Transform {\n' )
+	vrmlfile.write( '  scale 1 1 1\n' )
+	vrmlfile.write( '  translation 0 0 0\n' )
+	vrmlfile.write( '  children [\n' )
+	vrmlfile.write( '    Shape {\n' )
+	vrmlfile.write( '      geometry IndexedFaceSet {\n' )
 
-	# Write  vertex coordinates
-	vrmlfile.write( '    Coordinate {\n' )
-	vrmlfile.write( '        point [\n' )
+	# Write vertex coordinates
+	vrmlfile.write( '        coord Coordinate {\n' )
+	vrmlfile.write( '          point [\n' )
 	for i in range( len(mesh.vertices)-1 ) :
-		vrmlfile.write( '            {0} {1} {2},\n'.format( mesh.vertices[i,0], mesh.vertices[i,1], mesh.vertices[i,2] ) )
-	vrmlfile.write( '            {0} {1} {2}\n'.format( mesh.vertices[len(mesh.vertices)-1,0], mesh.vertices[len(mesh.vertices)-1,1], mesh.vertices[len(mesh.vertices)-1,2] ) )
-	vrmlfile.write( '        ]\n' )
-	vrmlfile.write( '    }\n' )
+		vrmlfile.write( '                {0} {1} {2},\n'.format( mesh.vertices[i,0], mesh.vertices[i,1], mesh.vertices[i,2] ) )
+	vrmlfile.write( '                {0} {1} {2}\n'.format( mesh.vertices[len(mesh.vertices)-1,0], mesh.vertices[len(mesh.vertices)-1,1], mesh.vertices[len(mesh.vertices)-1,2] ) )
+	vrmlfile.write( '          ]\n' )
+	vrmlfile.write( '        }\n' )
 
 	# Write face indices
-	vrmlfile.write( '    coordIndex [\n' )
+	vrmlfile.write( '        coordIndex [\n' )
 	for i in range( len(mesh.faces)-1 ) :
-		vrmlfile.write( '        {0}, {1}, {2}, -1,\n'.format( mesh.faces[i,0], mesh.faces[i,1], mesh.faces[i,2] ) )
-	vrmlfile.write( '        {0}, {1}, {2}, -1\n'.format( mesh.faces[len(mesh.faces)-1,0], mesh.faces[len(mesh.faces)-1,1], mesh.faces[len(mesh.faces)-1,2] ) )
-	vrmlfile.write( '    ]\n' )
+		vrmlfile.write( '            {0}, {1}, {2}, -1,\n'.format( mesh.faces[i,0], mesh.faces[i,1], mesh.faces[i,2] ) )
+	vrmlfile.write( '            {0}, {1}, {2}, -1\n'.format( mesh.faces[len(mesh.faces)-1,0], mesh.faces[len(mesh.faces)-1,1], mesh.faces[len(mesh.faces)-1,2] ) )
+	vrmlfile.write( '        ]\n' )
 
 	# End description
-	vrmlfile.write( '  }\n' )
+	vrmlfile.write( '      }\n' )
+	vrmlfile.write( '    }\n' )
+	vrmlfile.write( '  ]\n' )
 	vrmlfile.write( '}\n' )
 
 	# Close the file
