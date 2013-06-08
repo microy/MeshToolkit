@@ -10,16 +10,12 @@ from Neighbor import *
 if __name__ == "__main__":
 
 	m = ReadSmfFile("swirl.smf")
-	print m
 	UpdateNormals( m )
-	print m
 	UpdateNeighbors( m )
 	print m
 	m = ReadVrmlFile("cube.wrl")
-	print m
 	UpdateNormals( m )
-	print m
 	UpdateNeighbors( m )
 	print m
-	print m.faces
+	WriteVrmlFile( m, "test.wrl" )
 #	Visualizer( mesh=m, title="Test" ).Run()
