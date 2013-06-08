@@ -230,7 +230,7 @@ def WriteVrmlFile( mesh, filename ) :
 	vrmlfile.write( '        point [\n' )
 	for i in range( len(mesh.vertices)-1 ) :
 		vrmlfile.write( '            {0} {1} {2},\n'.format( mesh.vertices[i,0], mesh.vertices[i,1], mesh.vertices[i,2] ) )
-	vrmlfile.write( '            {0}, {1}, {2}\n'.format( mesh.vertices[len(mesh.vertices)-1,0], mesh.vertices[len(mesh.vertices)-1,1], mesh.vertices[len(mesh.vertices)-1,2] ) )
+	vrmlfile.write( '            {0} {1} {2}\n'.format( mesh.vertices[len(mesh.vertices)-1,0], mesh.vertices[len(mesh.vertices)-1,1], mesh.vertices[len(mesh.vertices)-1,2] ) )
 	vrmlfile.write( '        ]\n' )
 	vrmlfile.write( '    }\n' )
 
