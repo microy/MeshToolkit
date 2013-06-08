@@ -41,21 +41,21 @@ def ReadVrmlFile( filename ) :
 	normals = []
 	colors = []
 	texcoords = []
-        material = ""
+        material = ''
 	nlbrack = 0
 	nrbrack = 0
 	level = 0
 	ixyz = 0
-	nodes = [""]
+	nodes = ['']
 	vec2d = [0., 0.]
 	vec3d = [0., 0., 0.]
 	vec3i = [0, 0, 0]
-	previous_word = ""
+	previous_word = ''
 	# Open the file
 	vrmlfile = open( filename, 'r' )
 	# Check the first line
 	line = vrmlfile.readline()
-	if "#VRML" not in line :
+	if '#VRML' not in line :
 		vrmlfile.close()
 		return None
 	# Read each line in the file
@@ -65,13 +65,13 @@ def ReadVrmlFile( filename ) :
 		# Comment
 		if line.startswith( '#' ) : continue
 		# Remove comma
-		line = line.replace( ",", " " )
+		line = line.replace( ',', ' ' )
 		# Add buffer space around brackets and braces
-		line = line.replace( "[", " [ " ).replace( "{", " { " ).replace( "]", " ] " ).replace( "}", " } " )
+		line = line.replace( '[', ' [ ' ).replace( '{', ' { ' ).replace( ']', ' ] ' ).replace( '}', ' } ' )
 		# Split values in the line
 		for word in line.split() :
 			# Left bracket or brace
-			if word in [ "[", "{" ] :
+			if word in [ '[', '{' ] :
 				# Increment left deliminter number
 				nlbrack += 1
 				# Get level number
@@ -82,7 +82,7 @@ def ReadVrmlFile( filename ) :
 				# Initialize coordinate index
 				ixyz = 0
 			# Right bracket or brace
-			elif word in [ "}", "]" ] :
+			elif word in [ '}', ']' ] :
 				# Increment right deliminter number
 				nrbrack += 1
 				# Get level number
@@ -96,9 +96,9 @@ def ReadVrmlFile( filename ) :
 				# Next line
 				break
 			# Point
-			elif nodes[level] == "point" :
+			elif nodes[level] == 'point' :
 				# Geometry
-				if nodes[level-1] in [ "Coordinate", "Coordinate3" ] :
+				if nodes[level-1] in [ 'Coordinate', 'Coordinate3' ] :
 					# Get current value
 					vec3d[ixyz] = float( word )
 					# Complete coordinate ?
@@ -108,7 +108,7 @@ def ReadVrmlFile( filename ) :
 					else :
 						ixyz += 1
 				# Texture
-				elif nodes[level-1] in [ "TextureCoordinate", "TextureCoordinate2" ] :
+				elif nodes[level-1] in [ 'TextureCoordinate', 'TextureCoordinate2' ] :
 					# Get current value
 					vec2d[ixyz] = float( word )
 					# Complete coordinate ?
@@ -118,8 +118,8 @@ def ReadVrmlFile( filename ) :
 					else :
 						ixyz += 1
 			# Color
-			elif nodes[level] == "color" :
-				if nodes[level-1] == "Color" :
+			elif nodes[level] == 'color' :
+				if nodes[level-1] == 'Color' :
 					# Get current value
 					vec3d[ixyz] = float( word )
 					# Complete coordinate ?
@@ -130,8 +130,8 @@ def ReadVrmlFile( filename ) :
 						# Next coordinate
 						ixyz += 1
 			# Color
-			elif nodes[level] == "diffuseColor" :
-				if nodes[level-1] == "Material" :
+			elif nodes[level] == 'diffuseColor' :
+				if nodes[level-1] == 'Material' :
 					# Get current value
 					vec3d[ixyz] = float( word )
 					# Complete coordinate ?
@@ -142,8 +142,8 @@ def ReadVrmlFile( filename ) :
 						# Next coordinate
 						ixyz += 1
 			# Normal
-			elif nodes[level] == "vector" :
-				if nodes[level-1] == "Normal" :
+			elif nodes[level] == 'vector' :
+				if nodes[level-1] == 'Normal' :
 					# Get current value
 					vec3d[ixyz] = float( word )
 					# Complete coordinate ?
@@ -154,22 +154,22 @@ def ReadVrmlFile( filename ) :
 						# Next coordinate
 						ixyz += 1
 			# Texture filename
-			elif nodes[level] == "ImageTexture" :
-				if previous_word == "url" :
+			elif nodes[level] == 'ImageTexture' :
+				if previous_word == 'url' :
 					if len(word) > 2 :
 						# Get texture filename
 						# Remove quotes around the filename
 						material = word[ 1 : -1 ]
 			# Texture filename
-			elif nodes[level] == "Texture2" :
-				if previous_word == "filename" :
+			elif nodes[level] == 'Texture2' :
+				if previous_word == 'filename' :
 					if len(word) > 2 :
 						# Get texture filename
 						# Remove quotes around the filename
 						material = word[ 1 : -1 ]
 			# Face
-			elif nodes[level] == "coordIndex" :
-				if nodes[level-1] == "IndexedFaceSet" :
+			elif nodes[level] == 'coordIndex' :
+				if nodes[level-1] == 'IndexedFaceSet' :
 					# -1 value
 					if ixyz == 3 :
 						# Next face
