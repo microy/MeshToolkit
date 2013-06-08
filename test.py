@@ -12,4 +12,8 @@ if __name__ == "__main__":
 	UpdateNormals( m )
 	UpdateNeighbors( m )
 	print m
-	Visualizer( mesh=m, title="Test" ).Run()
+	m = ReadVrmlFile("cube.wrl")
+	UpdateNormals( m )
+	UpdateNeighbors( m )
+	print m
+#	Visualizer( mesh=m, title="Test" ).Run()
