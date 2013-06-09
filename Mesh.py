@@ -50,8 +50,6 @@ class Mesh :
 		self.texture_name = texture_name
 		self.face_normals = face_normals
 		self.vertex_normals = vertex_normals
-		self.neighbor_faces = []
-		self.neighbor_vertices = []
 
 	#
 	# Display
@@ -65,8 +63,8 @@ class Mesh :
 			'  Vertex normals :   ' + `len(self.vertex_normals)` + '\n'\
 			'  Textures :         ' + `len(self.textures)` + '\n'\
 			'  Texture filename : ' + self.texture_name + '\n'\
-			'  Neighbors :        ' + `len( self.neighbor_vertices )`
 	        return string
+
 
 
 #--
