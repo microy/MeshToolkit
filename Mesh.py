@@ -73,7 +73,7 @@ class Mesh :
 #
 #--
 #
-# Defines a function that check several parameters
+# Defines a function that checks several parameters
 # of a given mesh
 #
 def CheckMesh( mesh ) :
