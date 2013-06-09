@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                  Vrml.py
 #                             -------------------
-#    update               : 2013-06-08
+#    update               : 2013-06-09
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -119,7 +119,16 @@ def ReadVrmlFile( filename ) :
 						ixyz += 1
 			# Face
 			elif nodes[level] == 'coordIndex' :
-				if nodes[level-1] == 'IndexedFaceSet' :
+				# Color binding
+				if previous_word == 'colorPerVertex' and word == 'TRUE' :
+					color_binding = 'PER_VERTEX'
+					continue
+				# Normal binding
+				elif previous_word == 'normalPerVertex' and word == 'TRUE' :
+					normal_binding = 'PER_VERTEX'
+					continue
+				# Face indices
+				elif nodes[level-1] == 'IndexedFaceSet' :
 					# -1 value
 					if ixyz == 3 :
 						# Next face
@@ -198,8 +207,8 @@ def ReadVrmlFile( filename ) :
 	vrmlfile.close()
 
 	# Only accept per vertex binding
-	if material_binding is not 'PER_VERTEX' : colors=[]
-	if normal_binding is not 'PER_VERTEX' : normals=[]
+#	if material_binding is not 'PER_VERTEX' : colors=[]
+#	if normal_binding is not 'PER_VERTEX' : normals=[]
 
 	#
 	# TODO: Check mesh
@@ -243,9 +252,17 @@ def WriteVrmlFile( mesh, filename ) :
 	vrmlfile.write( '  translation 0 0 0\n' )
 	vrmlfile.write( '  children [\n' )
 	vrmlfile.write( '    Shape {\n' )
-	vrmlfile.write( '      geometry IndexedFaceSet {\n' )
 
-	# Write vertex coordinates
+	# Texture filename
+	if ( len(mesh.textures) == len(mesh.vertices) ) and ( mesh.texture_name is not '' ) :
+		vrmlfile.write( '      appearance Appearance {\n' )
+		vrmlfile.write( '        texture ImageTexture {\n' )
+		vrmlfile.write( '          url "{}"\n'.format(mesh.texture_name) )
+		vrmlfile.write( '        }\n' )
+		vrmlfile.write( '      }\n' )
+
+	# Vertex coordinates
+	vrmlfile.write( '      geometry IndexedFaceSet {\n' )
 	vrmlfile.write( '        coord Coordinate {\n' )
 	vrmlfile.write( '          point [\n' )
 	for i in range( len(mesh.vertices)-1 ) :
@@ -254,12 +271,44 @@ def WriteVrmlFile( mesh, filename ) :
 	vrmlfile.write( '          ]\n' )
 	vrmlfile.write( '        }\n' )
 
-	# Write face indices
+	# Face indices
 	vrmlfile.write( '        coordIndex [\n' )
 	for i in range( len(mesh.faces)-1 ) :
 		vrmlfile.write( '            {0}, {1}, {2}, -1,\n'.format( mesh.faces[i,0], mesh.faces[i,1], mesh.faces[i,2] ) )
 	vrmlfile.write( '            {0}, {1}, {2}, -1\n'.format( mesh.faces[len(mesh.faces)-1,0], mesh.faces[len(mesh.faces)-1,1], mesh.faces[len(mesh.faces)-1,2] ) )
 	vrmlfile.write( '        ]\n' )
+
+	# Colors
+	if len(mesh.colors) == len(mesh.vertices) :
+		vrmlfile.write( '        colorPerVertex TRUE\n' )
+		vrmlfile.write( '        color Color {\n' )
+		vrmlfile.write( '          color [\n' )
+		for i in range( len(mesh.colors)-1 ) :
+			vrmlfile.write( '            {0} {1} {2},\n'.format( mesh.colors[i,0], mesh.colors[i,1], mesh.colors[i,2] ) )
+		vrmlfile.write( '            {0} {1} {2}\n'.format( mesh.colors[len(mesh.colors)-1,0], mesh.colors[len(mesh.colors)-1,1], mesh.colors[len(mesh.colors)-1,2] ) )
+		vrmlfile.write( '          ]\n' )
+		vrmlfile.write( '        }\n' )
+
+	# Vertex normals
+#	if len(mesh.vertex_normals) == len(mesh.vertices) :
+#		vrmlfile.write( '        normalPerVertex TRUE\n' )
+#		vrmlfile.write( '        normal Normal {\n' )
+#		vrmlfile.write( '          vector [\n' )
+#		for i in range( len(mesh.vertex_normals)-1 ) :
+#			vrmlfile.write( '            {0} {1} {2},\n'.format( mesh.vertex_normals[i,0], mesh.vertex_normals[i,1], mesh.vertex_normals[i,2] ) )
+#		vrmlfile.write( '            {0} {1} {2}\n'.format( mesh.vertex_normals[len(mesh.vertex_normals)-1,0], mesh.vertex_normals[len(mesh.vertex_normals)-1,1], mesh.vertex_normals[len(mesh.vertex_normals)-1,2] ) )
+#		vrmlfile.write( '          ]\n' )
+#		vrmlfile.write( '        }\n' )
+
+	# Texture coordinates
+	if ( len(mesh.textures) == len(mesh.vertices) ) and ( mesh.texture_name is not '' ) :
+		vrmlfile.write( '        texCoord TextureCoordinate {\n' )
+		vrmlfile.write( '          point [\n' )
+		for i in range( len(mesh.textures)-1 ) :
+			vrmlfile.write( '            {0} {1},\n'.format( mesh.textures[i,0], mesh.textures[i,1] ) )
+		vrmlfile.write( '            {0} {1}\n'.format( mesh.textures[len(mesh.textures)-1,0], mesh.textures[len(mesh.textures)-1,1] ) )
+		vrmlfile.write( '          ]\n' )
+		vrmlfile.write( '        }\n' )
 
 	# End description
 	vrmlfile.write( '      }\n' )

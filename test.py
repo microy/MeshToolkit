@@ -13,7 +13,8 @@ if __name__ == "__main__":
 	UpdateNormals( m )
 	UpdateNeighbors( m )
 	print m
-	m = ReadVrmlFile("cube.wrl")
+	WriteVrmlFile( m, "swirl.wrl" )
+#	m = ReadVrmlFile("cube.wrl")
 	UpdateNormals( m )
 	UpdateNeighbors( m )
 	print m
