@@ -57,7 +57,7 @@ def ReadVrmlFile( filename ) :
 	header = vrmlfile.readline().split()
 	if header[0] not in [ '#VRML', '#X3D', '#Inventor' ] :
 		vrmlfile.close()
-		return None
+		raise StandardError( 'Wrong file format !' )
 	# Read each line in the file
 	for line in vrmlfile :
 		# Empty line

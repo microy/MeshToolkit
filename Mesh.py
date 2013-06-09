@@ -78,41 +78,32 @@ class Mesh :
 #
 def CheckMesh( mesh ) :
 	# Initialisation
-	valid = True
 	vertex_number = len( mesh.vertices )
 	face_number = len( mesh.faces )
 	# Vertex number
 	if vertex_number < 3 :
-		print 'Error: Not enough vertices ({})'.format( vertex_number )
-		valid = False
+		raise StandardError( 'Error: Not enough vertices ({})'.format( vertex_number ) )
 	# Face number
 	if face_number < 1 :
-		print 'Error: Not enough faces ({})'.format( face_number )
-		valid = False
+		raise StandardError( 'Error: Not enough faces ({})'.format( face_number ) )
 	# Face normal number
 	if ( len(mesh.face_normals) > 0 ) and ( len(mesh.face_normals) != face_number ) :
-		print 'Error: Face normal number doesn\'t match face number ({}/{})'.format( len(mesh.face_normals), face_number )
-		valid = False
+		raise StandardError( 'Error: Face normal number doesn\'t match face number ({}/{})'.format( len(mesh.face_normals), face_number ) )
 	# Vertex normal number
 	if ( len(mesh.vertex_normals) > 0 ) and ( len(mesh.vertex_normals) != vertex_number ) :
-		print 'Error: Vertex normal number doesn\'t match vertex number ({}/{})'.format( len(mesh.vertex_normals), vertex_number )
-		valid = False
+		raise StandardError( 'Error: Vertex normal number doesn\'t match vertex number ({}/{})'.format( len(mesh.vertex_normals), vertex_number ) )
 	# Color number
 	if ( len(mesh.colors) > 0 ) and ( len(mesh.colors) != vertex_number ) :
-		print 'Error: Color number doesn\'t match vertex number ({}/{})'.format( len(mesh.colors), vertex_number )
-		valid = False
+		raise StandardError( 'Error: Color number doesn\'t match vertex number ({}/{})'.format( len(mesh.colors), vertex_number ) )
 	# Texture coordinate number
 	if ( len(mesh.textures) > 0 ) and ( len(mesh.textures) != vertex_number ) :
-		print 'Error: Texture coordinate number doesn\'t match vertex number ({}/{})'.format( len(mesh.textures), vertex_number )
-		valid = False
+		raise StandardError( 'Error: Texture coordinate number doesn\'t match vertex number ({}/{})'.format( len(mesh.textures), vertex_number ) )
 	# Texture filename
 	if ( len(mesh.textures) > 0 ) and ( mesh.texture_name == '' ) :
-		print 'Error: Empty texture filename'
-		valid = False
+		raise StandardError( 'Error: Empty texture filename' )
 	# Face indices
 	if ( mesh.faces < 0 ).any() or ( mesh.faces >= vertex_number ).any() :
-		print 'Error: Wrong face indices'
-		valid = False
+		raise IndexError( 'Error: Wrong face indices' )
 	# Degenerate face
 	for (i, face) in enumerate( mesh.faces ) :
 		# Calculate face normal vector           
@@ -120,14 +111,11 @@ def CheckMesh( mesh ) :
 					mesh.vertices[ face[2] ] - mesh.vertices[ face[0] ] )
 		# Normal vector length
 		if numpy.linalg.norm( face_normal ) == 0 :
-			print 'Error: Face {} is degenerate'.format(i)
-			valid = False
+			raise StandardError( 'Error: Face {} is degenerate'.format(i) )
 	# Degenerate vertex normals
 	if len(mesh.vertex_normals) > 0 :
 		for (i, normal) in enumerate( mesh.vertex_normals ) :
 			# Normal vector length
 			if numpy.linalg.norm( normal ) == 0 :
-				print 'Error: Null vertex normal {}'.format(i)
-				valid = False
-	# Return checking result
-	return valid
+				raise StandardError( 'Error: Null vertex normal {}'.format(i) )
+
