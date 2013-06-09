@@ -17,5 +17,5 @@ if __name__ == "__main__":
 	UpdateNormals( m )
 	UpdateNeighbors( m )
 	print m
-	WriteVrmlFile( m, "test.wrl" )
+	WriteVrmlFile( m, "test2.wrl" )
 #	Visualizer( mesh=m, title="Test" ).Run()

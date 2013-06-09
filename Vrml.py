@@ -32,8 +32,6 @@ from numpy import array
 #
 # Import mesh from a file in Inventor / VRML / X3D format
 #
-# TODO: Check bindings
-#
 def ReadVrmlFile( filename ) :
 	# Initialisation
 	vertices = []
@@ -51,6 +49,8 @@ def ReadVrmlFile( filename ) :
 	vec3d = [0., 0., 0.]
 	vec3i = [0, 0, 0]
 	previous_word = ''
+	color_binding=""
+	normal_binding=""
 	# Open the file
 	vrmlfile = open( filename, 'r' )
 	# Check the header
@@ -117,7 +117,22 @@ def ReadVrmlFile( filename ) :
 						ixyz = 0
 					else :
 						ixyz += 1
-			# Color
+			# Face
+			elif nodes[level] == 'coordIndex' :
+				if nodes[level-1] == 'IndexedFaceSet' :
+					# -1 value
+					if ixyz == 3 :
+						# Next face
+						ixyz = 0
+						continue
+					# Get value
+					vec3i[ixyz] = int( word )
+					# Complete coordinate ?
+					if ixyz == 2 :
+						faces.append( vec3i[:] )
+					# Next coordinate
+					ixyz += 1
+			# Color (VRML 2)
 			elif nodes[level] == 'color' :
 				if nodes[level-1] == 'Color' :
 					# Get current value
@@ -129,7 +144,7 @@ def ReadVrmlFile( filename ) :
 					else :
 						# Next coordinate
 						ixyz += 1
-			# Color
+			# Color (VRML 1)
 			elif nodes[level] == 'diffuseColor' :
 				if nodes[level-1] == 'Material' :
 					# Get current value
@@ -167,27 +182,24 @@ def ReadVrmlFile( filename ) :
 						# Get texture filename
 						# Remove quotes around the filename
 						material = word[ 1 : -1 ]
-			# Face
-			elif nodes[level] == 'coordIndex' :
-				if nodes[level-1] == 'IndexedFaceSet' :
-					# -1 value
-					if ixyz == 3 :
-						# Next face
-						ixyz = 0
-						continue
-					# Get value
-					vec3i[ixyz] = int( word )
-					# Complete coordinate ?
-					if ixyz == 2 :
-						faces.append( vec3i[:] )
-					# Next coordinate
-					ixyz += 1
+			# Color binding
+			elif nodes[level] == 'MaterialBinding' :
+				if previous_word == 'value' :
+					color_binding = word
+			# Normal binding
+			elif nodes[level] == 'NormalBinding' :
+				if previous_word == 'value' :
+					normal_binding = word
 			
 			# Save current word
 			previous_word = word
 
 	# Close the file
 	vrmlfile.close()
+
+	# Only accept per vertex binding
+	if material_binding is not 'PER_VERTEX' : colors=[]
+	if normal_binding is not 'PER_VERTEX' : normals=[]
 
 	#
 	# TODO: Check mesh
