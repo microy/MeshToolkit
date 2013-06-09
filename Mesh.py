@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2013-06-07
+#    update               : 2013-06-09
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -36,7 +36,7 @@ class Mesh :
 	#
 	# Initialisation
 	#
-	def __init__( self, name="", vertices=[], faces=[], colors=[], textures=[], face_normals=[], vertex_normals=[], texture_name="" ) :
+	def __init__( self, name='', vertices=[], faces=[], colors=[], textures=[], face_normals=[], vertex_normals=[], texture_name='' ) :
 		self.name = name
 		self.vertices = vertices
 		self.faces = faces
@@ -51,16 +51,16 @@ class Mesh :
 	#
 	# Display
 	#
-	def __repr__( self ) :
-		string = "Mesh " + self.name + "\n"\
-			"  Vertices  : " + `len(self.vertices)` + "\n"\
-			"  Faces     : " + `len(self.faces)` + "\n"\
-			"  Colors    : " + `len(self.colors)` + "\n"\
-			"  FNormals  : " + `len(self.face_normals)` + "\n"\
-			"  VNormals  : " + `len(self.vertex_normals)` + "\n"\
-			"  Textures  : " + `len(self.textures)` + "\n"\
-			"  TextFile  : " + self.texture_name + "\n"\
-			"  Neighbors : " + `len( self.neighbor_vertices )`
+	def __str__( self ) :
+		string = 'Mesh ' + self.name + '\n'\
+			'  Vertices :         ' + `len(self.vertices)` + '\n'\
+			'  Faces :            ' + `len(self.faces)` + '\n'\
+			'  Colors :           ' + `len(self.colors)` + '\n'\
+			'  Faces normals :    ' + `len(self.face_normals)` + '\n'\
+			'  Vertex normals :   ' + `len(self.vertex_normals)` + '\n'\
+			'  Textures :         ' + `len(self.textures)` + '\n'\
+			'  Texture filename : ' + self.texture_name + '\n'\
+			'  Neighbors :        ' + `len( self.neighbor_vertices )`
 	        return string
 
 
