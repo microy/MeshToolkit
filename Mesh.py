@@ -122,5 +122,12 @@ def CheckMesh( mesh ) :
 		if numpy.linalg.norm( face_normal ) == 0 :
 			print 'Error: Face {} is degenerate'.format(i)
 			valid = False
+	# Degenerate vertex normals
+	if len(mesh.vertex_normals) > 0 :
+		for (i, normal) in enumerate( mesh.vertex_normals ) :
+			# Normal vector length
+			if numpy.linalg.norm( normal ) == 0 :
+				print 'Error: Null vertex normal {}'.format(i)
+				valid = False
 	# Return checking result
 	return valid
