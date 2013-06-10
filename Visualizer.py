@@ -67,14 +67,13 @@ class Visualizer :
 		glEnable( GL_CULL_FACE )
 		glCullFace( GL_FRONT_AND_BACK )
 		glFrontFace( GL_CCW )
-		glEnableClientState( GL_VERTEX_ARRAY )
-		glEnableClientState( GL_COLOR_ARRAY )
-		glEnableClientState( GL_NORMAL_ARRAY )
+#		glEnableClientState( GL_VERTEX_ARRAY )
+#		glEnableClientState( GL_COLOR_ARRAY )
+#		glEnableClientState( GL_NORMAL_ARRAY )
 		glEnable( GL_POLYGON_SMOOTH )
 		glEnable( GL_BLEND )
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 		glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST )
-
 		# Load mesh
 		self.LoadMesh( mesh )
 
@@ -84,22 +83,22 @@ class Visualizer :
 	def LoadMesh( self, mesh=None ) :
 		# Initialisation
 		self.Close()		
-		self.VertexShaderId, self.FragmentShaderId, self.ProgramId, self.VaoId, self.BufferId, self.IndexBufferId = 0		
+		self.vertex_array_id = 0
+		self.vertex_buffer_id = 0
+		self.face_buffer_id = 0
 		self.mesh = mesh
+		# Return if no mesh
 		if mesh is None : pass
-		# Vertex Buffer Object
-		glGenVertexArrays( 1, VaoId )
-		glBindVertexArray( VaoId )
-		glGenBuffers( 1, BufferId )
-		glBindBuffer( GL_ARRAY_BUFFER, BufferId )
+		# Vertex Array Object
+		glGenVertexArrays( 1, vertex_array_id )
+		glBindVertexArray( vertex_array_id )
+		# Vertex buffer object
+		glGenBuffers( 1, vertex_buffer_id )
+		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer_id )
 		glBufferData( GL_ARRAY_BUFFER, len(mesh.vertices), mesh.vertices, GL_STATIC_DRAW )
-#		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VertexSize, 0)
-#		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VertexSize, (GLvoid*)RgbOffset)
-#		glEnableVertexAttribArray(0)
-#		glEnableVertexAttribArray(1)
-		# Index Buffer Object
-		glGenBuffers( 2, IndexBufferId )
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId )
+		# Face buffer object
+		glGenBuffers( 2, face_buffer_id )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, face_buffer_id )
 		glBufferData( GL_ELEMENT_ARRAY_BUFFER, len(mesh.faces), mesh.faces, GL_STATIC_DRAW )
 
 
@@ -171,15 +170,10 @@ class Visualizer :
 		# Is there a mesh to display ?
 		if mesh is None : pass
 
-#		glutWireCube(1)
+		glBindVertexArray( self.vertex_array_id )
+		glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_INT, 0 )
+		glBindVertexArray (0);
 
-#		glVertexPointer( 3, GL_FLOAT, 0, mesh.vertices )
-#		glColorPointer( 3, GL_FLOAT, 0, mesh.colors )
-#		glNormalPointer( GL_FLOAT, 0, mesh.vertex_normals )
-		# Draw the triangles !
-		glDrawElements( GL_TRIANGLES, len(mesh.faces), GL_INT, mesh.faces )
-
-#		glFlush()
 		glutSwapBuffers()
 		glutPostRedisplay()
 
@@ -198,12 +192,12 @@ class Visualizer :
 		# Destroy Buffer Objects
 #		glDisableVertexAttribArray(1);
 #		glDisableVertexAttribArray(0);
-		glBindBuffer( GL_ARRAY_BUFFER, 0 )
-		glDeleteBuffers( 1, self.BufferId )
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
-		glDeleteBuffers( 2, self.IndexBufferId )
-		glBindVertexArray( 0 )
-		glDeleteVertexArrays( 1, self.VaoId )
+#		glBindBuffer( GL_ARRAY_BUFFER, 0 )
+#		glDeleteBuffers( 1, self.BufferId )
+#		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
+#		glDeleteBuffers( 2, self.IndexBufferId )
+#		glBindVertexArray( 0 )
+#		glDeleteVertexArrays( 1, self.VaoId )
 
 	#
 	# TrackballMapping
