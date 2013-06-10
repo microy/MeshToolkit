@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Visualizer.py
 #                             -------------------
-#    update               : 2013-06-07
+#    update               : 2013-06-10
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -39,29 +39,69 @@ class Visualizer :
 	# Initialisation
 	#
 	def __init__( self, mesh=None, title="Untitled Window", width=640, height=480 ) :
-		self.LoadMesh( mesh )
+		# Initialise member variables
 		self.width  = width
 		self.height = height
 		self.keybindings = {chr(27):exit}
 		self.trackball_transform = numpy.identity( 4 )
+		# Initialise OpenGL / GLUT
 		glutInit()
+		glutInitContextVersion( 3, 3 )
+		glutInitContextFlags( GLUT_FORWARD_COMPATIBLE )
+		glutInitContextProfile( GLUT_CORE_PROFILE )
 		glutInitWindowSize( self.width, self.height )
 		glutCreateWindow( title )
 		glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH )
 		glClearColor( 0, 0, 0, 0 )
+		# GLUT function binding
 		glutReshapeFunc( self.Reshape )
 		glutKeyboardFunc( self.Keyboard )
 		glutDisplayFunc( self.Display )
 		glutMouseFunc( self.Mouse )
+		glutIdleFunc( self.Idle )
+		glutCloseFunc( self.Close )
+		# OpenGL parameters
 		glShadeModel( GL_FLAT )
+		glEnable( GL_DEPTH_TEST )
+		glDepthFunc( GL_LESS )
+		glEnable( GL_CULL_FACE )
+		glCullFace( GL_FRONT_AND_BACK )
+		glFrontFace( GL_CCW )
+		glEnableClientState( GL_VERTEX_ARRAY )
+		glEnableClientState( GL_COLOR_ARRAY )
+		glEnableClientState( GL_NORMAL_ARRAY )
+		glEnable( GL_POLYGON_SMOOTH )
+		glEnable( GL_BLEND )
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
+		glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST )
+
+		# Load mesh
+		self.LoadMesh( mesh )
 
 	#
 	# Load mesh
 	#
-	def LoadMesh( self, mesh ) :
+	def LoadMesh( self, mesh=None ) :
+		# Initialisation
+		self.Close()		
+		self.VertexShaderId, self.FragmentShaderId, self.ProgramId, self.VaoId, self.BufferId, self.IndexBufferId = 0		
 		self.mesh = mesh
 		if mesh is None : pass
-		pass
+		# Vertex Buffer Object
+		glGenVertexArrays( 1, VaoId )
+		glBindVertexArray( VaoId )
+		glGenBuffers( 1, BufferId )
+		glBindBuffer( GL_ARRAY_BUFFER, BufferId )
+		glBufferData( GL_ARRAY_BUFFER, len(mesh.vertices), mesh.vertices, GL_STATIC_DRAW )
+#		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VertexSize, 0)
+#		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VertexSize, (GLvoid*)RgbOffset)
+#		glEnableVertexAttribArray(0)
+#		glEnableVertexAttribArray(1)
+		# Index Buffer Object
+		glGenBuffers( 2, IndexBufferId )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId )
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, len(mesh.faces), mesh.faces, GL_STATIC_DRAW )
+
 
 	#
 	# Keyboard
@@ -120,24 +160,57 @@ class Visualizer :
 	# Display
 	#
 	def Display( self ):
-		# Clear all pixels
-		glClear(GL_COLOR_BUFFER_BIT)
-		# Draw white polygon (rectangle) with corners at (0.25, 0.25, 0) and (0.75, 0.75, 0)
+		# Initialisation
+		# Clear all pixels and depth buffer
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 		glColor3f(1, 1, 1)
 		glLoadIdentity()
 		gluLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0)
 		glScalef(1, 2, 1)
-		glutWireCube(1)
-		glFlush()
 
-	#--
+		# Is there a mesh to display ?
+		if mesh is None : pass
+
+#		glutWireCube(1)
+
+#		glVertexPointer( 3, GL_FLOAT, 0, mesh.vertices )
+#		glColorPointer( 3, GL_FLOAT, 0, mesh.colors )
+#		glNormalPointer( GL_FLOAT, 0, mesh.vertex_normals )
+		# Draw the triangles !
+		glDrawElements( GL_TRIANGLES, len(mesh.faces), GL_INT, mesh.faces )
+
+#		glFlush()
+		glutSwapBuffers()
+		glutPostRedisplay()
+
+	#
+	# Idle
+	#
+	def Idle( self ):
+		glutPostRedisplay()
+
+
+	#
+	# Close
+	#
+	def Close( self ):
+		# TODO:
+		# Destroy Buffer Objects
+#		glDisableVertexAttribArray(1);
+#		glDisableVertexAttribArray(0);
+		glBindBuffer( GL_ARRAY_BUFFER, 0 )
+		glDeleteBuffers( 1, self.BufferId )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
+		glDeleteBuffers( 2, self.IndexBufferId )
+		glBindVertexArray( 0 )
+		glDeleteVertexArrays( 1, self.VaoId )
+
 	#
 	# TrackballMapping
 	#
-	#--
-	# Adapted from Nate Robins programs
-	# http://www.xmission.com/~nate
-	def TrackballMapping( x, y ) :
+	def TrackballMapping( self, x, y ) :
+		# Adapted from Nate Robins' programs
+		# http://www.xmission.com/~nate
 		v = numpy.zeros( 3 )
 		v[0] = ( 2.0 * float(x) - float(self.width) ) / float(self.width)
 		v[1] = ( float(self.height) - 2.0 * float(y) ) / float(self.height)
