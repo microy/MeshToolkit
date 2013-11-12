@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Visualizer.py
 #                             -------------------
-#    update               : 2013-06-10
+#    update               : 2013-11-12
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -22,8 +22,7 @@
 # External dependencies
 #
 import OpenGL
-OpenGL.ERROR_CHECKING = False
-OpenGL.ERROR_LOGGING = False
+OpenGL.FORWARD_COMPATIBLE_ONLY = True
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -32,27 +31,63 @@ import math
 import numpy
 
 
+#
+# Vertex shader code
+#
+vertex_shader_source = '''
+#version 330
+ 
+in vec4 position;
+void main()
+{
+	gl_Position = position;
+}
+'''
+
+
+#
+# Fragment shader code
+#
+fragment_shader_source = '''
+#version 330
+ 
+void main()
+{
+	gl_FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+}
+'''
+
+
+
+#--
+#
+# Visualizer
+#
+#--
+#
+# Displaying a mesh with OpenGL 3.3+
+#
 class Visualizer :
 
 
 	#
 	# Initialisation
 	#
-	def __init__( self, mesh=None, title="Untitled Window", width=640, height=480 ) :
+	def __init__( self, mesh=None, title="Untitled Window", width=1024, height=768 ) :
 		# Initialise member variables
+		self.mesh = None
 		self.width  = width
 		self.height = height
-		self.keybindings = {chr(27):exit}
 		self.trackball_transform = numpy.identity( 4 )
+		self.vertex_array_id = 0
+		self.vertex_buffer_id = 0
+		self.face_buffer_id = 0
+		self.normal_buffer_id = 0
 		# Initialise OpenGL / GLUT
 		glutInit()
-		glutInitContextVersion( 3, 3 )
-		glutInitContextFlags( GLUT_FORWARD_COMPATIBLE )
-		glutInitContextProfile( GLUT_CORE_PROFILE )
 		glutInitWindowSize( self.width, self.height )
 		glutCreateWindow( title )
 		glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH )
-		glClearColor( 0, 0, 0, 0 )
 		# GLUT function binding
 		glutReshapeFunc( self.Reshape )
 		glutKeyboardFunc( self.Keyboard )
@@ -60,46 +95,68 @@ class Visualizer :
 		glutMouseFunc( self.Mouse )
 		glutIdleFunc( self.Idle )
 		glutCloseFunc( self.Close )
-		# OpenGL parameters
-		glShadeModel( GL_FLAT )
-		glEnable( GL_DEPTH_TEST )
-		glDepthFunc( GL_LESS )
-		glEnable( GL_CULL_FACE )
-		glCullFace( GL_FRONT_AND_BACK )
-		glFrontFace( GL_CCW )
-#		glEnableClientState( GL_VERTEX_ARRAY )
-#		glEnableClientState( GL_COLOR_ARRAY )
-#		glEnableClientState( GL_NORMAL_ARRAY )
-		glEnable( GL_POLYGON_SMOOTH )
-		glEnable( GL_BLEND )
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
-		glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST )
+		# Color configuration
+		glClearColor( 1, 1, 1, 1 )
+		# Create and compile GLSL program
+		global vertex_shader_source, fragment_shader_source
+		self.program_id = self.LoadShaders( vertex_shader_source, fragment_shader_source )
 		# Load mesh
-		self.LoadMesh( mesh )
+		if mesh : self.LoadMesh( mesh )
+
+
+	#
+	# Load OpenGL shaders
+	#
+	def LoadShaders( self, vertex_source, fragment_source ) :
+		# Compile vertex shader
+		vertex_shader = glCreateShader( GL_VERTEX_SHADER )
+		glShaderSource( vertex_shader, vertex_source )
+		glCompileShader( vertex_shader )
+		# Check vertex shader
+		if not glGetShaderiv( vertex_shader, GL_COMPILE_STATUS ) :
+			print '~~~ Vertex shader info log :\n' + glGetShaderInfoLog( vertex_shader )
+		# Compile fragment shader
+		fragment_shader = glCreateShader( GL_FRAGMENT_SHADER )
+		glShaderSource( fragment_shader, fragment_source )
+		glCompileShader( fragment_shader )
+		# Check fragment shader
+		if not glGetShaderiv( fragment_shader, GL_COMPILE_STATUS ) :
+			print '~~~ Fragment shader info log :\n' + glGetShaderInfoLog( fragment_shader )
+		# Link the program
+		program_id = glCreateProgram()
+		glAttachShader( program_id, vertex_shader )
+		glAttachShader( program_id, fragment_shader )
+		glLinkProgram( program_id )
+		# Check the program
+		if not glGetProgramiv( program_id, GL_LINK_STATUS ) :
+			print '~~~ Shader program info log :\n' + glGetProgramInfoLog( program_id )
+		# Delete the shaders
+		glDeleteShader( vertex_shader )
+		glDeleteShader( fragment_shader )
+		return program_id
+
 
 	#
 	# Load mesh
 	#
-	def LoadMesh( self, mesh=None ) :
+	def LoadMesh( self, mesh ) :
 		# Initialisation
-		self.Close()		
-		self.vertex_array_id = 0
-		self.vertex_buffer_id = 0
-		self.face_buffer_id = 0
 		self.mesh = mesh
-		# Return if no mesh
-		if mesh is None : pass
-		# Vertex Array Object
-		glGenVertexArrays( 1, vertex_array_id )
-		glBindVertexArray( vertex_array_id )
+		# Vertex array object
+		self.vertex_array_id = glGenVertexArrays( 1 )
+		glBindVertexArray( self.vertex_array_id )
 		# Vertex buffer object
-		glGenBuffers( 1, vertex_buffer_id )
-		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer_id )
-		glBufferData( GL_ARRAY_BUFFER, len(mesh.vertices), mesh.vertices, GL_STATIC_DRAW )
+		self.vertex_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
+		glBufferData( GL_ARRAY_BUFFER, mesh.vertices, GL_STATIC_DRAW )
+		# Normal buffer object
+		self.normal_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ARRAY_BUFFER, self.normal_buffer_id )
+		glBufferData( GL_ARRAY_BUFFER, mesh.vertex_normals, GL_STATIC_DRAW )
 		# Face buffer object
-		glGenBuffers( 2, face_buffer_id )
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, face_buffer_id )
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, len(mesh.faces), mesh.faces, GL_STATIC_DRAW )
+		self.face_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, mesh.faces, GL_STATIC_DRAW )
 
 
 	#
@@ -155,49 +212,56 @@ class Visualizer :
 		glMatrixMode( GL_MODELVIEW )
 		glLoadIdentity()
 
+
 	#
 	# Display
 	#
 	def Display( self ):
-		# Initialisation
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
-		glColor3f(1, 1, 1)
-		glLoadIdentity()
-		gluLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0)
-		glScalef(1, 2, 1)
-
 		# Is there a mesh to display ?
-		if mesh is None : pass
-
-		glBindVertexArray( self.vertex_array_id )
-		glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_INT, 0 )
-		glBindVertexArray (0);
-
+		if self.mesh is None : pass
+                # Shader program
+                glUseProgram( self.program_id )
+		# Vertex buffer
+		glEnableVertexAttribArray( 0 )
+		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
+		# Normal buffer
+		glEnableVertexAttribArray( 1 )
+		glBindBuffer( GL_ARRAY_BUFFER, self.normal_buffer_id )
+		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
+		# Face buffer
+                glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
+		# Draw the mesh
+		glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_UNSIGNED_INT, 0 )
+		# Cleanup
+                glDisableVertexAttribArray( 0 )
+                glDisableVertexAttribArray( 1 )
+                # Swap buffers
 		glutSwapBuffers()
 		glutPostRedisplay()
+
 
 	#
 	# Idle
 	#
-	def Idle( self ):
+	def Idle( self ) :
 		glutPostRedisplay()
 
 
 	#
 	# Close
 	#
-	def Close( self ):
-		# TODO:
-		# Destroy Buffer Objects
-#		glDisableVertexAttribArray(1);
-#		glDisableVertexAttribArray(0);
-#		glBindBuffer( GL_ARRAY_BUFFER, 0 )
-#		glDeleteBuffers( 1, self.BufferId )
-#		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
-#		glDeleteBuffers( 2, self.IndexBufferId )
-#		glBindVertexArray( 0 )
-#		glDeleteVertexArrays( 1, self.VaoId )
+	def Close( self ) :
+		# Delete buffer objects
+		glDeleteBuffers( 1, [ self.vertex_buffer_id ] )
+		glDeleteBuffers( 1, [ self.normal_buffer_id ] )
+		glDeleteBuffers( 1, [ self.face_buffer_id ] )
+		# Delete vertex array
+		glDeleteVertexArrays( 1, [ self.vertex_array_id ] )
+		# Delete shader program
+		glDeleteProgram( self.program_id )
 
 	#
 	# TrackballMapping
