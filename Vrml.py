@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                  Vrml.py
 #                             -------------------
-#    update               : 2013-06-09
+#    update               : 2013-11-12
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -21,8 +21,9 @@
 #
 # External dependencies
 #
-from Mesh import Mesh
-from numpy import array
+from Mesh import *
+from numpy import *
+
 
 #--
 #
@@ -215,9 +216,9 @@ def ReadVrmlFile( filename ) :
 	#
 
 	# Return the final mesh
-	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
-		vertex_normals=array(normals), colors=array(colors),
-		textures=array(texcoords), texture_name=material )
+	return Mesh( name=filename, vertices=array(vertices, dtype=float32), faces=array(faces, dtype=uint32),
+		vertex_normals=array(normals, dtype=float32), colors=array(colors, dtype=float32),
+		textures=array(texcoords, dtype=float32), texture_name=material )
 
 
 #--
