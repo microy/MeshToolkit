@@ -27,6 +27,7 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
+from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from Core.Mesh import *
 from Frame import *
@@ -103,6 +104,10 @@ class Viewer( Frame ) :
 		glBindBuffer( GL_ARRAY_BUFFER, 0 )
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
 		glBindVertexArray( 0 )
+		# Error checkup
+		error = glGetError()
+		if error != GL_NO_ERROR :
+			raise RuntimeError( gluErrorString(error) )
 
 
 	#
@@ -142,4 +147,9 @@ class Viewer( Frame ) :
 		glDeleteBuffers( 1, numpy.array([ self.color_buffer_id ]) )
 		# Delete vertex array
 		glDeleteVertexArrays( 1, numpy.array([ self.vertex_array_id ]) )
+		# Error checkup
+		error = glGetError()
+		if error != GL_NO_ERROR :
+			raise RuntimeError( gluErrorString(error) )
+
 
