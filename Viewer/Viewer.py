@@ -111,6 +111,8 @@ class Viewer( Frame ) :
 	def Display( self ) :
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+		# Framerate counter
+		self.frame_count += 1
 		# Is there a mesh to display ?
 		if self.mesh :
 		        # Use the shader program

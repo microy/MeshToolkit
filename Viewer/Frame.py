@@ -49,8 +49,10 @@ class Frame :
 	#
 	def __init__( self, title="Untitled Window", width=1024, height=768 ) :
 		# Initialise member variables
+		self.title = title
 		self.width  = width
 		self.height = height
+		self.frame_count = 0
 		self.trackball_transform = numpy.identity( 4 )
 		# Initialise OpenGL / GLUT
 		glutInit()
@@ -58,12 +60,13 @@ class Frame :
 		glutCreateWindow( title )
 		glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH )
 		# GLUT function binding
-		glutReshapeFunc( self.Reshape )
-		glutKeyboardFunc( self.Keyboard )
-		glutDisplayFunc( self.Display )
-		glutMouseFunc( self.Mouse )
-		glutIdleFunc( self.Idle )
 		glutCloseFunc( self.Close )
+		glutDisplayFunc( self.Display )
+		glutIdleFunc( self.Idle )
+		glutKeyboardFunc( self.Keyboard )
+		glutMouseFunc( self.Mouse )
+		glutReshapeFunc( self.Reshape )
+		glutTimerFunc( 0, self.Timer, 0 )
 		# Color configuration
 		glClearColor( 1, 1, 1, 1 )
 		# Checkup
@@ -127,6 +130,8 @@ class Frame :
 	def Display( self ) :
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+		# Framerate counter
+		self.frame_count += 1
 		# Swap buffers
 		glutSwapBuffers()
 		glutPostRedisplay()
@@ -159,6 +164,18 @@ class Frame :
 		if d > 1.0 : d = 1.0
 		v[2] = math.cos( math.pi / 2.0 * d );
 		return v / numpy.linalg.norm(v)
+
+
+	#
+	# Timer
+	#
+	def Timer( self, value ) :
+		if value :
+			title = self.title + ' - {} FPS @ {} x {}'.format( self.frame_count * 4, self.width, self.height )
+			glutSetWindowTitle( title )     
+		self.frame_count = 0
+		glutTimerFunc( 250, self.Timer, 1 )
+	
 
 	#
 	# Run
