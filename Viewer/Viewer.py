@@ -110,10 +110,14 @@ class Viewer( Frame ) :
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 		# Is there a mesh to display ?
 		if self.mesh :
+		        # Use the shader program
+		        glUseProgram( self.shader_program_id )
 			# Draw the mesh
 			glBindVertexArray( self.vertex_array_id )
 			glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_UNSIGNED_INT, 0 )
+			# Cleanup
 			glBindVertexArray( 0 )
+			glUseProgram( 0 )
                 # Swap buffers
 		glutSwapBuffers()
 		glutPostRedisplay()

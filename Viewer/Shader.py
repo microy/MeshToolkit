@@ -96,8 +96,6 @@ def LoadShaders() :
 	# Check the program
 	if not glGetProgramiv( program_id, GL_LINK_STATUS ) :
 		raise RuntimeError( glGetProgramInfoLog( program_id ) )
-        # Use the shader program
-        glUseProgram( program_id )
 	# Delete the shaders
 	glDeleteShader( vertex_shader )
 	glDeleteShader( fragment_shader )
