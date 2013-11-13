@@ -96,7 +96,7 @@ class Viewer( Frame ) :
 		glBufferData( GL_ARRAY_BUFFER, mesh.colors, GL_STATIC_DRAW )
 		glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
 		glEnableVertexAttribArray( 2 )
-		# Cleanup
+		# Release the bindings
 		glBindBuffer( GL_ARRAY_BUFFER, 0 )
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
 		glBindVertexArray( 0 )
@@ -105,7 +105,7 @@ class Viewer( Frame ) :
 	#
 	# Display
 	#
-	def Display( self ):
+	def Display( self ) :
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 		# Is there a mesh to display ?
@@ -115,10 +115,10 @@ class Viewer( Frame ) :
 			# Draw the mesh
 			glBindVertexArray( self.vertex_array_id )
 			glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_UNSIGNED_INT, 0 )
-			# Cleanup
+			# Release the bindings
 			glBindVertexArray( 0 )
 			glUseProgram( 0 )
-                # Swap buffers
+		# Swap buffers
 		glutSwapBuffers()
 		glutPostRedisplay()
 

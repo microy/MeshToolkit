@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                  Vrml.py
 #                             -------------------
-#    update               : 2013-11-12
+#    update               : 2013-11-13
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -58,7 +58,7 @@ def ReadVrmlFile( filename ) :
 	header = vrmlfile.readline().split()
 	if header[0] not in [ '#VRML', '#X3D', '#Inventor' ] :
 		vrmlfile.close()
-		raise StandardError( 'Wrong file format !' )
+		raise RuntimeError( 'Wrong file format !' )
 	# Read each line in the file
 	for line in vrmlfile :
 		# Empty line
@@ -234,18 +234,17 @@ def WriteVrmlFile( mesh, filename ) :
 	# Open the file
 	vrmlfile = open( filename, 'w' )
 
-	#
-	# TODO: Check mesh/file
-	# 
-
-
 	# Write file Header
 	vrmlfile.write( '#VRML V2.0 utf8\n\n' );
 
-	# Write vertex number (comment)
-	vrmlfile.write( '# Vertices:  {}\n'.format(len(mesh.vertices)) )
-	# Write face number (comment)
-	vrmlfile.write( '# Faces:     {}\n\n'.format(len(mesh.faces)) )
+	# Write comments
+	vrmlfile.write( '# Vertices : {}\n'.format(len(mesh.vertices)) )
+	vrmlfile.write( '# Faces    : {}\n'.format(len(mesh.faces)) )
+	if len(mesh.colors) == len(mesh.vertices) :
+		vrmlfile.write( '# Colors   : {}\n'.format(len(mesh.colors)) )
+	if ( len(mesh.textures) == len(mesh.vertices) ) and ( mesh.texture_name is not '' ) :
+		vrmlfile.write( '# Texture  : {}\n'.format(mesh.texture_name) )
+	vrmlfile.write( '\n' )
 
 	# Begin description
 	vrmlfile.write( 'Transform {\n' )

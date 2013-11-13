@@ -121,10 +121,10 @@ class Frame :
 	#
 	# Display
 	#
-	def Display( self ):
+	def Display( self ) :
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
-                # Swap buffers
+		# Swap buffers
 		glutSwapBuffers()
 		glutPostRedisplay()
 
@@ -161,6 +161,6 @@ class Frame :
 	# Run
 	#
 	@staticmethod
-	def Run():
+	def Run() :
 		# Start up the main loop
 		glutMainLoop()
