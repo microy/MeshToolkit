@@ -28,6 +28,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from Mesh import *
 from Shader import *
+from Transformation import *
 import math
 import numpy
 
@@ -110,6 +111,10 @@ class Visualizer :
 		glBufferData( GL_ARRAY_BUFFER, mesh.colors, GL_STATIC_DRAW )
 		glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
 		glEnableVertexAttribArray( 2 )
+		# Cleanup
+		glBindBuffer( GL_ARRAY_BUFFER, 0 )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
+		glBindVertexArray( 0 )
 
 
 	#
@@ -171,9 +176,8 @@ class Visualizer :
 			glBindVertexArray( self.vertex_array_id )
 			glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_UNSIGNED_INT, 0 )
                 # Swap buffers
-#		glutSwapBuffers()
-#		glutPostRedisplay()
-		glFlush()
+		glutSwapBuffers()
+		glutPostRedisplay()
 
 
 	#
