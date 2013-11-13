@@ -8,9 +8,9 @@ Implement a triangular mesh processing library in Python for research purpose.
 - OpenGL 3.3 (via PyOpenGL 3.1)
 - Glut 3.7 (or FreeGLUT 2.6)
 
-## Contacts :
+## Contact :
 
-- Michaël Roy
+Michaël Roy
 microygh@gmail.com
 
 
