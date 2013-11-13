@@ -13,6 +13,6 @@ Implement a triangular mesh processing library in Python for research purpose.
 
 Michaël Roy
 
-microygh@gmail.com
+	microygh@gmail.com
 
 
