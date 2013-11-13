@@ -83,9 +83,9 @@ def LoadShaders() :
 	glCompileShader( fragment_shader )
 	# Check the shaders
 	if not glGetShaderiv( vertex_shader, GL_COMPILE_STATUS ) :
-		print '~~~ Vertex shader error :\n' + glGetShaderInfoLog( vertex_shader )
+		raise RuntimeError( glGetShaderInfoLog( vertex_shader ) )
 	if not glGetShaderiv( fragment_shader, GL_COMPILE_STATUS ) :
-		print '~~~ Fragment shader error :\n' + glGetShaderInfoLog( fragment_shader )
+		raise RuntimeError( glGetShaderInfoLog( fragment_shader ) )
 	# Create the program
 	program_id = glCreateProgram()
 	# Attach the shaders to the program
@@ -95,7 +95,7 @@ def LoadShaders() :
 	glLinkProgram( program_id )
 	# Check the program
 	if not glGetProgramiv( program_id, GL_LINK_STATUS ) :
-		print '~~~ Shader program error :\n' + glGetProgramInfoLog( program_id )
+		raise RuntimeError( glGetProgramInfoLog( program_id ) )
         # Use the shader program
         glUseProgram( program_id )
 	# Delete the shaders
