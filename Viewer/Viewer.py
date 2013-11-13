@@ -113,6 +113,7 @@ class Viewer( Frame ) :
 			# Draw the mesh
 			glBindVertexArray( self.vertex_array_id )
 			glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_UNSIGNED_INT, 0 )
+			glBindVertexArray( 0 )
                 # Swap buffers
 		glutSwapBuffers()
 		glutPostRedisplay()
