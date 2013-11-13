@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*- 
 
 # ***************************************************************************
-#                                Visualizer.py
+#                                  Viewer.py
 #                             -------------------
 #    update               : 2013-11-13
 #    copyright            : (C) 2013 by Michaël Roy
@@ -26,7 +26,7 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-from Mesh import *
+from Core.Mesh import *
 from Shader import *
 from Transformation import *
 import math
@@ -36,13 +36,13 @@ import numpy
 
 #--
 #
-# Visualizer
+# Viewer
 #
 #--
 #
 # Display a mesh with OpenGL
 #
-class Visualizer :
+class Viewer :
 
 
 	#

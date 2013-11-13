@@ -1,16 +1,14 @@
 #! /usr/bin/env python
 
-from Mesh import *
-from Vrml import *
-from Visualizer import *
-from Normal import *
-from Neighbor import *
+from Core.Mesh import *
+from Core.Vrml import *
+from Viewer.Viewer import *
 
 if __name__ == "__main__":
 
-	m = ReadVrmlFile("swirl.wrl")
+	m = ReadVrmlFile("Data/swirl.wrl")
 	UpdateNormals( m )
 	UpdateNeighbors( m )
 	print m
 #	CheckMesh( m )
-	Visualizer( mesh=m, title="Test" ).Run()
+	Viewer( mesh=m, title="Test" ).Run()
