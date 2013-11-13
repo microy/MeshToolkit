@@ -5,7 +5,6 @@ from Vrml import *
 from Visualizer import *
 from Normal import *
 from Neighbor import *
-import time
 
 if __name__ == "__main__":
 
