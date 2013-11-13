@@ -55,14 +55,15 @@ class Mesh :
 	# Display
 	#
 	def __str__( self ) :
-		string = 'Mesh ' + self.name + '\n'\
-			'  Vertices            ' + `len(self.vertices)` + '\n'\
-			'  Faces               ' + `len(self.faces)` + '\n'\
-			'  Colors              ' + `len(self.colors)` + '\n'\
-			'  Faces normals       ' + `len(self.face_normals)` + '\n'\
-			'  Vertex normals      ' + `len(self.vertex_normals)` + '\n'\
-			'  Textures            ' + `len(self.textures)` + '\n'\
-			'  Texture filename    ' + self.texture_name
+		string = '~~~ Mesh Informations ~~~\n' +\
+			'  Filename :         ' + self.name + '\n'\
+			'  Vertices :         ' + `len(self.vertices)` + '\n'\
+			'  Faces :            ' + `len(self.faces)` + '\n'\
+			'  Colors :           ' + `len(self.colors)` + '\n'\
+			'  Faces normals :    ' + `len(self.face_normals)` + '\n'\
+			'  Vertex normals :   ' + `len(self.vertex_normals)` + '\n'\
+			'  Textures :         ' + `len(self.textures)` + '\n'\
+			'  Texture filename : ' + self.texture_name
 	        return string
 
 

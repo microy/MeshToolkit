@@ -65,10 +65,10 @@ class Frame :
 		glClearColor( 1, 1, 1, 1 )
 		# Checkup
 		print '~~~ OpenGL Informations ~~~'
-		print ' Vendor   : ' + glGetString( GL_VENDOR )
-		print ' Renderer : ' + glGetString( GL_RENDERER )
-		print ' Version  : ' + glGetString( GL_VERSION )
-		print ' Shader   : ' + glGetString( GL_SHADING_LANGUAGE_VERSION )
+		print '  Vendor :   ' + glGetString( GL_VENDOR )
+		print '  Renderer : ' + glGetString( GL_RENDERER )
+		print '  Version :  ' + glGetString( GL_VERSION )
+		print '  Shader :   ' + glGetString( GL_SHADING_LANGUAGE_VERSION )
 
 
 	#
