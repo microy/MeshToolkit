@@ -23,6 +23,9 @@
 #
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
+#OpenGL.ERROR_CHECKING = False
+#OpenGL.ERROR_LOGGING = False
+OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from Core.Mesh import *
@@ -131,10 +134,10 @@ class Viewer( Frame ) :
 		glUseProgram( 0 )
 		glDeleteProgram( self.shader_program_id )
 		# Delete buffer objects
-		glDeleteBuffers( 1, [ self.face_buffer_id ] )
-		glDeleteBuffers( 1, [ self.vertex_buffer_id ] )
-		glDeleteBuffers( 1, [ self.normal_buffer_id ] )
-		glDeleteBuffers( 1, [ self.color_buffer_id ] )
+		glDeleteBuffers( 1, numpy.array([ self.face_buffer_id ]) )
+		glDeleteBuffers( 1, numpy.array([ self.vertex_buffer_id ]) )
+		glDeleteBuffers( 1, numpy.array([ self.normal_buffer_id ]) )
+		glDeleteBuffers( 1, numpy.array([ self.color_buffer_id ]) )
 		# Delete vertex array
-		glDeleteVertexArrays( 1, [ self.vertex_array_id ] )
+		glDeleteVertexArrays( 1, numpy.array([ self.vertex_array_id ]) )
 

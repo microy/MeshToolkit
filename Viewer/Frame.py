@@ -23,6 +23,9 @@
 #
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
+#OpenGL.ERROR_CHECKING = False
+#OpenGL.ERROR_LOGGING = False
+OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 import math
