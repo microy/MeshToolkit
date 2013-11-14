@@ -11,7 +11,6 @@ Implement a triangular mesh processing library in Python for research purpose.
 
 ## Contact :
 
-Michaël Roy
-  microygh@gmail.com
+Michaël Roy : microygh@gmail.com
 
 
