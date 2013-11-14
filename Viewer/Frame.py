@@ -28,9 +28,10 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-import math
-import numpy
-
+from math import *
+from numpy import *
+from Shader import *
+from Transformation import *
 
 
 #--
@@ -53,7 +54,14 @@ class Frame :
 		self.width  = width
 		self.height = height
 		self.frame_count = 0
-		self.trackball_transform = numpy.identity( 4 )
+		self.projection_matrix_id = 0
+		self.view_matrix_id = 0
+		self.model_matrix_id = 0
+		self.shader_program_id = 0
+		self.projection_matrix = identity( 4, dtype=float32 )
+		self.view_matrix = identity( 4, dtype=float32 )
+		self.model_matrix = identity( 4, dtype=float32 )
+		self.trackball_transform = identity( 4, dtype=float32 )
 		# Initialise OpenGL / GLUT
 		glutInit()
 		glutInitWindowSize( self.width, self.height )
@@ -68,8 +76,31 @@ class Frame :
 		glutReshapeFunc( self.Reshape )
 		glutTimerFunc( 0, self.Timer, 0 )
 		# Color configuration
-		glClearColor( 1, 1, 1, 1 )
-		# Checkup
+#		glClearColor( 1, 1, 1, 1 )
+		glEnable( GL_DEPTH_TEST )
+		glDepthFunc( GL_LESS )
+		glEnable( GL_CULL_FACE )
+		glCullFace( GL_BACK )
+		glFrontFace( GL_CCW )
+		# Initialise view matrix
+		TranslateMatrix( self.view_matrix, 0, 0, -2 )
+		# Create and compile GLSL program
+		self.shader_program_id = LoadShaders()
+		model_matrix_id = glGetUniformLocation( self.shader_program_id, "ModelMatrix" )
+		view_matrix_id = glGetUniformLocation( self.shader_program_id, "ViewMatrix" )
+		projection_matrix_id = glGetUniformLocation( self.shader_program_id, "ProjectionMatrix" )
+		# Error checkup
+		error = glGetError()
+		if error != GL_NO_ERROR :
+			raise RuntimeError( gluErrorString(error) )
+
+
+
+
+	#
+	# PrintInfo
+	#
+	def PrintInfo( self ) :
 		print '~~~ OpenGL Informations ~~~'
 		print '  Vendor :   ' + glGetString( GL_VENDOR )
 		print '  Renderer : ' + glGetString( GL_RENDERER )
@@ -82,6 +113,7 @@ class Frame :
 	#
 	def Keyboard( self, key, mouseX, mouseY ) :
 		glutPostRedisplay()
+
 
 	#
 	# Mouse
@@ -97,11 +129,13 @@ class Frame :
 			raise ValueError(button)
 		glutPostRedisplay()
 
+
 	#
 	# MouseLeftClick
 	#
 	def MouseLeftClick( self, x, y ) :
 		pass
+
 
 	#
 	# MouseMiddleClick
@@ -109,11 +143,13 @@ class Frame :
 	def MouseMiddleClick( self, x, y ) :
 		pass
 
+
 	#
 	# MouseRightClick
 	#
 	def MouseRightClick( self, x, y ) :
 		pass
+
 
 	#
 	# Reshape
@@ -122,6 +158,10 @@ class Frame :
 		self.width  = width
 		self.height = height
 		glViewport( 0, 0, self.width, self.height )
+		self.projection_matrix = PerspectiveMatrix( 60, float(self.width) / float(self.height), 1.0, 100.0 )
+		glUseProgram( self.shader_program_id )
+		glUniformMatrix4fv( self.projection_matrix_id, 1, GL_FALSE, self.projection_matrix )
+		glUseProgram( 0 )
 
 
 	#
@@ -148,7 +188,13 @@ class Frame :
 	# Close
 	#
 	def Close( self ) :
-		pass
+		# Delete shader program
+		glUseProgram( 0 )
+		glDeleteProgram( self.shader_program_id )
+		# Error checkup
+		error = glGetError()
+		if error != GL_NO_ERROR :
+			raise RuntimeError( gluErrorString(error) )
 
 
 	#
@@ -157,13 +203,13 @@ class Frame :
 	def TrackballMapping( self, x, y ) :
 		# Adapted from Nate Robins' programs
 		# http://www.xmission.com/~nate
-		v = numpy.zeros( 3 )
+		v = zeros( 3 )
 		v[0] = ( 2.0 * float(x) - float(self.width) ) / float(self.width)
 		v[1] = ( float(self.height) - 2.0 * float(y) ) / float(self.height)
-		d = numpy.linalg.norm( v )
+		d = norm( v )
 		if d > 1.0 : d = 1.0
-		v[2] = math.cos( math.pi / 2.0 * d );
-		return v / numpy.linalg.norm(v)
+		v[2] = cos( pi / 2.0 * d )
+		return v / norm(v)
 
 
 	#
