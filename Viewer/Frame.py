@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                  Frame.py
 #                             -------------------
-#    update               : 2013-11-13
+#    update               : 2013-11-14
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -27,11 +27,24 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
+from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from math import *
 from numpy import *
 from Shader import *
 from Transformation import *
+
+
+
+#
+# ErrorCheckup
+#
+def ErrorCheckup( info='' ) :
+	error = glGetError()
+	if error != GL_NO_ERROR :
+		raise RuntimeError( info + '\n' + gluErrorString(error) )
+
+
 
 
 #--
@@ -90,9 +103,7 @@ class Frame :
 		view_matrix_id = glGetUniformLocation( self.shader_program_id, "ViewMatrix" )
 		projection_matrix_id = glGetUniformLocation( self.shader_program_id, "ProjectionMatrix" )
 		# Error checkup
-		error = glGetError()
-		if error != GL_NO_ERROR :
-			raise RuntimeError( gluErrorString(error) )
+		ErrorCheckup( 'Initialisation failed.' )
 
 
 
@@ -192,9 +203,7 @@ class Frame :
 		glUseProgram( 0 )
 		glDeleteProgram( self.shader_program_id )
 		# Error checkup
-		error = glGetError()
-		if error != GL_NO_ERROR :
-			raise RuntimeError( gluErrorString(error) )
+		ErrorCheckup( 'Error while deleting the shader program' )
 
 
 	#
@@ -230,3 +239,7 @@ class Frame :
 	def Run() :
 		# Start up the main loop
 		glutMainLoop()
+
+
+
+

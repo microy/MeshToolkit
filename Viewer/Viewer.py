@@ -120,10 +120,7 @@ class Viewer( Frame ) :
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
 		glBindVertexArray( 0 )
 		# Error checkup
-		error = glGetError()
-		if error != GL_NO_ERROR :
-			raise RuntimeError( gluErrorString(error) )
-
+		ErrorCheckup( 'Error while creating buffer objects' )
 
 
 
@@ -177,8 +174,5 @@ class Viewer( Frame ) :
 		# Delete vertex array
 		glDeleteVertexArrays( 1, numpy.array([ self.vertex_array_id ]) )
 		# Error checkup
-		error = glGetError()
-		if error != GL_NO_ERROR :
-			raise RuntimeError( gluErrorString(error) )
-
+		ErrorCheckup( 'Error while deleting buffer objects' )
 
