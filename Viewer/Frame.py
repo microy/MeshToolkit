@@ -77,9 +77,10 @@ class Frame :
 		self.trackball_transform = identity( 4, dtype=float32 )
 		# Initialise OpenGL / GLUT
 		glutInit()
-		glutInitWindowSize( self.width, self.height )
-		glutCreateWindow( title )
 		glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH )
+		glutInitWindowSize( self.width, self.height )
+		glutInitWindowPosition(100, 100)
+		glutCreateWindow( title )
 		# GLUT function binding
 		glutCloseFunc( self.Close )
 		glutDisplayFunc( self.Display )
@@ -89,19 +90,18 @@ class Frame :
 		glutReshapeFunc( self.Reshape )
 		glutTimerFunc( 0, self.Timer, 0 )
 		# Color configuration
-#		glClearColor( 1, 1, 1, 1 )
-		glEnable( GL_DEPTH_TEST )
-		glDepthFunc( GL_LESS )
-		glEnable( GL_CULL_FACE )
-		glCullFace( GL_BACK )
-		glFrontFace( GL_CCW )
+		glClearColor( 1, 1, 1, 1 )
 		# Initialise view matrix
 		TranslateMatrix( self.view_matrix, 0, 0, -2 )
 		# Create and compile GLSL program
 		self.shader_program_id = LoadShaders()
+		glUseProgram( self.shader_program_id )
 		model_matrix_id = glGetUniformLocation( self.shader_program_id, "ModelMatrix" )
 		view_matrix_id = glGetUniformLocation( self.shader_program_id, "ViewMatrix" )
 		projection_matrix_id = glGetUniformLocation( self.shader_program_id, "ProjectionMatrix" )
+		glUniformMatrix4fv( self.model_matrix_id, 1, GL_FALSE, self.model_matrix )
+		glUniformMatrix4fv( self.view_matrix_id, 1, GL_FALSE, self.view_matrix )
+		glUniformMatrix4fv( self.projection_matrix_id, 1, GL_FALSE, self.projection_matrix )
 		# Error checkup
 		ErrorCheckup( 'Initialisation failed.' )
 
@@ -170,9 +170,7 @@ class Frame :
 		self.height = height
 		glViewport( 0, 0, self.width, self.height )
 		self.projection_matrix = PerspectiveMatrix( 60, float(self.width) / float(self.height), 1.0, 100.0 )
-		glUseProgram( self.shader_program_id )
 		glUniformMatrix4fv( self.projection_matrix_id, 1, GL_FALSE, self.projection_matrix )
-		glUseProgram( 0 )
 
 
 	#
@@ -193,7 +191,6 @@ class Frame :
 	#
 	def Idle( self ) :
 		glutPostRedisplay()
-
 
 	#
 	# Close

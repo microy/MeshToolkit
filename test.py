@@ -3,11 +3,14 @@
 from Core.Mesh import *
 from Core.Vrml import *
 from Viewer.Viewer import *
+from numpy import *
 
 
 if __name__ == "__main__":
 
 	m = ReadVrmlFile("cube1.wrl")
+#	m = Mesh(vertices = array( [ [-1,-1,0], [1,-1,0], [0,1,0] ], dtype=float32 ))
+
 	UpdateNormals( m )
 #	UpdateNeighbors( m )
 	print m

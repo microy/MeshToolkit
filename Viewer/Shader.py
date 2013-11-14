@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 Shader.py
 #                             -------------------
-#    update               : 2013-11-13
+#    update               : 2013-11-14
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -33,10 +33,10 @@ vertex_shader_source = '''
 #version 330 core
 
 layout (location = 0) in vec3 in_Position;
-layout (location = 1) in vec3 in_Normal;
-layout (location = 2) in vec3 in_Color;
+//layout (location = 1) in vec3 in_Normal;
+//layout (location = 2) in vec3 in_Color;
 
-out vec3  out_Color;
+//out vec3  out_Color;
 
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
@@ -44,8 +44,9 @@ uniform mat4 ProjectionMatrix;
 
 void main(void)
 {
-	gl_Position = (ProjectionMatrix * ViewMatrix * ModelMatrix) * vec4( in_Position, 1.0 );
-	out_Color = in_Color;
+	gl_Position = ViewMatrix * vec4( in_Position, 1.0 );
+//	gl_Position = (ProjectionMatrix * ViewMatrix * ModelMatrix) * vec4( in_Position, 1.0 );
+//	out_Color = in_Color;
 }
 '''
 
@@ -56,12 +57,13 @@ void main(void)
 fragment_shader_source = '''
 #version 330 core
 
-in vec3 in_Color;
+//in vec3 in_Color;
 out vec4 out_Color;
 
 void main()
 {
-	out_Color = vec4( in_Color, 1.0 );
+//	out_Color = vec4( in_Color, 1.0 );
+	out_Color = vec4(1.0, 0.0, 0.0, 1.0);
 }
 '''
 
@@ -87,9 +89,9 @@ def LoadShaders() :
 	glCompileShader( fragment_shader )
 	# Check the shaders
 	if not glGetShaderiv( vertex_shader, GL_COMPILE_STATUS ) :
-		raise RuntimeError( glGetShaderInfoLog( vertex_shader ) )
+		raise RuntimeError( 'Vertex shader compilation failed.\n' + glGetShaderInfoLog( vertex_shader ) )
 	if not glGetShaderiv( fragment_shader, GL_COMPILE_STATUS ) :
-		raise RuntimeError( glGetShaderInfoLog( fragment_shader ) )
+		raise RuntimeError( 'Fragment shader compilation failed.\n' + glGetShaderInfoLog( fragment_shader ) )
 	# Create the program
 	program_id = glCreateProgram()
 	# Attach the shaders to the program
@@ -99,7 +101,7 @@ def LoadShaders() :
 	glLinkProgram( program_id )
 	# Check the program
 	if not glGetProgramiv( program_id, GL_LINK_STATUS ) :
-		raise RuntimeError( glGetProgramInfoLog( program_id ) )
+		raise RuntimeError( 'Shader linking failed.\n' + glGetProgramInfoLog( program_id ) )
 	# Delete the shaders
 	glDeleteShader( vertex_shader )
 	glDeleteShader( fragment_shader )

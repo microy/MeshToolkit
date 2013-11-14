@@ -31,8 +31,8 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from Core.Mesh import *
 from Frame import *
-import math
-import numpy
+from math import *
+from numpy import *
 
 
 
@@ -71,20 +71,20 @@ class Viewer( Frame ) :
 		# Initialisation
 		self.mesh = mesh
 		# Use the shader program
-		glUseProgram( self.shader_program_id )
+#		glUseProgram( self.shader_program_id )
 		# Vertex array object
 		self.vertex_array_id = glGenVertexArrays( 1 )
 		glBindVertexArray( self.vertex_array_id )
 		# Face buffer object
 		self.face_buffer_id = glGenBuffers( 1 )
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, mesh.faces.nbytes, mesh.faces, GL_DYNAMIC_DRAW )
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, mesh.faces.nbytes, mesh.faces, GL_STATIC_DRAW )
 		# Vertex buffer object
-#		self.vertex_buffer_id = glGenBuffers( 1 )
-#		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
-#		glBufferData( GL_ARRAY_BUFFER, len(mesh.vertices)*4, mesh.vertices, GL_STATIC_DRAW )
-#		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
-#		glEnableVertexAttribArray( 0 )
+		self.vertex_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
+		glBufferData( GL_ARRAY_BUFFER, mesh.vertices.nbytes, mesh.vertices, GL_STATIC_DRAW )
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
+		glEnableVertexAttribArray( 0 )
 		# Normal buffer object
 #		self.normal_buffer_id = glGenBuffers( 1 )
 #		glBindBuffer( GL_ARRAY_BUFFER, self.normal_buffer_id )
@@ -100,27 +100,27 @@ class Viewer( Frame ) :
 #			glEnableVertexAttribArray( 2 )
 
 
-		self.vertex_buffer_id = glGenBuffers( 1 )
-		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
-		glBufferData( GL_ARRAY_BUFFER, mesh.vertices.nbytes + mesh.vertex_normals.nbytes + mesh.colors.nbytes, None, GL_DYNAMIC_DRAW )
-		glBufferSubData( GL_ARRAY_BUFFER, 0, mesh.vertices.nbytes, mesh.vertices )
-		glBufferSubData( GL_ARRAY_BUFFER, mesh.vertices.nbytes, mesh.vertex_normals.nbytes, mesh.vertex_normals )
-		glBufferSubData( GL_ARRAY_BUFFER, mesh.vertices.nbytes + mesh.vertex_normals.nbytes, mesh.colors.nbytes, mesh.colors )
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
-		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
-		glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
-		glEnableVertexAttribArray( 0 )
-		glEnableVertexAttribArray( 1 )
-		glEnableVertexAttribArray( 2 )
+#		self.vertex_buffer_id = glGenBuffers( 1 )
+#		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
+#		glBufferData( GL_ARRAY_BUFFER, mesh.vertices.nbytes + mesh.vertex_normals.nbytes + mesh.colors.nbytes, None, GL_DYNAMIC_DRAW )
+#		glBufferSubData( GL_ARRAY_BUFFER, 0, mesh.vertices.nbytes, mesh.vertices )
+#		glBufferSubData( GL_ARRAY_BUFFER, mesh.vertices.nbytes, mesh.vertex_normals.nbytes, mesh.vertex_normals )
+#		glBufferSubData( GL_ARRAY_BUFFER, mesh.vertices.nbytes + mesh.vertex_normals.nbytes, mesh.colors.nbytes, mesh.colors )
+#		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
+#		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
+#		glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
+#		glEnableVertexAttribArray( 0 )
+#		glEnableVertexAttribArray( 1 )
+#		glEnableVertexAttribArray( 2 )
 
+		# Error checkup
+		ErrorCheckup( 'Error while creating buffer objects' )
 
 
 		# Release the bindings
-		glBindBuffer( GL_ARRAY_BUFFER, 0 )
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
-		glBindVertexArray( 0 )
-		# Error checkup
-		ErrorCheckup( 'Error while creating buffer objects' )
+#		glBindBuffer( GL_ARRAY_BUFFER, 0 )
+#		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
+#		glBindVertexArray( 0 )
 
 
 
@@ -133,30 +133,30 @@ class Viewer( Frame ) :
 		# Framerate counter
 		self.frame_count += 1
 		# Is there a mesh to display ?
-#		if self.mesh :
+		if self.mesh :
 			# Draw the mesh
-#			glBindVertexArray( self.vertex_array_id )
-#			glDrawElements( GL_TRIANGLES, len(self.mesh.faces)*3, GL_UNSIGNED_INT, 0 )
+			glBindVertexArray( self.vertex_array_id )
+			glDrawElements( GL_TRIANGLES, len(self.mesh.faces)*3, GL_UNSIGNED_INT, 0 )
 			# Release the bindings
-#			glBindVertexArray( 0 )
+			glBindVertexArray( 0 )
 
 
-		glUseProgram(self.shader_program_id)
-		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
-		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
-		glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
-		glEnableVertexAttribArray( 0 )
-		glEnableVertexAttribArray( 1 )
-		glEnableVertexAttribArray( 2 )
-		glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_UNSIGNED_INT, None )
-		glUseProgram(0)
+#		glUseProgram(self.shader_program_id)
+#		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
+#		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
+#		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
+#		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
+#		glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
+#		glEnableVertexAttribArray( 0 )
+#		glEnableVertexAttribArray( 1 )
+#		glEnableVertexAttribArray( 2 )
+#		glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_UNSIGNED_INT, None )
+#		glUseProgram(0)
 
-
+ 
 		# Swap buffers
 		glutSwapBuffers()
-		glutPostRedisplay()
+#		glutPostRedisplay()
 
 
 	#
@@ -168,9 +168,9 @@ class Viewer( Frame ) :
 		# Delete buffer objects
 		glDeleteBuffers( 1, numpy.array([ self.face_buffer_id ]) )
 		glDeleteBuffers( 1, numpy.array([ self.vertex_buffer_id ]) )
-		glDeleteBuffers( 1, numpy.array([ self.normal_buffer_id ]) )
-		if len(self.mesh.colors) :
-			glDeleteBuffers( 1, numpy.array([ self.color_buffer_id ]) )
+#		glDeleteBuffers( 1, numpy.array([ self.normal_buffer_id ]) )
+#		if len(self.mesh.colors) :
+#			glDeleteBuffers( 1, numpy.array([ self.color_buffer_id ]) )
 		# Delete vertex array
 		glDeleteVertexArrays( 1, numpy.array([ self.vertex_array_id ]) )
 		# Error checkup
