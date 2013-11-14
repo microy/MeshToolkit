@@ -23,6 +23,9 @@
 #
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
+#OpenGL.ERROR_CHECKING = False
+#OpenGL.ERROR_LOGGING = False
+OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 
 
@@ -34,13 +37,13 @@ from OpenGL.GL import *
 #
 # Load OpenGL vertex and fragment shaders
 #
-def LoadShaders() :
+def LoadShaders( name='Simple' ) :
 	# Initialisation
 	vertex_shader_source = ''
 	fragment_shader_source = ''
 	# Load shader source files
-	with open('Viewer/Shader-Simple.vert.glsl', 'r') as f : vertex_shader_source = f.read()
-	with open('Viewer/Shader-Simple.frag.glsl', 'r') as f : fragment_shader_source = f.read()
+	with open('Viewer/Shader-'+name+'.vert.glsl', 'r') as f : vertex_shader_source = f.read()
+	with open('Viewer/Shader-'+name+'.frag.glsl', 'r') as f : fragment_shader_source = f.read()
 	# Create the shaders
 	vertex_shader = glCreateShader( GL_VERTEX_SHADER )
 	fragment_shader = glCreateShader( GL_FRAGMENT_SHADER )
