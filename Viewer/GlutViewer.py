@@ -27,8 +27,8 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
-from OpenGL.GLU import *
 from OpenGL.GLUT import *
+
 from math import *
 from numpy import *
 
@@ -105,10 +105,6 @@ class GlutViewer( MeshViewer ) :
 
 		# Send the transformation matrices to the shader
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_FALSE, self.mvp_matrix )
-
-		# Error checkup
-		ErrorCheckup( 'Initialisation failed.' )
-
 
 
 

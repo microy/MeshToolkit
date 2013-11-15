@@ -27,26 +27,12 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
-from OpenGL.GLU import *
 
 from numpy import array
 
 from Core.Mesh import *
 
 
-
-#--
-#
-# ErrorCheckup
-#
-#--
-#
-# Check for OpenGL errors
-#
-def ErrorCheckup( info='' ) :
-	error = glGetError()
-	if error != GL_NO_ERROR :
-		raise RuntimeError( info + '\n' + gluErrorString(error) )
 
 
 
@@ -184,9 +170,6 @@ class MeshViewer() :
 #		glEnableVertexAttribArray( 1 )
 
 
-		# Error checkup
-		ErrorCheckup( 'Error while creating buffer objects' )
-
 
 	#
 	# Display
@@ -212,9 +195,6 @@ class MeshViewer() :
 		glUseProgram( 0 )
 		glDeleteProgram( self.shader_program_id )
 
-		# Error checkup
-		ErrorCheckup( 'Error while deleting the shader program' )
-
 		# Delete buffer objects
 		glDeleteBuffers( 1, array([ self.face_buffer_id ]) )
 		glDeleteBuffers( 1, array([ self.vertex_buffer_id ]) )
@@ -224,9 +204,6 @@ class MeshViewer() :
 
 		# Delete vertex array
 		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
-
-		# Error checkup
-		ErrorCheckup( 'Error while deleting buffer objects' )
 
 		# Initialise member variables
 		self.mesh = None
