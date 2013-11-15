@@ -57,11 +57,11 @@ class Viewer( Frame ) :
 
 		# Initialise member variables
 		self.mesh = None
-		self.vertex_array_id = 0
-		self.vertex_buffer_id = 0
-		self.face_buffer_id = 0
-		self.normal_buffer_id = 0
-		self.color_buffer_id = 0
+		self.vertex_array_id = -1
+		self.vertex_buffer_id = -1
+		self.face_buffer_id = -1
+		self.normal_buffer_id = -1
+		self.color_buffer_id = -1
 
 		# Load mesh
 		if mesh : self.LoadMesh( mesh )
@@ -113,13 +113,6 @@ class Viewer( Frame ) :
 		ErrorCheckup( 'Error while creating buffer objects' )
 
 
-		# Release the bindings
-#		glBindBuffer( GL_ARRAY_BUFFER, 0 )
-#		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
-#		glBindVertexArray( 0 )
-
-
-
 	#
 	# Display
 	#
@@ -135,27 +128,39 @@ class Viewer( Frame ) :
 		if self.mesh :
 			# Draw the mesh
 			glDrawElements( GL_TRIANGLES, len(self.mesh.vertices), GL_UNSIGNED_INT, None )
-#			glDrawArrays(GL_TRIANGLES, 0, 3)
 
 		# Swap buffers
 		glutSwapBuffers()
-#		glutPostRedisplay()
+		glutPostRedisplay()
 
 
 	#
 	# Close
 	#
 	def Close( self ) :
+
 		# Close base class
 		Frame.Close( self )
+
 		# Delete buffer objects
 #		glDeleteBuffers( 1, numpy.array([ self.face_buffer_id ]) )
 #		glDeleteBuffers( 1, numpy.array([ self.vertex_buffer_id ]) )
 #		glDeleteBuffers( 1, numpy.array([ self.normal_buffer_id ]) )
 #		if len(self.mesh.colors) :
 #			glDeleteBuffers( 1, numpy.array([ self.color_buffer_id ]) )
+
 		# Delete vertex array
-		glDeleteVertexArrays( 1, numpy.array([ self.vertex_array_id ]) )
+		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
+
 		# Error checkup
 		ErrorCheckup( 'Error while deleting buffer objects' )
+
+		# Initialise member variables
+		self.mesh = None
+		self.vertex_array_id = -1
+		self.vertex_buffer_id = -1
+		self.face_buffer_id = -1
+		self.normal_buffer_id = -1
+		self.color_buffer_id = -1
+
 
