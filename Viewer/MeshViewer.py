@@ -169,6 +169,9 @@ class MeshViewer() :
 #		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 #		glEnableVertexAttribArray( 1 )
 
+		if glGetError() != GL_NO_ERROR :
+			raise RuntimeError('OpenGL error while loading the mesh.' )
+
 
 
 	#
