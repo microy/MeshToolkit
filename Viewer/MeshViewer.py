@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*- 
 
 # ***************************************************************************
-#                                  Viewer.py
+#                                MeshViewer.py
 #                             -------------------
 #    update               : 2013-11-15
 #    copyright            : (C) 2013 by Michaël Roy
@@ -28,35 +28,47 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from OpenGL.GLUT import *
+
+from numpy import array
+
 from Core.Mesh import *
-from Frame import *
-from math import *
-from numpy import *
 
 
 
 #--
 #
-# Viewer
+# ErrorCheckup
+#
+#--
+#
+# Check for OpenGL errors
+#
+def ErrorCheckup( info='' ) :
+	error = glGetError()
+	if error != GL_NO_ERROR :
+		raise RuntimeError( info + '\n' + gluErrorString(error) )
+
+
+
+#--
+#
+# MeshViewer
 #
 #--
 #
 # Display a mesh with OpenGL
 #
-class Viewer( Frame ) :
+class MeshViewer() :
 
 
 	#
 	# Initialisation
 	#
-	def __init__( self, mesh=None, title="Untitled Window", width=1024, height=768 ) :
-
-		# Initialise base class
-		Frame.__init__( self, title=title, width=width, height=height )
+	def __init__( self, mesh=None ) :
 
 		# Initialise member variables
 		self.mesh = None
+		self.shader_program_id = -1
 		self.vertex_array_id = -1
 		self.vertex_buffer_id = -1
 		self.face_buffer_id = -1
@@ -67,13 +79,76 @@ class Viewer( Frame ) :
 		if mesh : self.LoadMesh( mesh )
 
 
+
 	#
-	# Load mesh
+	#  LoadShaders
+	#
+	def LoadShaders( self, name='Simple' ) :
+
+		# Initialisation
+		vertex_shader_source = ''
+		fragment_shader_source = ''
+
+		# Load shader source files
+		with open('Viewer/Shader-'+name+'.vert.glsl', 'r') as f : vertex_shader_source = f.read()
+		with open('Viewer/Shader-'+name+'.frag.glsl', 'r') as f : fragment_shader_source = f.read()
+
+		# Create the shaders
+		vertex_shader = glCreateShader( GL_VERTEX_SHADER )
+		fragment_shader = glCreateShader( GL_FRAGMENT_SHADER )
+
+		# Load shader source codes
+		glShaderSource( vertex_shader, vertex_shader_source )
+		glShaderSource( fragment_shader, fragment_shader_source )
+
+		# Compile the shaders
+		glCompileShader( vertex_shader )
+		glCompileShader( fragment_shader )
+
+		# Check the shaders
+		if not glGetShaderiv( vertex_shader, GL_COMPILE_STATUS ) :
+			raise RuntimeError( 'Vertex shader compilation failed.\n' + glGetShaderInfoLog( vertex_shader ) )
+		if not glGetShaderiv( fragment_shader, GL_COMPILE_STATUS ) :
+			raise RuntimeError( 'Fragment shader compilation failed.\n' + glGetShaderInfoLog( fragment_shader ) )
+
+		# Create the program
+		program_id = glCreateProgram()
+
+		# Attach the shaders to the program
+		glAttachShader( program_id, vertex_shader )
+		glAttachShader( program_id, fragment_shader )
+
+		# Link the program
+		glLinkProgram( program_id )
+
+		# Check the program
+		if not glGetProgramiv( program_id, GL_LINK_STATUS ) :
+			raise RuntimeError( 'Shader program linking failed.\n' + glGetProgramInfoLog( program_id ) )
+
+		# Use the shader program
+		glUseProgram( program_id )
+
+		# Delete the shaders
+		glDeleteShader( vertex_shader )
+		glDeleteShader( fragment_shader )
+
+		# Return shader program ID
+		self.shader_program_id = program_id
+
+
+
+
+
+	#
+	# LoadMesh
 	#
 	def LoadMesh( self, mesh ) :
 
 		# Initialisation
 		self.mesh = mesh
+
+		# Load the shader
+		self.LoadShaders( 'Color' )
 
 		# Vertex array object
 		self.vertex_array_id = glGenVertexArrays( 1 )
@@ -118,20 +193,11 @@ class Viewer( Frame ) :
 	#
 	def Display( self ) :
 
-		# Clear all pixels and depth buffer
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
-
-		# Framerate counter
-		self.frame_count += 1
-
 		# Is there a mesh to display ?
-		if self.mesh :
-			# Draw the mesh
-			glDrawElements( GL_TRIANGLES, len(self.mesh.vertices), GL_UNSIGNED_INT, None )
+		if not self.mesh : return
 
-		# Swap buffers
-		glutSwapBuffers()
-		glutPostRedisplay()
+		# Draw the mesh
+		glDrawElements( GL_TRIANGLES, len(self.mesh.vertices), GL_UNSIGNED_INT, None )
 
 
 	#
@@ -139,15 +205,22 @@ class Viewer( Frame ) :
 	#
 	def Close( self ) :
 
-		# Close base class
-		Frame.Close( self )
+		# Need to initialise ?
+		if not self.mesh : return
+
+		# Delete shader program
+		glUseProgram( 0 )
+		glDeleteProgram( self.shader_program_id )
+
+		# Error checkup
+		ErrorCheckup( 'Error while deleting the shader program' )
 
 		# Delete buffer objects
-#		glDeleteBuffers( 1, numpy.array([ self.face_buffer_id ]) )
-#		glDeleteBuffers( 1, numpy.array([ self.vertex_buffer_id ]) )
+		glDeleteBuffers( 1, array([ self.face_buffer_id ]) )
+		glDeleteBuffers( 1, array([ self.vertex_buffer_id ]) )
 #		glDeleteBuffers( 1, numpy.array([ self.normal_buffer_id ]) )
-#		if len(self.mesh.colors) :
-#			glDeleteBuffers( 1, numpy.array([ self.color_buffer_id ]) )
+		if len(self.mesh.colors) :
+			glDeleteBuffers( 1, array([ self.color_buffer_id ]) )
 
 		# Delete vertex array
 		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
@@ -157,10 +230,10 @@ class Viewer( Frame ) :
 
 		# Initialise member variables
 		self.mesh = None
+		self.shader_program_id = -1
 		self.vertex_array_id = -1
 		self.vertex_buffer_id = -1
 		self.face_buffer_id = -1
 		self.normal_buffer_id = -1
 		self.color_buffer_id = -1
-
 

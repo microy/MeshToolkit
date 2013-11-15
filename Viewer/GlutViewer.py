@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*- 
 
 # ***************************************************************************
-#                                  Frame.py
+#                                GlutViewer.py
 #                             -------------------
 #    update               : 2013-11-15
 #    copyright            : (C) 2013 by Michaël Roy
@@ -31,42 +31,30 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from math import *
 from numpy import *
-from Shader import *
+
+from MeshViewer import *
 from Transformation import *
 
 
 
-#--
-#
-# ErrorCheckup
-#
-#--
-#
-# Check for OpenGL errors
-#
-def ErrorCheckup( info='' ) :
-	error = glGetError()
-	if error != GL_NO_ERROR :
-		raise RuntimeError( info + '\n' + gluErrorString(error) )
-
 
 
 
 #--
 #
-# Frame
+# GlutViewer
 #
 #--
 #
-# Create an OpenGL frame
+# Create an OpenGL frame with GLUT
 #
-class Frame :
+class GlutViewer( MeshViewer ) :
 
 
 	#
 	# Initialisation
 	#
-	def __init__( self, title="Untitled Window", width=1024, height=768 ) :
+	def __init__( self, mesh="None", title="Untitled Window", width=1024, height=768 ) :
 
 		# Initialise member variables
 		self.title = title
@@ -74,7 +62,6 @@ class Frame :
 		self.height = height
 		self.frame_count = 0
 		self.mvp_matrix_id = -1
-		self.shader_program_id = -1
 		self.projection_matrix = identity( 4, dtype=float32 )
 		self.view_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = identity( 4, dtype=float32 )
@@ -103,8 +90,8 @@ class Frame :
 #		glDepthFunc( GL_LESS )
 #		glEnable( GL_CULL_FACE )
 
-		# Load the shader
-		self.shader_program_id = LoadShaders( 'Color' )
+		# MeshViewer initialisation
+		MeshViewer.__init__( self, mesh )
 
 		# Initialise the transformation matrices
 #		RotateMatrixZ(self.model_matrix, 45 )
@@ -116,11 +103,8 @@ class Frame :
 		# Compute Model-View-Projection matrix
 		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
 
-		# Get a handle for the transformation matrix
-		self.mvp_matrix_id = glGetUniformLocation( self.shader_program_id, "MVP_Matrix" )
-
 		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( self.mvp_matrix_id, 1, GL_FALSE, self.mvp_matrix )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_FALSE, self.mvp_matrix )
 
 		# Error checkup
 		ErrorCheckup( 'Initialisation failed.' )
@@ -145,6 +129,7 @@ class Frame :
 	# Keyboard
 	#
 	def Keyboard( self, key, mouseX, mouseY ) :
+
 		glutPostRedisplay()
 
 
@@ -152,6 +137,7 @@ class Frame :
 	# Mouse
 	#
 	def Mouse( self, button, state, x, y ) :
+
 		if button == GLUT_LEFT_BUTTON:
 			self.MouseLeftClick(x, y)
 		elif button == GLUT_MIDDLE_BUTTON:
@@ -193,6 +179,8 @@ class Frame :
 		self.width  = width
 		self.height = height
 		glViewport( 0, 0, self.width, self.height )
+
+		# Recompute the perspective matrix
 #		self.projection_matrix = PerspectiveMatrix( 60, float(self.width) / float(self.height), 0.1, 100.0 )
 #		glUniformMatrix4fv( self.projection_matrix_id, 1, GL_FALSE, self.projection_matrix )
 
@@ -201,10 +189,16 @@ class Frame :
 	# Display
 	#
 	def Display( self ) :
+
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+
 		# Framerate counter
 		self.frame_count += 1
+
+		# Display the mesh
+		MeshViewer.Display( self )
+
 		# Swap buffers
 		glutSwapBuffers()
 		glutPostRedisplay()
@@ -224,16 +218,11 @@ class Frame :
 	#
 	def Close( self ) :
 
-		# Delete shader program
-		glUseProgram( 0 )
-		glDeleteProgram( self.shader_program_id )
-
-		# Error checkup
-		ErrorCheckup( 'Error while deleting the shader program' )
+		# Close the mesh
+		MeshViewer.Close( self )
 
 		# Initialise member variables
 		self.mvp_matrix_id = -1
-		self.shader_program_id = -1
 		self.projection_matrix = identity( 4, dtype=float32 )
 		self.view_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = identity( 4, dtype=float32 )
@@ -246,6 +235,7 @@ class Frame :
 	# TrackballMapping
 	#
 	def TrackballMapping( self, x, y ) :
+
 		# Adapted from Nate Robins' programs
 		# http://www.xmission.com/~nate
 		v = zeros( 3 )
@@ -275,6 +265,7 @@ class Frame :
 	#
 	@staticmethod
 	def Run() :
+
 		# Start up the main loop
 		glutMainLoop()
 

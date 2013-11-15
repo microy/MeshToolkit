@@ -2,7 +2,7 @@
 
 from Core.Mesh import *
 from Core.Vrml import *
-from Viewer.Viewer import *
+from Viewer.GlutViewer import *
 from numpy import *
 
 
@@ -17,6 +17,6 @@ if __name__ == "__main__":
 #	UpdateNeighbors( m )
 	print m
 #	CheckMesh( m )
-	v = Viewer( mesh=m, title="Test" )
+	v = GlutViewer( mesh=m, title="Test" )
 	v.PrintInfo()
 	v.Run()
