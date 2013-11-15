@@ -169,6 +169,7 @@ class MeshViewer() :
 #		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 #		glEnableVertexAttribArray( 1 )
 
+		# OpenGL error checking
 		if glGetError() != GL_NO_ERROR :
 			raise RuntimeError('OpenGL error while loading the mesh.' )
 
@@ -207,6 +208,10 @@ class MeshViewer() :
 
 		# Delete vertex array
 		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
+
+		# OpenGL error checking
+		if glGetError() != GL_NO_ERROR :
+			raise RuntimeError('OpenGL error while closing the mesh.' )
 
 		# Initialise member variables
 		self.mesh = None

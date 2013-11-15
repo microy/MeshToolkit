@@ -94,6 +94,15 @@ class GlutViewer( MeshViewer ) :
 		MeshViewer.__init__( self, mesh )
 
 		# Initialise the transformation matrices
+		TranslateMatrix( self.model_matrix, 0.5, 0.5, 0 )
+		print self.model_matrix
+		RotateMatrix( self.view_matrix, 30, 0, 0, 1 )
+		print self.view_matrix
+#		RotateMatrix( self.model_matrix, 20, 0, 0, 1 )
+#		RotateMatrix( self.model_matrix, 30, 0, 1, 0 )
+#		print self.model_matrix.T
+#		self.projection_matrix = PerspectiveMatrix( 45.0, 4.0/3.0, 2.0, 10.0 )
+#		print self.projection_matrix
 #		RotateMatrixZ(self.model_matrix, 45 )
 #		TranslateMatrix( self.model_matrix, 0.5, 0.5, 5.0 )
 #		self.projection_matrix = PerspectiveMatrix( 60.0, float(self.width) / float(self.height), 0.1, 100.0 )
@@ -102,9 +111,10 @@ class GlutViewer( MeshViewer ) :
 
 		# Compute Model-View-Projection matrix
 		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
+		print self.mvp_matrix
 
 		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_FALSE, self.mvp_matrix )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
 
 
 
