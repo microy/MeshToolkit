@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                  Frame.py
 #                             -------------------
-#    update               : 2013-11-14
+#    update               : 2013-11-15
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -96,7 +96,7 @@ class Frame :
 		glClearColor( 1, 1, 1, 1 )
 #		glEnable( GL_DEPTH_TEST )
 #		glDepthFunc( GL_LESS )
-#		glEnable( GL_CULL_FACE )
+		glEnable( GL_CULL_FACE )
 
 		# Load the shader
 		self.shader_program_id = LoadShaders('Color')

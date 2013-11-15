@@ -134,8 +134,8 @@ class Viewer( Frame ) :
 		# Is there a mesh to display ?
 		if self.mesh :
 			# Draw the mesh
-#			glDrawElements( GL_TRIANGLES, len(self.mesh.faces), GL_UNSIGNED_INT, 0 )
-			glDrawArrays(GL_TRIANGLES, 0, 3)
+			glDrawElements( GL_TRIANGLES, len(self.mesh.vertices), GL_UNSIGNED_INT, None )
+#			glDrawArrays(GL_TRIANGLES, 0, 3)
 
 		# Swap buffers
 		glutSwapBuffers()
