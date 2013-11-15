@@ -62,25 +62,27 @@ class Frame :
 	# Initialisation
 	#
 	def __init__( self, title="Untitled Window", width=1024, height=768 ) :
+
 		# Initialise member variables
 		self.title = title
 		self.width  = width
 		self.height = height
 		self.frame_count = 0
-		self.projection_matrix_id = 0
-		self.view_matrix_id = 0
-		self.model_matrix_id = 0
+		self.mvp_matrix_id = -1
 		self.shader_program_id = 0
 		self.projection_matrix = identity( 4, dtype=float32 )
 		self.view_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = identity( 4, dtype=float32 )
+		self.mvp_matrix = identity( 4, dtype=float32 )
 		self.trackball_transform = identity( 4, dtype=float32 )
+
 		# Initialise OpenGL / GLUT
 		glutInit()
 		glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH )
 		glutInitWindowSize( self.width, self.height )
 		glutInitWindowPosition(100, 100)
 		glutCreateWindow( title )
+
 		# GLUT function binding
 		glutCloseFunc( self.Close )
 		glutDisplayFunc( self.Display )
@@ -89,19 +91,31 @@ class Frame :
 		glutMouseFunc( self.Mouse )
 		glutReshapeFunc( self.Reshape )
 		glutTimerFunc( 0, self.Timer, 0 )
-		# Color configuration
+
+		# OpenGL configuration
 		glClearColor( 1, 1, 1, 1 )
-		# Initialise view matrix
-		TranslateMatrix( self.view_matrix, 0, 0, -2 )
-		# Create and compile GLSL program
-		self.shader_program_id = LoadShaders()
-		glUseProgram( self.shader_program_id )
-		model_matrix_id = glGetUniformLocation( self.shader_program_id, "ModelMatrix" )
-		view_matrix_id = glGetUniformLocation( self.shader_program_id, "ViewMatrix" )
-		projection_matrix_id = glGetUniformLocation( self.shader_program_id, "ProjectionMatrix" )
-		glUniformMatrix4fv( self.model_matrix_id, 1, GL_FALSE, self.model_matrix )
-		glUniformMatrix4fv( self.view_matrix_id, 1, GL_FALSE, self.view_matrix )
-		glUniformMatrix4fv( self.projection_matrix_id, 1, GL_FALSE, self.projection_matrix )
+#		glEnable( GL_DEPTH_TEST )
+#		glDepthFunc( GL_LESS )
+#		glEnable( GL_CULL_FACE )
+
+		# Load the shader
+		self.shader_program_id = LoadShaders('Color')
+
+		# Initialise the transformation matrices
+#		TranslateMatrix( self.model_matrix, 0.5, 0.5, 0.0 )
+#		self.projection_matrix = PerspectiveMatrix( 60.0, float(self.width) / float(self.height), 0.1, 100.0 )
+#		self.projection_matrix = OrthoMatrix( -10.0, 10.0, -10.0, 10.0, 0.1, 100.0 )
+#		self.view_matrix = LookAt( array([0.0,0.0,-10.0]), array([0.0,0.0,0.0]), array([0.0,1.0,0.0]) )
+
+		# Compute Model-View-Projection matrix
+#		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
+
+		# Get a handle for the transformation matrix
+		self.mvp_matrix_id = glGetUniformLocation( self.shader_program_id, "MVP_Matrix" )
+
+		# Send the transformation matrices to the shader
+		glUniformMatrix4fv( self.mvp_matrix_id, 1, GL_FALSE, self.mvp_matrix )
+
 		# Error checkup
 		ErrorCheckup( 'Initialisation failed.' )
 
@@ -169,8 +183,8 @@ class Frame :
 		self.width  = width
 		self.height = height
 		glViewport( 0, 0, self.width, self.height )
-		self.projection_matrix = PerspectiveMatrix( 60, float(self.width) / float(self.height), 1.0, 100.0 )
-		glUniformMatrix4fv( self.projection_matrix_id, 1, GL_FALSE, self.projection_matrix )
+#		self.projection_matrix = PerspectiveMatrix( 60, float(self.width) / float(self.height), 0.1, 100.0 )
+#		glUniformMatrix4fv( self.projection_matrix_id, 1, GL_FALSE, self.projection_matrix )
 
 
 	#

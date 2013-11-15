@@ -27,6 +27,7 @@
 #
 from math import *
 from numpy import *
+from numpy.linalg import *
 
 
 
@@ -187,6 +188,41 @@ def PerspectiveMatrix( fovy, aspect, znear, zfar ) :
 	h = tan(fovy / 360.0 * pi) * znear
 	w = h * aspect
 	return FrustrumMatrix( -w, w, -h, h, znear, zfar )
+
+
+#--
+#
+# LookAt
+#
+#--
+#
+# Taken from GLM
+# https://github.com/g-truc/glm
+#
+def LookAt( eye, center, up ) :
+	# The "look-at" vector
+	f = center - eye
+	f /= norm( f )
+	# The "right" vector
+	s = cross(f, up)
+	s /= norm( s )
+	# The "up" vector
+	u = cross(s, f)
+	# Compute view matrix
+	M = ones( (4,4), dtype=float32 )
+	M[0][0] = s[0]
+	M[1][0] = s[1]
+	M[2][0] = s[2]
+	M[0][1] = u[0]
+	M[1][1] = u[1]
+	M[2][1] = u[2]
+	M[0][2] =-f[0]
+	M[1][2] =-f[1]
+	M[2][2] =-f[2]
+	M[3][0] =-dot( s, eye )
+	M[3][1] =-dot( u, eye )
+	M[3][2] = dot( f, eye )
+	return M
 
 
 #-

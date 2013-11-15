@@ -38,39 +38,54 @@ from OpenGL.GL import *
 # Load OpenGL vertex and fragment shaders
 #
 def LoadShaders( name='Simple' ) :
+
 	# Initialisation
 	vertex_shader_source = ''
 	fragment_shader_source = ''
+
 	# Load shader source files
 	with open('Viewer/Shader-'+name+'.vert.glsl', 'r') as f : vertex_shader_source = f.read()
 	with open('Viewer/Shader-'+name+'.frag.glsl', 'r') as f : fragment_shader_source = f.read()
+
 	# Create the shaders
 	vertex_shader = glCreateShader( GL_VERTEX_SHADER )
 	fragment_shader = glCreateShader( GL_FRAGMENT_SHADER )
+
 	# Load shader source codes
 	glShaderSource( vertex_shader, vertex_shader_source )
 	glShaderSource( fragment_shader, fragment_shader_source )
+
 	# Compile the shaders
 	glCompileShader( vertex_shader )
 	glCompileShader( fragment_shader )
+
 	# Check the shaders
 	if not glGetShaderiv( vertex_shader, GL_COMPILE_STATUS ) :
 		raise RuntimeError( 'Vertex shader compilation failed.\n' + glGetShaderInfoLog( vertex_shader ) )
 	if not glGetShaderiv( fragment_shader, GL_COMPILE_STATUS ) :
 		raise RuntimeError( 'Fragment shader compilation failed.\n' + glGetShaderInfoLog( fragment_shader ) )
+
 	# Create the program
 	program_id = glCreateProgram()
+
 	# Attach the shaders to the program
 	glAttachShader( program_id, vertex_shader )
 	glAttachShader( program_id, fragment_shader )
+
 	# Link the program
 	glLinkProgram( program_id )
+
 	# Check the program
 	if not glGetProgramiv( program_id, GL_LINK_STATUS ) :
 		raise RuntimeError( 'Shader program linking failed.\n' + glGetProgramInfoLog( program_id ) )
+
+	# Use the shader program
+	glUseProgram( program_id )
+
 	# Delete the shaders
 	glDeleteShader( vertex_shader )
 	glDeleteShader( fragment_shader )
+
 	# Return shader program ID
 	return program_id
 
