@@ -1,7 +1,8 @@
 #version 330 core
 
 layout (location = 0) in vec3 in_Position;
-layout (location = 1) in vec3 in_Color;
+layout (location = 1) in vec3 in_Normals;
+layout (location = 2) in vec3 in_Color;
 
 uniform mat4 MVP_Matrix;
 

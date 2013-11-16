@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                GlutViewer.py
 #                             -------------------
-#    update               : 2013-11-15
+#    update               : 2013-11-16
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -67,6 +67,8 @@ class GlutViewer( MeshViewer ) :
 		self.model_matrix = identity( 4, dtype=float32 )
 		self.mvp_matrix = identity( 4, dtype=float32 )
 		self.trackball_transform = identity( 4, dtype=float32 )
+		self.model_scale_factor = 1.0
+		self.model_translation = array( [0, 0, 0], dtype=float32 )
 
 		# Initialise OpenGL / GLUT
 		glutInit()
@@ -86,32 +88,19 @@ class GlutViewer( MeshViewer ) :
 
 		# OpenGL configuration
 		glClearColor( 1, 1, 1, 1 )
-#		glEnable( GL_DEPTH_TEST )
-#		glDepthFunc( GL_LESS )
-#		glEnable( GL_CULL_FACE )
+		glEnable( GL_DEPTH_TEST )
+		glDepthFunc( GL_LESS )
+		glEnable( GL_CULL_FACE )
 
 		# MeshViewer initialisation
 		MeshViewer.__init__( self, mesh )
 
 		# Initialise the transformation matrices
-		TranslateMatrix( self.model_matrix, 0.5, 0.5, 0 )
-		print self.model_matrix
-		RotateMatrix( self.view_matrix, 30, 0, 0, 1 )
-		print self.view_matrix
-#		RotateMatrix( self.model_matrix, 20, 0, 0, 1 )
-#		RotateMatrix( self.model_matrix, 30, 0, 1, 0 )
-#		print self.model_matrix.T
-#		self.projection_matrix = PerspectiveMatrix( 45.0, 4.0/3.0, 2.0, 10.0 )
-#		print self.projection_matrix
-#		RotateMatrixZ(self.model_matrix, 45 )
-#		TranslateMatrix( self.model_matrix, 0.5, 0.5, 5.0 )
-#		self.projection_matrix = PerspectiveMatrix( 60.0, float(self.width) / float(self.height), 0.1, 100.0 )
-#		self.projection_matrix = OrthoMatrix( -10.0, 10.0, -10.0, 10.0, 0.1, 100.0 )
-#		self.view_matrix = LookAt( array([4.0,3.0,3.0]), array([0.0,0.0,0.0]), array([0.0,1.0,0.0]) )
+		self.view_matrix = LookAtMatrix( [4, 3, 3], [0, 0, 0], [0, 1, 0] )
+		self.projection_matrix = PerspectiveMatrix( 45.0, float(self.width)/float(self.height), 0.1, 100.0 )
 
 		# Compute Model-View-Projection matrix
 		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
-		print self.mvp_matrix
 
 		# Send the transformation matrices to the shader
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
@@ -144,6 +133,30 @@ class GlutViewer( MeshViewer ) :
 	#
 	def Mouse( self, button, state, x, y ) :
 
+#               case FL_PUSH :
+#                       Mouse(Fl::event_button(), Fl::event_x(), Fl::event_y());
+#                        break;
+
+ #               // Mouse up event
+#                case FL_RELEASE :
+#                        motion_state = MOTION_NONE;
+#                        cursor(FL_CURSOR_DEFAULT);
+#                        break;
+
+#                // Mouse moved while down event
+#                case FL_DRAG :
+#                        Motion(Fl::event_x(), Fl::event_y());
+#                        break;
+
+#                // Keyboard event
+#                // Return 1 if you understand/use the keyboard event, 0 otherwise...
+#                case FL_KEYBOARD :
+#                case FL_SHORTCUT :
+#                        if( Keyboard( Fl::event_key() ) ) break;
+#                        return 0;
+
+
+
 		if button == GLUT_LEFT_BUTTON:
 			self.MouseLeftClick(x, y)
 		elif button == GLUT_MIDDLE_BUTTON:
@@ -159,6 +172,11 @@ class GlutViewer( MeshViewer ) :
 	# MouseLeftClick
 	#
 	def MouseLeftClick( self, x, y ) :
+#                motion_state = MOTION_ROTATION;
+#                // Trackball Rotation
+#                previous_trackball_position = TrackballMapping( x, y );
+#                // Change window cursor
+#                cursor(FL_CURSOR_HAND);
 		pass
 
 
@@ -166,6 +184,9 @@ class GlutViewer( MeshViewer ) :
 	# MouseMiddleClick
 	#
 	def MouseMiddleClick( self, x, y ) :
+#                        motion_state = MOTION_TRANSLATION_XY;
+#                        previous_mouse_position = Vector2i( x, y );
+#                        cursor(FL_CURSOR_MOVE);
 		pass
 
 
@@ -173,6 +194,9 @@ class GlutViewer( MeshViewer ) :
 	# MouseRightClick
 	#
 	def MouseRightClick( self, x, y ) :
+#                        motion_state = MOTION_TRANSLATION_Z;
+#                        previous_mouse_position = Vector2i( x, y );
+#                        cursor(FL_CURSOR_NS);
 		pass
 
 
@@ -187,8 +211,14 @@ class GlutViewer( MeshViewer ) :
 		glViewport( 0, 0, self.width, self.height )
 
 		# Recompute the perspective matrix
-#		self.projection_matrix = PerspectiveMatrix( 60, float(self.width) / float(self.height), 0.1, 100.0 )
-#		glUniformMatrix4fv( self.projection_matrix_id, 1, GL_FALSE, self.projection_matrix )
+		self.projection_matrix = PerspectiveMatrix( 45.0, float(self.width)/float(self.height), 1, 100.0 )
+
+		# Compute Model-View-Projection matrix
+		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
+
+		# Send the transformation matrices to the shader
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
+
 
 
 	#
@@ -201,6 +231,17 @@ class GlutViewer( MeshViewer ) :
 
 		# Framerate counter
 		self.frame_count += 1
+
+		# Apply model transformations
+		self.model_matrix = identity( 4, dtype=float32 )
+		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
+		self.model_matrix = TranslateMatrix( self.model_matrix, self.model_translation )
+
+		# Compute Model-View-Projection matrix
+		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
+
+		# Send the transformation matrices to the shader
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
 
 		# Display the mesh
 		MeshViewer.Display( self )
@@ -251,6 +292,9 @@ class GlutViewer( MeshViewer ) :
 		if d > 1.0 : d = 1.0
 		v[2] = cos( pi / 2.0 * d )
 		return v / norm(v)
+
+
+
 
 
 	#

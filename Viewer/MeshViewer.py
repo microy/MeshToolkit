@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-15
+#    update               : 2013-11-16
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -152,22 +152,21 @@ class MeshViewer() :
 		glEnableVertexAttribArray( 0 )
 		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
 
+		# Normal buffer object
+		self.normal_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ARRAY_BUFFER, self.normal_buffer_id )
+		glBufferData( GL_ARRAY_BUFFER, mesh.vertex_normals.nbytes, mesh.vertex_normals, GL_STATIC_DRAW )
+		glEnableVertexAttribArray( 1 )
+		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
+
 		# Color buffer object
 		if len(self.mesh.colors) :
-			# Color buffer object
 			self.color_buffer_id = glGenBuffers( 1 )
 			glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
 			glBufferData( GL_ARRAY_BUFFER, mesh.colors.nbytes, mesh.colors, GL_STATIC_DRAW )
-			glEnableVertexAttribArray( 1 )
-			glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
+			glEnableVertexAttribArray( 2 )
+			glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
 
-
-		# Normal buffer object
-#		self.normal_buffer_id = glGenBuffers( 1 )
-#		glBindBuffer( GL_ARRAY_BUFFER, self.normal_buffer_id )
-#		glBufferData( GL_ARRAY_BUFFER, len(mesh.vertex_normals)*4, mesh.vertex_normals, GL_STATIC_DRAW )
-#		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
-#		glEnableVertexAttribArray( 1 )
 
 		# OpenGL error checking
 		if glGetError() != GL_NO_ERROR :
@@ -184,7 +183,7 @@ class MeshViewer() :
 		if not self.mesh : return
 
 		# Draw the mesh
-		glDrawElements( GL_TRIANGLES, len(self.mesh.vertices), GL_UNSIGNED_INT, None )
+		glDrawElements( GL_TRIANGLES, len(self.mesh.faces)*3, GL_UNSIGNED_INT, None )
 
 
 	#
@@ -202,7 +201,7 @@ class MeshViewer() :
 		# Delete buffer objects
 		glDeleteBuffers( 1, array([ self.face_buffer_id ]) )
 		glDeleteBuffers( 1, array([ self.vertex_buffer_id ]) )
-#		glDeleteBuffers( 1, numpy.array([ self.normal_buffer_id ]) )
+		glDeleteBuffers( 1, array([ self.normal_buffer_id ]) )
 		if len(self.mesh.colors) :
 			glDeleteBuffers( 1, array([ self.color_buffer_id ]) )
 
