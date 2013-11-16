@@ -28,10 +28,11 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 
-from numpy import array
+from numpy import *
 
 from Core.Mesh import *
-
+from Core.BoundingContainer import *
+from Transformation import *
 
 
 
@@ -50,7 +51,7 @@ class MeshViewer() :
 	#
 	# Initialisation
 	#
-	def __init__( self, mesh=None ) :
+	def __init__( self, mesh=None, width=1024, height=768 ) :
 
 		# Initialise member variables
 		self.mesh = None
@@ -60,9 +61,29 @@ class MeshViewer() :
 		self.face_buffer_id = -1
 		self.normal_buffer_id = -1
 		self.color_buffer_id = -1
+		self.projection_matrix = identity( 4, dtype=float32 )
+		self.view_matrix = identity( 4, dtype=float32 )
+		self.model_matrix = identity( 4, dtype=float32 )
+		self.mvp_matrix = identity( 4, dtype=float32 )
+		self.trackball_transform = identity( 4, dtype=float32 )
+		self.model_scale_factor = 1.0
+		self.model_translation = array( [0, 0, 0], dtype=float32 )
+
 
 		# Load mesh
 		if mesh : self.LoadMesh( mesh )
+
+		# Initialise the transformation matrices
+		self.view_matrix = LookAtMatrix( [0, 0, 2], [0, 0, 0], [0, 1, 0] )
+		self.projection_matrix = PerspectiveMatrix( 45.0, float(self.width)/float(self.height), 0.1, 100.0 )
+
+		# Compute Model-View-Projection matrix
+		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
+
+		# Send the transformation matrices to the shader
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
+
+
 
 
 
@@ -128,13 +149,13 @@ class MeshViewer() :
 	#
 	# LoadMesh
 	#
-	def LoadMesh( self, mesh ) :
+	def LoadMesh( self, mesh, shader='Color' ) :
 
 		# Initialisation
 		self.mesh = mesh
 
 		# Load the shader
-		self.LoadShaders( 'Color' )
+		self.LoadShaders( shader )
 
 		# Vertex array object
 		self.vertex_array_id = glGenVertexArrays( 1 )
@@ -173,17 +194,56 @@ class MeshViewer() :
 			raise RuntimeError('OpenGL error while loading the mesh.' )
 
 
+		# Compute initial model transformations
+		(center, radius) = GetBoundingSphere( mesh )
+		self.model_scale_factor = 1.0 / radius
+		self.model_translation = array( center, dtype=float32 )
+
+		
 
 	#
 	# Display
 	#
 	def Display( self ) :
 
+		# Clear all pixels and depth buffer
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+
 		# Is there a mesh to display ?
 		if not self.mesh : return
 
+		# Compute model transformation matrix
+		self.model_matrix = identity( 4, dtype=float32 )
+		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
+		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_translation )
+
+		# Compute Model-View-Projection matrix
+		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
+
+		# Send the transformation matrices to the shader
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
+
 		# Draw the mesh
 		glDrawElements( GL_TRIANGLES, len(self.mesh.faces)*3, GL_UNSIGNED_INT, None )
+
+
+
+	#
+	# SetPerspectiveMatrix
+	#
+	def SetPerspectiveMatrix( self, witdh, height ) :
+
+		# Compute perspective projection matrix
+		self.projection_matrix = PerspectiveMatrix( 45.0, float(self.width)/float(self.height), 0.1, 100.0 )
+
+		# Compute Model-View-Projection matrix
+		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
+
+		# Send the transformation matrices to the shader
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
+
+
+
 
 
 	#
@@ -220,4 +280,12 @@ class MeshViewer() :
 		self.face_buffer_id = -1
 		self.normal_buffer_id = -1
 		self.color_buffer_id = -1
+		self.projection_matrix = identity( 4, dtype=float32 )
+		self.view_matrix = identity( 4, dtype=float32 )
+		self.model_matrix = identity( 4, dtype=float32 )
+		self.mvp_matrix = identity( 4, dtype=float32 )
+		self.trackball_transform = identity( 4, dtype=float32 )
+		self.model_scale_factor = 1.0
+		self.model_translation = array( [0, 0, 0], dtype=float32 )
+
 

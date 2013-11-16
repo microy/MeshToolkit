@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from Core.Mesh import *
+from Core.BoundingContainer import *
 from Core.Vrml import *
 from Viewer.GlutViewer import *
 from numpy import *
@@ -8,7 +9,7 @@ from numpy import *
 
 if __name__ == "__main__":
 
-	m = ReadVrmlFile("cube1.wrl")
+	m = ReadVrmlFile("bunny.wrl")
 
 	UpdateNormals( m )
 #	UpdateNeighbors( m )

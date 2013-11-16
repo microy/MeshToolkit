@@ -29,11 +29,8 @@ OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 
-from math import *
-from numpy import *
-
 from MeshViewer import *
-from Transformation import *
+
 
 
 
@@ -61,19 +58,11 @@ class GlutViewer( MeshViewer ) :
 		self.width  = width
 		self.height = height
 		self.frame_count = 0
-		self.mvp_matrix_id = -1
-		self.projection_matrix = identity( 4, dtype=float32 )
-		self.view_matrix = identity( 4, dtype=float32 )
-		self.model_matrix = identity( 4, dtype=float32 )
-		self.mvp_matrix = identity( 4, dtype=float32 )
-		self.trackball_transform = identity( 4, dtype=float32 )
-		self.model_scale_factor = 1.0
-		self.model_translation = array( [0, 0, 0], dtype=float32 )
 
 		# Initialise OpenGL / GLUT
 		glutInit()
 		glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH )
-		glutInitWindowSize( self.width, self.height )
+		glutInitWindowSize( width, height )
 		glutInitWindowPosition( 100, 100 )
 		glutCreateWindow( title )
 
@@ -93,17 +82,7 @@ class GlutViewer( MeshViewer ) :
 		glEnable( GL_CULL_FACE )
 
 		# MeshViewer initialisation
-		MeshViewer.__init__( self, mesh )
-
-		# Initialise the transformation matrices
-		self.view_matrix = LookAtMatrix( [4, 3, 3], [0, 0, 0], [0, 1, 0] )
-		self.projection_matrix = PerspectiveMatrix( 45.0, float(self.width)/float(self.height), 0.1, 100.0 )
-
-		# Compute Model-View-Projection matrix
-		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
-
-		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
+		MeshViewer.__init__( self, mesh, width, height )
 
 
 
@@ -208,16 +187,10 @@ class GlutViewer( MeshViewer ) :
 		# Resize the viewport
 		self.width  = width
 		self.height = height
-		glViewport( 0, 0, self.width, self.height )
+		glViewport( 0, 0, width, height )
 
 		# Recompute the perspective matrix
-		self.projection_matrix = PerspectiveMatrix( 45.0, float(self.width)/float(self.height), 1, 100.0 )
-
-		# Compute Model-View-Projection matrix
-		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
-
-		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
+		MeshViewer.SetPerspectiveMatrix( self, width, height )
 
 
 
@@ -226,22 +199,8 @@ class GlutViewer( MeshViewer ) :
 	#
 	def Display( self ) :
 
-		# Clear all pixels and depth buffer
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
-
 		# Framerate counter
 		self.frame_count += 1
-
-		# Apply model transformations
-		self.model_matrix = identity( 4, dtype=float32 )
-		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
-		self.model_matrix = TranslateMatrix( self.model_matrix, self.model_translation )
-
-		# Compute Model-View-Projection matrix
-		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
-
-		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
 
 		# Display the mesh
 		MeshViewer.Display( self )
@@ -269,32 +228,6 @@ class GlutViewer( MeshViewer ) :
 		MeshViewer.Close( self )
 
 		# Initialise member variables
-		self.mvp_matrix_id = -1
-		self.projection_matrix = identity( 4, dtype=float32 )
-		self.view_matrix = identity( 4, dtype=float32 )
-		self.model_matrix = identity( 4, dtype=float32 )
-		self.mvp_matrix = identity( 4, dtype=float32 )
-		self.trackball_transform = identity( 4, dtype=float32 )
-
-
-
-	#
-	# TrackballMapping
-	#
-	def TrackballMapping( self, x, y ) :
-
-		# Adapted from Nate Robins' programs
-		# http://www.xmission.com/~nate
-		v = zeros( 3 )
-		v[0] = ( 2.0 * float(x) - float(self.width) ) / float(self.width)
-		v[1] = ( float(self.height) - 2.0 * float(y) ) / float(self.height)
-		d = norm( v )
-		if d > 1.0 : d = 1.0
-		v[2] = cos( pi / 2.0 * d )
-		return v / norm(v)
-
-
-
 
 
 	#

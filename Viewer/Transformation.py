@@ -186,6 +186,7 @@ def PerspectiveMatrix( fovy, aspect, znear, zfar ) :
 #
 def LookAtMatrix( eye, center, up ) :
 
+	# Cast input variables
 	eye = array ( eye, dtype=float32 )
 	center = array ( center, dtype=float32 )
 	up = array ( up, dtype=float32 )
@@ -213,6 +214,7 @@ def LookAtMatrix( eye, center, up ) :
 	M[2,1] = -f[1]
 	M[2,2] = -f[2]
 
+	# Return result
 	return TranslateMatrix( M, -eye )
 
 
