@@ -123,8 +123,17 @@ class GlutViewer( MeshViewer ) :
 
 		# Escape
 		if key == '\x1b' :
+
 			# Exit
 			sys.exit()
+
+		# R
+		elif key in [ 'r', 'R' ] :
+
+			# Reset model translation and rotation
+			self.trackball_transform = identity( 4, dtype=float32 )
+			self.model_translation = array( [0, 0, 0], dtype=float32 )
+
 
 
 	#-
