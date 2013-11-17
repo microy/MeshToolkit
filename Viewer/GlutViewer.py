@@ -57,7 +57,7 @@ class GlutViewer( MeshViewer ) :
 	#
 	#-
 	#
-	def __init__( self, mesh="None", title="Untitled Window", width=1024, height=768 ) :
+	def __init__( self, mesh=None, title="Untitled Window", width=1024, height=768 ) :
 
 		# Initialise member variables
 		self.title = title
