@@ -159,7 +159,7 @@ class MeshViewer() :
 	#
 	#-
 	#
-	def LoadMesh( self, mesh, shader='Color' ) :
+	def LoadMesh( self, mesh, shader='Normal' ) :
 
 		# Initialisation
 		self.mesh = mesh
@@ -227,15 +227,18 @@ class MeshViewer() :
 
 		# Compute model transformation matrix
 		self.model_matrix = identity( 4, dtype=float32 )
-		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
-		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_center )
 		self.model_matrix = dot( self.model_matrix, self.trackball_transform )
 		self.model_matrix = TranslateMatrix( self.model_matrix, self.model_translation )
+		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
+		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_center )
 
 		# Compute Model-View-Projection matrix
 		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
 
 		# Send the transformation matrices to the shader
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "View_Matrix" ), 1, GL_TRUE, self.view_matrix )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "Model_Matrix" ), 1, GL_TRUE, self.model_matrix )
+		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition_worldspace" ), 4.0, 4.0, 4.0 )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
 
 		# Draw the mesh
