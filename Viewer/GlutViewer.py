@@ -32,6 +32,7 @@ from OpenGL.GLUT import *
 from math import *
 from numpy import *
 
+from AxesViewer import *
 from MeshViewer import *
 from Transformation import *
 
@@ -92,8 +93,10 @@ class GlutViewer() :
 		glEnable( GL_CULL_FACE )
 
 		# MeshViewer initialisation
-		self.mesh_viewer = MeshViewer( mesh, 'Color', width, height )
+		self.mesh_viewer = MeshViewer( mesh, width, height )
 
+		# MeshViewer initialisation
+		self.axes_viewer = AxesViewer()
 
 
 	#-
@@ -116,6 +119,7 @@ class GlutViewer() :
 			# Reset model translation and rotation
 			self.mesh_viewer.trackball_transform = identity( 4, dtype=float32 )
 			self.mesh_viewer.model_translation = array( [0, 0, 0], dtype=float32 )
+			self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
 
 
 
@@ -175,6 +179,7 @@ class GlutViewer() :
                         rotation_angle = 90.0 * norm(current_position - self.previous_trackball_position) * 1.5
                         self.previous_trackball_position = current_position
 			RotateMatrix( self.mesh_viewer.trackball_transform, rotation_angle, rotation_axis[0], rotation_axis[1], rotation_axis[2] )
+			self.axes_viewer.trackball_transform = self.mesh_viewer.trackball_transform
 
 		# XY translation
                 elif self.motion_state ==  2 :
@@ -248,6 +253,15 @@ class GlutViewer() :
 
 		# Display the mesh
 		self.mesh_viewer.Display()
+
+		# Resize the viewport
+		glViewport( 0, 0, 100, 100 )
+
+		# Display the XYZ axes
+		self.axes_viewer.Display()
+
+		# Restore the viewport
+		glViewport( 0, 0, self.width, self.height )
 
 		# Swap buffers
 		glutSwapBuffers()

@@ -55,7 +55,7 @@ class MeshViewer() :
 	#
 	#-
 	#
-	def __init__( self, mesh=None, shader='Color', width=1024, height=768 ) :
+	def __init__( self, mesh=None, width=1024, height=768 ) :
 
 		# Initialise member variables
 		self.mesh = None
@@ -75,7 +75,7 @@ class MeshViewer() :
 		self.trackball_transform = identity( 4, dtype=float32 )
 
 		# Load mesh
-		if mesh : self.LoadMesh( mesh, shader )
+		if mesh : self.LoadMesh( mesh )
 
 		# Initialise the view matrix
 		self.view_matrix = LookAtMatrix( [0, 0, 20], [0, 0, 0], [0, 1, 0] )
@@ -92,13 +92,13 @@ class MeshViewer() :
 	#
 	#-
 	#
-	def LoadMesh( self, mesh, shader='Color' ) :
+	def LoadMesh( self, mesh ) :
 
 		# Initialisation
 		self.mesh = mesh
 
 		# Load the shader
-		self.shader_program_id = LoadShaders( shader )
+		self.shader_program_id = LoadShaders( 'Normal' )
 
 		# Use the shader program
 		glUseProgram( self.shader_program_id )
@@ -178,9 +178,9 @@ class MeshViewer() :
 		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
 
 		# Send the transformation matrices to the shader
-#		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "View_Matrix" ), 1, GL_TRUE, self.view_matrix )
-#		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "Model_Matrix" ), 1, GL_TRUE, self.model_matrix )
-#		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition_worldspace" ), 4.0, 4.0, 4.0 )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "View_Matrix" ), 1, GL_TRUE, self.view_matrix )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "Model_Matrix" ), 1, GL_TRUE, self.model_matrix )
+		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition_worldspace" ), 4.0, 4.0, 4.0 )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
 
 		# Vertex array object
