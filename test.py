@@ -1,10 +1,9 @@
 #! /usr/bin/env python
 
-from Core.Mesh import *
-from Core.BoundingContainer import *
+from Core import *
 from Core.Vrml import *
+from Viewer import *
 from Viewer.GlutViewer import *
-from numpy import *
 
 
 if __name__ == "__main__":
