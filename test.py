@@ -8,7 +8,7 @@ from Viewer.GlutViewer import *
 
 if __name__ == "__main__":
 
-	m = ReadVrmlFile("bunny.wrl")
+	m = ReadVrmlFile("swirl.wrl")
 
 	UpdateNormals( m )
 #	UpdateNeighbors( m )

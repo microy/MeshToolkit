@@ -54,7 +54,7 @@ class MeshViewer() :
 	#
 	#-
 	#
-	def __init__( self, mesh=None, width=1024, height=768 ) :
+	def __init__( self, mesh=None, shader='Simple', width=1024, height=768 ) :
 
 		# Initialise member variables
 		self.mesh = None
@@ -73,12 +73,11 @@ class MeshViewer() :
 		self.model_translation = array( [0, 0, 0], dtype=float32 )
 		self.trackball_transform = identity( 4, dtype=float32 )
 
-
 		# Load mesh
-		if mesh : self.LoadMesh( mesh )
+		if mesh : self.LoadMesh( mesh, shader )
 
 		# Initialise the transformation matrices
-		self.view_matrix = LookAtMatrix( [0, 0, 2], [0, 0, 0], [0, 1, 0] )
+		self.view_matrix = LookAtMatrix( [0, 0, 20], [0, 0, 0], [0, 1, 0] )
 		self.projection_matrix = PerspectiveMatrix( 45.0, float(self.width)/float(self.height), 0.1, 100.0 )
 
 		# Compute Model-View-Projection matrix
@@ -104,8 +103,10 @@ class MeshViewer() :
 		fragment_shader_source = ''
 
 		# Load shader source files
-		with open('Viewer/Shader-'+name+'.vert.glsl', 'r') as f : vertex_shader_source = f.read()
-		with open('Viewer/Shader-'+name+'.frag.glsl', 'r') as f : fragment_shader_source = f.read()
+		with open('Viewer/Shader-'+name+'.vert.glsl', 'r') as vertex_shader_file :
+			vertex_shader_source = vertex_shader_file.read()
+		with open('Viewer/Shader-'+name+'.frag.glsl', 'r') as fragment_shader_file :
+			fragment_shader_source = fragment_shader_file.read()
 
 		# Create the shaders
 		vertex_shader = glCreateShader( GL_VERTEX_SHADER )
@@ -159,7 +160,7 @@ class MeshViewer() :
 	#
 	#-
 	#
-	def LoadMesh( self, mesh, shader='Normal' ) :
+	def LoadMesh( self, mesh, shader='Simple' ) :
 
 		# Initialisation
 		self.mesh = mesh
@@ -206,7 +207,7 @@ class MeshViewer() :
 
 		# Compute initial model transformations
 		(center, radius) = GetBoundingSphere( mesh )
-		self.model_scale_factor = 1.0 / radius
+		self.model_scale_factor = 10.0 / radius
 		self.model_center = array( center, dtype=float32 )
 
 		
@@ -227,10 +228,10 @@ class MeshViewer() :
 
 		# Compute model transformation matrix
 		self.model_matrix = identity( 4, dtype=float32 )
-		self.model_matrix = dot( self.model_matrix, self.trackball_transform )
 		self.model_matrix = TranslateMatrix( self.model_matrix, self.model_translation )
-		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
+		self.model_matrix = dot( self.model_matrix, self.trackball_transform )
 		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_center )
+		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
 
 		# Compute Model-View-Projection matrix
 		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
@@ -312,5 +313,23 @@ class MeshViewer() :
 		self.model_center = array( [0, 0, 0], dtype=float32 )
 		self.model_translation = array( [0, 0, 0], dtype=float32 )
 		self.trackball_transform = identity( 4, dtype=float32 )
+
+
+	#-
+	#
+	# PrintInfo
+	#
+	#-
+	#
+	def PrintInfo( self ) :
+
+		# Display OpenGL driver informations
+		print '~~~ OpenGL Informations ~~~'
+		print '  Vendor :   ' + glGetString( GL_VENDOR )
+		print '  Renderer : ' + glGetString( GL_RENDERER )
+		print '  Version :  ' + glGetString( GL_VERSION )
+		print '  Shader :   ' + glGetString( GL_SHADING_LANGUAGE_VERSION )
+
+
 
 

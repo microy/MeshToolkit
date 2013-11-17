@@ -93,24 +93,8 @@ class GlutViewer( MeshViewer ) :
 		glEnable( GL_CULL_FACE )
 
 		# MeshViewer initialisation
-		MeshViewer.__init__( self, mesh, width, height )
+		MeshViewer.__init__( self, mesh, 'Color', width, height )
 
-
-
-	#-
-	#
-	# PrintInfo
-	#
-	#-
-	#
-	def PrintInfo( self ) :
-
-		# Display OpenGL driver informations
-		print '~~~ OpenGL Informations ~~~'
-		print '  Vendor :   ' + glGetString( GL_VENDOR )
-		print '  Renderer : ' + glGetString( GL_RENDERER )
-		print '  Version :  ' + glGetString( GL_VERSION )
-		print '  Shader :   ' + glGetString( GL_SHADING_LANGUAGE_VERSION )
 
 
 	#-
@@ -136,6 +120,7 @@ class GlutViewer( MeshViewer ) :
 
 
 
+
 	#-
 	#
 	# Mouse
@@ -149,18 +134,21 @@ class GlutViewer( MeshViewer ) :
 
 			# Left button
 			if button == GLUT_LEFT_BUTTON :
+
 				# Trackball rotation
 				self.motion_state = 1
 				self.previous_trackball_position = self.TrackballMapping( x, y )
 
 			# Middle button
 			elif button == GLUT_MIDDLE_BUTTON :
+
 				# XY translation
 				self.motion_state = 2
 				self.previous_mouse_position = array([ x, y ])
 
 			# Right button
 			elif button == GLUT_RIGHT_BUTTON :
+
 				# Z translation
 				self.motion_state = 3
 				self.previous_mouse_position = array([ x, y ])
@@ -187,20 +175,21 @@ class GlutViewer( MeshViewer ) :
                         rotation_axis = cross( self.previous_trackball_position, current_position )
                         rotation_angle = 90.0 * norm(current_position - self.previous_trackball_position) * 1.5
                         self.previous_trackball_position = current_position
-			RotateMatrix( self.trackball_transform, rotation_angle, -rotation_axis[0], -rotation_axis[1], -rotation_axis[2] )
+			RotateMatrix( self.trackball_transform, rotation_angle, rotation_axis[0], rotation_axis[1], rotation_axis[2] )
 
 		# XY translation
                 elif self.motion_state ==  2 :
 
-                        self.model_translation[0] -= float(self.previous_mouse_position[0]-x)*0.005
-                        self.model_translation[1] += float(self.previous_mouse_position[1]-y)*0.005
+                        self.model_translation[0] -= float(self.previous_mouse_position[0]-x)*0.001
+                        self.model_translation[1] += float(self.previous_mouse_position[1]-y)*0.001
                         self.previous_mouse_position = array([ x, y ])
 
 		# Z translation
                 elif self.motion_state ==  3 :
 
-                        self.model_translation[2] -= float(self.previous_mouse_position[1]-y) * 0.05
+                        self.model_translation[2] -= float(self.previous_mouse_position[1]-y) * 0.001
                         self.previous_mouse_position = array([ x, y ])
+
 
 
 	#-
@@ -209,10 +198,12 @@ class GlutViewer( MeshViewer ) :
 	#
 	#-
 	#
+	# Map the mouse coordinates to a ball
+	# Adapted from Nate Robins' programs
+	# http://www.xmission.com/~nate
+	#
 	def TrackballMapping( self, x, y ) :
 
-		# Adapted from Nate Robins' programs
-		# http://www.xmission.com/~nate
 		v = zeros( 3 )
 		v[0] = ( 2.0 * float(x) - float(self.width) ) / float(self.width)
 		v[1] = ( float(self.height) - 2.0 * float(y) ) / float(self.height)
@@ -271,6 +262,7 @@ class GlutViewer( MeshViewer ) :
 
 		# Redraw
 		glutPostRedisplay()
+
 
 
 	#-
