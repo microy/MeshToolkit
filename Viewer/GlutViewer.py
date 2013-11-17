@@ -48,7 +48,7 @@ from Transformation import *
 #
 # Create an OpenGL frame with GLUT
 #
-class GlutViewer( MeshViewer ) :
+class GlutViewer() :
 
 
 	#-
@@ -64,7 +64,6 @@ class GlutViewer( MeshViewer ) :
 		self.width  = width
 		self.height = height
 		self.frame_count = 0
-		self.trackball_transform = identity( 4, dtype=float32 )
 		self.previous_mouse_position = array([0, 0])
 		self.previous_trackball_position = array([0.0, 0.0, 0.0 ])
 		self.motion_state = 0
@@ -93,7 +92,7 @@ class GlutViewer( MeshViewer ) :
 		glEnable( GL_CULL_FACE )
 
 		# MeshViewer initialisation
-		MeshViewer.__init__( self, mesh, 'Color', width, height )
+		self.mesh_viewer = MeshViewer( mesh, 'Color', width, height )
 
 
 
@@ -115,8 +114,8 @@ class GlutViewer( MeshViewer ) :
 		elif key in [ 'r', 'R' ] :
 
 			# Reset model translation and rotation
-			self.trackball_transform = identity( 4, dtype=float32 )
-			self.model_translation = array( [0, 0, 0], dtype=float32 )
+			self.mesh_viewer.trackball_transform = identity( 4, dtype=float32 )
+			self.mesh_viewer.model_translation = array( [0, 0, 0], dtype=float32 )
 
 
 
@@ -175,19 +174,19 @@ class GlutViewer( MeshViewer ) :
                         rotation_axis = cross( self.previous_trackball_position, current_position )
                         rotation_angle = 90.0 * norm(current_position - self.previous_trackball_position) * 1.5
                         self.previous_trackball_position = current_position
-			RotateMatrix( self.trackball_transform, rotation_angle, rotation_axis[0], rotation_axis[1], rotation_axis[2] )
+			RotateMatrix( self.mesh_viewer.trackball_transform, rotation_angle, rotation_axis[0], rotation_axis[1], rotation_axis[2] )
 
 		# XY translation
                 elif self.motion_state ==  2 :
 
-                        self.model_translation[0] -= float(self.previous_mouse_position[0]-x)*0.001
-                        self.model_translation[1] += float(self.previous_mouse_position[1]-y)*0.001
+                        self.mesh_viewer.model_translation[0] -= float(self.previous_mouse_position[0]-x)*0.001
+                        self.mesh_viewer.model_translation[1] += float(self.previous_mouse_position[1]-y)*0.001
                         self.previous_mouse_position = array([ x, y ])
 
 		# Z translation
                 elif self.motion_state ==  3 :
 
-                        self.model_translation[2] -= float(self.previous_mouse_position[1]-y) * 0.001
+                        self.mesh_viewer.model_translation[2] -= float(self.previous_mouse_position[1]-y) * 0.001
                         self.previous_mouse_position = array([ x, y ])
 
 
@@ -229,7 +228,7 @@ class GlutViewer( MeshViewer ) :
 		glViewport( 0, 0, width, height )
 
 		# Recompute the perspective matrix
-		MeshViewer.SetPerspectiveMatrix( self, width, height )
+		self.mesh_viewer.SetPerspectiveMatrix( width, height )
 
 
 
@@ -244,8 +243,11 @@ class GlutViewer( MeshViewer ) :
 		# Framerate counter
 		self.frame_count += 1
 
+		# Clear all pixels and depth buffer
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+
 		# Display the mesh
-		MeshViewer.Display( self )
+		self.mesh_viewer.Display()
 
 		# Swap buffers
 		glutSwapBuffers()
@@ -274,11 +276,10 @@ class GlutViewer( MeshViewer ) :
 	def Close( self ) :
 
 		# Close the mesh
-		MeshViewer.Close( self )
+		self.mesh_viewer.Close()
 
 		# Initialise member variables
 		self.frame_count = 0
-		self.trackball_transform = identity( 4, dtype=float32 )
 		self.previous_mouse_position = array([0, 0])
 		self.previous_trackball_position = array([0.0, 0.0, 0.0 ])
 		self.motion_state = 0
@@ -312,6 +313,23 @@ class GlutViewer( MeshViewer ) :
 		# Start up the main loop
 		glutMainLoop()
 
+
+
+
+	#-
+	#
+	# PrintInfo
+	#
+	#-
+	#
+	def PrintInfo( self ) :
+
+		# Display OpenGL driver informations
+		print '~~~ OpenGL Informations ~~~'
+		print '  Vendor :   ' + glGetString( GL_VENDOR )
+		print '  Renderer : ' + glGetString( GL_RENDERER )
+		print '  Version :  ' + glGetString( GL_VERSION )
+		print '  Shader :   ' + glGetString( GL_SHADING_LANGUAGE_VERSION )
 
 
 

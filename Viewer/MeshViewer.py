@@ -32,6 +32,7 @@ from numpy import *
 
 from Core.Mesh import *
 from Core.BoundingContainer import *
+from Shader import *
 from Transformation import *
 
 
@@ -54,7 +55,7 @@ class MeshViewer() :
 	#
 	#-
 	#
-	def __init__( self, mesh=None, shader='Simple', width=1024, height=768 ) :
+	def __init__( self, mesh=None, shader='Color', width=1024, height=768 ) :
 
 		# Initialise member variables
 		self.mesh = None
@@ -76,80 +77,11 @@ class MeshViewer() :
 		# Load mesh
 		if mesh : self.LoadMesh( mesh, shader )
 
-		# Initialise the transformation matrices
+		# Initialise the view matrix
 		self.view_matrix = LookAtMatrix( [0, 0, 20], [0, 0, 0], [0, 1, 0] )
-		self.projection_matrix = PerspectiveMatrix( 45.0, float(self.width)/float(self.height), 0.1, 100.0 )
 
-		# Compute Model-View-Projection matrix
-		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
-
-		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
-
-
-
-
-
-	#-
-	#
-	#  LoadShaders
-	#
-	#-
-	#
-	def LoadShaders( self, name='Simple' ) :
-
-		# Initialisation
-		vertex_shader_source = ''
-		fragment_shader_source = ''
-
-		# Load shader source files
-		with open('Viewer/Shader-'+name+'.vert.glsl', 'r') as vertex_shader_file :
-			vertex_shader_source = vertex_shader_file.read()
-		with open('Viewer/Shader-'+name+'.frag.glsl', 'r') as fragment_shader_file :
-			fragment_shader_source = fragment_shader_file.read()
-
-		# Create the shaders
-		vertex_shader = glCreateShader( GL_VERTEX_SHADER )
-		fragment_shader = glCreateShader( GL_FRAGMENT_SHADER )
-
-		# Load shader source codes
-		glShaderSource( vertex_shader, vertex_shader_source )
-		glShaderSource( fragment_shader, fragment_shader_source )
-
-		# Compile the shaders
-		glCompileShader( vertex_shader )
-		glCompileShader( fragment_shader )
-
-		# Check the shaders
-		if not glGetShaderiv( vertex_shader, GL_COMPILE_STATUS ) :
-			raise RuntimeError( 'Vertex shader compilation failed.\n' + glGetShaderInfoLog( vertex_shader ) )
-		if not glGetShaderiv( fragment_shader, GL_COMPILE_STATUS ) :
-			raise RuntimeError( 'Fragment shader compilation failed.\n' + glGetShaderInfoLog( fragment_shader ) )
-
-		# Create the program
-		program_id = glCreateProgram()
-
-		# Attach the shaders to the program
-		glAttachShader( program_id, vertex_shader )
-		glAttachShader( program_id, fragment_shader )
-
-		# Link the program
-		glLinkProgram( program_id )
-
-		# Check the program
-		if not glGetProgramiv( program_id, GL_LINK_STATUS ) :
-			raise RuntimeError( 'Shader program linking failed.\n' + glGetProgramInfoLog( program_id ) )
-
-		# Use the shader program
-		glUseProgram( program_id )
-
-		# Delete the shaders
-		glDeleteShader( vertex_shader )
-		glDeleteShader( fragment_shader )
-
-		# Return shader program ID
-		self.shader_program_id = program_id
-
+		# Initialise the projection matrix
+		self.projection_matrix = PerspectiveMatrix( 45.0, float(width)/float(height), 0.1, 100.0 )
 
 
 
@@ -160,13 +92,16 @@ class MeshViewer() :
 	#
 	#-
 	#
-	def LoadMesh( self, mesh, shader='Simple' ) :
+	def LoadMesh( self, mesh, shader='Color' ) :
 
 		# Initialisation
 		self.mesh = mesh
 
 		# Load the shader
-		self.LoadShaders( shader )
+		self.shader_program_id = LoadShaders( shader )
+
+		# Use the shader program
+		glUseProgram( self.shader_program_id )
 
 		# Vertex array object
 		self.vertex_array_id = glGenVertexArrays( 1 )
@@ -199,11 +134,17 @@ class MeshViewer() :
 			glEnableVertexAttribArray( 2 )
 			glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
 
+		# Release the buffers
+		glBindBuffer( GL_ARRAY_BUFFER, 0 )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
+		glBindVertexArray( 0 )
+
+		# Release the shader program
+		glUseProgram( 0 )
 
 		# OpenGL error checking
 		if glGetError() != GL_NO_ERROR :
 			raise RuntimeError('OpenGL error while loading the mesh.' )
-
 
 		# Compute initial model transformations
 		(center, radius) = GetBoundingSphere( mesh )
@@ -220,11 +161,11 @@ class MeshViewer() :
 	#
 	def Display( self ) :
 
-		# Clear all pixels and depth buffer
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
-
 		# Is there a mesh to display ?
 		if not self.mesh : return
+
+		# Use the shader program
+		glUseProgram( self.shader_program_id )
 
 		# Compute model transformation matrix
 		self.model_matrix = identity( 4, dtype=float32 )
@@ -237,13 +178,24 @@ class MeshViewer() :
 		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
 
 		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "View_Matrix" ), 1, GL_TRUE, self.view_matrix )
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "Model_Matrix" ), 1, GL_TRUE, self.model_matrix )
-		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition_worldspace" ), 4.0, 4.0, 4.0 )
+#		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "View_Matrix" ), 1, GL_TRUE, self.view_matrix )
+#		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "Model_Matrix" ), 1, GL_TRUE, self.model_matrix )
+#		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition_worldspace" ), 4.0, 4.0, 4.0 )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
+
+		# Vertex array object
+		glBindVertexArray( self.vertex_array_id )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
 
 		# Draw the mesh
 		glDrawElements( GL_TRIANGLES, len(self.mesh.faces)*3, GL_UNSIGNED_INT, None )
+
+		# Release the vertex array object
+		glBindVertexArray( 0 )
+
+		# Release the shader program
+		glUseProgram( 0 )
+
 
 
 
@@ -253,17 +205,10 @@ class MeshViewer() :
 	#
 	#-
 	#
-	def SetPerspectiveMatrix( self, witdh, height ) :
+	def SetPerspectiveMatrix( self, width, height ) :
 
 		# Compute perspective projection matrix
-		self.projection_matrix = PerspectiveMatrix( 45.0, float(self.width)/float(self.height), 0.1, 100.0 )
-
-		# Compute Model-View-Projection matrix
-		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
-
-		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
-
+		self.projection_matrix = PerspectiveMatrix( 45.0, float(width)/float(height), 0.1, 100.0 )
 
 
 
@@ -313,23 +258,6 @@ class MeshViewer() :
 		self.model_center = array( [0, 0, 0], dtype=float32 )
 		self.model_translation = array( [0, 0, 0], dtype=float32 )
 		self.trackball_transform = identity( 4, dtype=float32 )
-
-
-	#-
-	#
-	# PrintInfo
-	#
-	#-
-	#
-	def PrintInfo( self ) :
-
-		# Display OpenGL driver informations
-		print '~~~ OpenGL Informations ~~~'
-		print '  Vendor :   ' + glGetString( GL_VENDOR )
-		print '  Renderer : ' + glGetString( GL_RENDERER )
-		print '  Version :  ' + glGetString( GL_VERSION )
-		print '  Shader :   ' + glGetString( GL_SHADING_LANGUAGE_VERSION )
-
 
 
 
