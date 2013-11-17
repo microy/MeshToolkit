@@ -285,6 +285,14 @@ class GlutViewer( MeshViewer ) :
 		MeshViewer.Close( self )
 
 		# Initialise member variables
+		self.title = title
+		self.width  = width
+		self.height = height
+		self.frame_count = 0
+		self.trackball_transform = identity( 4, dtype=float32 )
+		self.previous_mouse_position = array([0, 0])
+		self.previous_trackball_position = array([0.0, 0.0, 0.0 ])
+		self.motion_state = 0
 
 
 	#-
