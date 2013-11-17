@@ -285,7 +285,6 @@ class GlutViewer( MeshViewer ) :
 		MeshViewer.Close( self )
 
 		# Initialise member variables
-		self.title = title
 		self.width  = width
 		self.height = height
 		self.frame_count = 0
