@@ -95,6 +95,7 @@ def RotateMatrix( M, angle, x, y, z ) :
 	angle = pi * float(angle) / 180.0
 	c,s = cos( angle ), sin( angle )
 	n = sqrt( x*x + y*y + z*z )
+	if n == 0 : n = 1.0
 	x /= n
 	y /= n
 	z /= n
@@ -218,22 +219,4 @@ def LookAtMatrix( eye, center, up ) :
 	return TranslateMatrix( M, -eye )
 
 
-#-
-#
-# TrackballMapping
-#
-#-
-#
-def TrackballMapping( x, y, width, height ) :
-
-	# Adapted from Nate Robins' programs
-	# http://www.xmission.com/~nate
-	v = zeros( 3 )
-	v[0] = ( 2.0 * float(x) - float(width) ) / float(width)
-	v[1] = ( float(height) - 2.0 * float(y) ) / float(height)
-	d = norm( v )
-	if d > 1.0 : d = 1.0
-	v[2] = cos( pi / 2.0 * d )
-
-	return v / norm(v)
 

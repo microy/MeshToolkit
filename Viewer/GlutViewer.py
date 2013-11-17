@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                GlutViewer.py
 #                             -------------------
-#    update               : 2013-11-16
+#    update               : 2013-11-17
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -29,8 +29,11 @@ OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 
-from MeshViewer import *
+from math import *
+from numpy import *
 
+from MeshViewer import *
+from Transformation import *
 
 
 
@@ -48,8 +51,11 @@ from MeshViewer import *
 class GlutViewer( MeshViewer ) :
 
 
+	#-
 	#
 	# Initialisation
+	#
+	#-
 	#
 	def __init__( self, mesh="None", title="Untitled Window", width=1024, height=768 ) :
 
@@ -58,6 +64,10 @@ class GlutViewer( MeshViewer ) :
 		self.width  = width
 		self.height = height
 		self.frame_count = 0
+		self.trackball_transform = identity( 4, dtype=float32 )
+		self.previous_mouse_position = array([0, 0])
+		self.previous_trackball_position = array([0.0, 0.0, 0.0 ])
+		self.motion_state = 0
 
 		# Initialise OpenGL / GLUT
 		glutInit()
@@ -72,6 +82,7 @@ class GlutViewer( MeshViewer ) :
 		glutIdleFunc( self.Idle )
 		glutKeyboardFunc( self.Keyboard )
 		glutMouseFunc( self.Mouse )
+		glutMotionFunc( self.Motion )
 		glutReshapeFunc( self.Reshape )
 		glutTimerFunc( 0, self.Timer, 0 )
 
@@ -86,8 +97,11 @@ class GlutViewer( MeshViewer ) :
 
 
 
+	#-
 	#
 	# PrintInfo
+	#
+	#-
 	#
 	def PrintInfo( self ) :
 
@@ -99,88 +113,113 @@ class GlutViewer( MeshViewer ) :
 		print '  Shader :   ' + glGetString( GL_SHADING_LANGUAGE_VERSION )
 
 
+	#-
 	#
 	# Keyboard
 	#
+	#-
+	#
 	def Keyboard( self, key, mouseX, mouseY ) :
 
-		glutPostRedisplay()
+		# Escape
+		if key == '\x1b' :
+			# Exit
+			sys.exit()
 
 
+	#-
 	#
 	# Mouse
 	#
+	#-
+	#
 	def Mouse( self, button, state, x, y ) :
 
-#               case FL_PUSH :
-#                       Mouse(Fl::event_button(), Fl::event_x(), Fl::event_y());
-#                        break;
+		# Button down
+		if state == GLUT_DOWN :
 
- #               // Mouse up event
-#                case FL_RELEASE :
-#                        motion_state = MOTION_NONE;
-#                        cursor(FL_CURSOR_DEFAULT);
-#                        break;
+			# Left button
+			if button == GLUT_LEFT_BUTTON :
+				# Trackball rotation
+				self.motion_state = 1
+				previous_trackball_position = self.TrackballMapping( x, y )
 
-#                // Mouse moved while down event
-#                case FL_DRAG :
-#                        Motion(Fl::event_x(), Fl::event_y());
-#                        break;
+			# Middle button
+			elif button == GLUT_MIDDLE_BUTTON :
+				# XY translation
+				self.motion_state = 2
+				self.previous_mouse_position = array([ x, y ])
 
-#                // Keyboard event
-#                // Return 1 if you understand/use the keyboard event, 0 otherwise...
-#                case FL_KEYBOARD :
-#                case FL_SHORTCUT :
-#                        if( Keyboard( Fl::event_key() ) ) break;
-#                        return 0;
+			# Right button
+			elif button == GLUT_RIGHT_BUTTON :
+				# Z translation
+				self.motion_state = 3
+				self.previous_mouse_position = array([ x, y ])
+		
+		# Button up
+		elif state == GLUT_UP :
 
-
-
-		if button == GLUT_LEFT_BUTTON:
-			self.MouseLeftClick(x, y)
-		elif button == GLUT_MIDDLE_BUTTON:
-			self.MouseMiddleClick(x, y)
-		elif button == GLUT_RIGHT_BUTTON:
-			self.MouseRightClick(x, y)
-		else:
-			raise ValueError(button)
-		glutPostRedisplay()
+			# Stop motion
+			self.motion_state = 0
 
 
+	#-
 	#
-	# MouseLeftClick
+	# Motion
 	#
-	def MouseLeftClick( self, x, y ) :
-#                motion_state = MOTION_ROTATION;
-#                // Trackball Rotation
-#                previous_trackball_position = TrackballMapping( x, y );
-#                // Change window cursor
-#                cursor(FL_CURSOR_HAND);
-		pass
-
-
+	#-
 	#
-	# MouseMiddleClick
+	def Motion( self, x, y ) :
+
+		# Trackball rotation
+                if self.motion_state == 1 :
+
+                        current_position = self.TrackballMapping( x, y )
+                        rotation_axis = cross( self.previous_trackball_position, current_position )
+                        rotation_angle = 90.0 * norm(current_position - self.previous_trackball_position) * 1.5
+                        self.previous_trackball_position = current_position
+			RotateMatrix( self.trackball_transform, rotation_angle, -rotation_axis[0], -rotation_axis[1], -rotation_axis[2] )
+
+		# XY translation
+                elif self.motion_state ==  2 :
+
+                        self.model_translation[0] -= float(self.previous_mouse_position[0]-x)*0.005
+                        self.model_translation[1] += float(self.previous_mouse_position[1]-y)*0.005
+                        self.previous_mouse_position = array([ x, y ])
+
+		# Z translation
+                elif self.motion_state ==  3 :
+
+                        self.model_translation[2] -= float(self.previous_mouse_position[1]-y) * 0.05
+                        self.previous_mouse_position = array([ x, y ])
+
+
+	#-
 	#
-	def MouseMiddleClick( self, x, y ) :
-#                        motion_state = MOTION_TRANSLATION_XY;
-#                        previous_mouse_position = Vector2i( x, y );
-#                        cursor(FL_CURSOR_MOVE);
-		pass
-
-
+	# TrackballMapping
 	#
-	# MouseRightClick
+	#-
 	#
-	def MouseRightClick( self, x, y ) :
-#                        motion_state = MOTION_TRANSLATION_Z;
-#                        previous_mouse_position = Vector2i( x, y );
-#                        cursor(FL_CURSOR_NS);
-		pass
+	def TrackballMapping( self, x, y ) :
+
+		# Adapted from Nate Robins' programs
+		# http://www.xmission.com/~nate
+		v = zeros( 3 )
+		v[0] = ( 2.0 * float(x) - float(self.width) ) / float(self.width)
+		v[1] = ( float(self.height) - 2.0 * float(y) ) / float(self.height)
+		d = norm( v )
+		if d > 1.0 : d = 1.0
+		v[2] = cos( pi / 2.0 * d )
+
+		return v / norm(v)
 
 
+
+	#-
 	#
 	# Reshape
+	#
+	#-
 	#
 	def Reshape( self, width, height ) :
 
@@ -194,8 +233,11 @@ class GlutViewer( MeshViewer ) :
 
 
 
+	#-
 	#
 	# Display
+	#
+	#-
 	#
 	def Display( self ) :
 
@@ -210,8 +252,11 @@ class GlutViewer( MeshViewer ) :
 		glutPostRedisplay()
 
 
+	#-
 	#
 	# Idle
+	#
+	#-
 	#
 	def Idle( self ) :
 
@@ -219,8 +264,11 @@ class GlutViewer( MeshViewer ) :
 		glutPostRedisplay()
 
 
+	#-
 	#
 	# Close
+	#
+	#-
 	#
 	def Close( self ) :
 
@@ -230,8 +278,11 @@ class GlutViewer( MeshViewer ) :
 		# Initialise member variables
 
 
+	#-
 	#
 	# Timer
+	#
+	#-
 	#
 	def Timer( self, value ) :
 
@@ -243,8 +294,11 @@ class GlutViewer( MeshViewer ) :
 		glutTimerFunc( 250, self.Timer, 1 )
 	
 
+	#-
 	#
 	# Run
+	#
+	#-
 	#
 	@staticmethod
 	def Run() :

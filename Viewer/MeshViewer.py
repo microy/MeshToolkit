@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-16
+#    update               : 2013-11-17
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -48,8 +48,11 @@ from Transformation import *
 class MeshViewer() :
 
 
+	#-
 	#
 	# Initialisation
+	#
+	#-
 	#
 	def __init__( self, mesh=None, width=1024, height=768 ) :
 
@@ -65,9 +68,10 @@ class MeshViewer() :
 		self.view_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = identity( 4, dtype=float32 )
 		self.mvp_matrix = identity( 4, dtype=float32 )
-		self.trackball_transform = identity( 4, dtype=float32 )
 		self.model_scale_factor = 1.0
+		self.model_center = array( [0, 0, 0], dtype=float32 )
 		self.model_translation = array( [0, 0, 0], dtype=float32 )
+		self.trackball_transform = identity( 4, dtype=float32 )
 
 
 		# Load mesh
@@ -87,8 +91,11 @@ class MeshViewer() :
 
 
 
+	#-
 	#
 	#  LoadShaders
+	#
+	#-
 	#
 	def LoadShaders( self, name='Simple' ) :
 
@@ -146,8 +153,11 @@ class MeshViewer() :
 
 
 
+	#-
 	#
 	# LoadMesh
+	#
+	#-
 	#
 	def LoadMesh( self, mesh, shader='Color' ) :
 
@@ -197,12 +207,15 @@ class MeshViewer() :
 		# Compute initial model transformations
 		(center, radius) = GetBoundingSphere( mesh )
 		self.model_scale_factor = 1.0 / radius
-		self.model_translation = array( center, dtype=float32 )
+		self.model_center = array( center, dtype=float32 )
 
 		
 
+	#-
 	#
 	# Display
+	#
+	#-
 	#
 	def Display( self ) :
 
@@ -215,7 +228,9 @@ class MeshViewer() :
 		# Compute model transformation matrix
 		self.model_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
-		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_translation )
+		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_center )
+		self.model_matrix = dot( self.model_matrix, self.trackball_transform )
+		self.model_matrix = TranslateMatrix( self.model_matrix, self.model_translation )
 
 		# Compute Model-View-Projection matrix
 		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
@@ -228,8 +243,11 @@ class MeshViewer() :
 
 
 
+	#-
 	#
 	# SetPerspectiveMatrix
+	#
+	#-
 	#
 	def SetPerspectiveMatrix( self, witdh, height ) :
 
@@ -246,8 +264,11 @@ class MeshViewer() :
 
 
 
+	#-
 	#
 	# Close
+	#
+	#-
 	#
 	def Close( self ) :
 
@@ -284,8 +305,9 @@ class MeshViewer() :
 		self.view_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = identity( 4, dtype=float32 )
 		self.mvp_matrix = identity( 4, dtype=float32 )
-		self.trackball_transform = identity( 4, dtype=float32 )
 		self.model_scale_factor = 1.0
+		self.model_center = array( [0, 0, 0], dtype=float32 )
 		self.model_translation = array( [0, 0, 0], dtype=float32 )
+		self.trackball_transform = identity( 4, dtype=float32 )
 
 
