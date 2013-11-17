@@ -151,7 +151,7 @@ class GlutViewer( MeshViewer ) :
 			if button == GLUT_LEFT_BUTTON :
 				# Trackball rotation
 				self.motion_state = 1
-				previous_trackball_position = self.TrackballMapping( x, y )
+				self.previous_trackball_position = self.TrackballMapping( x, y )
 
 			# Middle button
 			elif button == GLUT_MIDDLE_BUTTON :
@@ -285,8 +285,6 @@ class GlutViewer( MeshViewer ) :
 		MeshViewer.Close( self )
 
 		# Initialise member variables
-		self.width  = width
-		self.height = height
 		self.frame_count = 0
 		self.trackball_transform = identity( 4, dtype=float32 )
 		self.previous_mouse_position = array([0, 0])
