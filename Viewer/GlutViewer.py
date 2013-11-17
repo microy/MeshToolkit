@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                GlutViewer.py
 #                             -------------------
-#    update               : 2013-11-17
+#    update               : 2013-11-18
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -92,10 +92,10 @@ class GlutViewer() :
 		glDepthFunc( GL_LESS )
 		glEnable( GL_CULL_FACE )
 
-		# MeshViewer initialisation
+		# Mesh viewer initialisation
 		self.mesh_viewer = MeshViewer( mesh, width, height )
 
-		# MeshViewer initialisation
+		# XYZ axes viewer initialisation
 		self.axes_viewer = AxesViewer()
 
 
