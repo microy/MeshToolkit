@@ -132,11 +132,9 @@ class AxesViewer :
 		self.model_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = dot( self.model_matrix, self.trackball_transform )
 
-		# Compute Model-View-Projection matrix
-		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
-
-		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
+		# Send the Model-View-Projection matrix to the shader
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE,
+			dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) ) )
 
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )

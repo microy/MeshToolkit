@@ -90,23 +90,24 @@ def ScaleMatrix( M, x, y=None, z=None ) :
 #
 #--
 #
-def RotateMatrix( M, angle, x, y, z ) :
+def RotateMatrix( M, angle, axis ) :
 
+	x, y, z = axis[0], axis[1], axis[2]
 	angle = pi * float(angle) / 180.0
-	c,s = cos( angle ), sin( angle )
+	c, s = cos( angle ), sin( angle )
 	n = sqrt( x*x + y*y + z*z )
 	if n == 0 : n = 1.0
 	x /= n
 	y /= n
 	z /= n
-	cx,cy,cz = (1-c)*x, (1-c)*y, (1-c)*z
+	cx, cy, cz = (1 - c) * x, (1 - c) * y, (1 - c) * z
 
 	R = array([[  cx*x + c , cy*x - z*s, cz*x + y*s, 0],
 		   [ cx*y + z*s,   cy*y + c, cz*y - x*s, 0],
 		   [ cx*z - y*s, cy*z + x*s,   cz*z + c, 0],
 		   [          0,          0,          0, 1] ])
 
-	M[...] = dot( M, R )
+	return array( dot( M, R ), dtype=float32 )
 
 
 #--

@@ -177,7 +177,8 @@ class GlutViewer() :
                 if self.motion_state == 1 :
 
                         (rotation_angle, rotation_axis) = self.trackball.GetRotation( x, y )
-			RotateMatrix( self.mesh_viewer.trackball_transform, rotation_angle, rotation_axis[0], rotation_axis[1], rotation_axis[2] )
+			self.mesh_viewer.trackball_transform = RotateMatrix( self.mesh_viewer.trackball_transform,
+				rotation_angle, rotation_axis )
 			self.axes_viewer.trackball_transform = self.mesh_viewer.trackball_transform
 
 		# XY translation
