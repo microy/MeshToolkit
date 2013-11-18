@@ -53,12 +53,10 @@ from numpy.linalg import *
 #
 #--
 #
-def TranslateMatrix( M, v ) :
+def TranslateMatrix( M, direction ) :
 
 	T = identity( 4, dtype=float32 )
-	T[0,3] = v[0]
-	T[1,3] = v[1]
-	T[2,3] = v[2]
+	T[:3, 3] = direction[:3]
 
 	return dot( M, T )
 
