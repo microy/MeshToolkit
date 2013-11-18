@@ -56,12 +56,12 @@ def LoadShaders( name='Simple' ) :
 		geometry_shader_enabled = False
 
 	# Load shader source files
-	with open('Viewer/Shader-'+name+'.vert.glsl', 'r') as vertex_shader_file :
+	with open('Viewer/Shaders/Shader-'+name+'.vert.glsl', 'r') as vertex_shader_file :
 		vertex_shader_source = vertex_shader_file.read()
-	with open('Viewer/Shader-'+name+'.frag.glsl', 'r') as fragment_shader_file :
+	with open('Viewer/Shaders/Shader-'+name+'.frag.glsl', 'r') as fragment_shader_file :
 		fragment_shader_source = fragment_shader_file.read()
 	if geometry_shader_enabled :
-		with open('Viewer/Shader-'+name+'.geom.glsl', 'r') as geometry_shader_file :
+		with open('Viewer/Shaders/Shader-'+name+'.geom.glsl', 'r') as geometry_shader_file :
 			geometry_shader_source = geometry_shader_file.read()
 
 	# Create the shaders
