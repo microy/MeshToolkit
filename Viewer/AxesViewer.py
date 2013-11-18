@@ -153,7 +153,7 @@ class AxesViewer :
 		# Restore line width
 		glLineWidth( 1.0 )
 
-		# Enable lien antialiasing
+		# Disable line antialiasing
 		glDisable( GL_LINE_SMOOTH )
 
 

@@ -89,6 +89,8 @@ class QtViewerWidget( QGLWidget ) :
 
 		# OpenGL configuration
 		glClearColor( 1, 1, 1, 1 )
+		glHint( GL_LINE_SMOOTH_HINT, GL_NICEST )
+		glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST )
 		glEnable( GL_DEPTH_TEST )
 		glEnable( GL_CULL_FACE )
 		glEnable( GL_BLEND )
