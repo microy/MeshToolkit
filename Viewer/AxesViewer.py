@@ -56,13 +56,13 @@ class AxesViewer :
 	def __init__( self ) :
 
 		# Vertices
-		self.vertices = array( [
+		vertices = array( [
 			[0, 0, 0], [1, 0, 0],
 			[0, 0, 0], [0, 1, 0],
 			[0, 0, 0], [0, 0, 1] ] , dtype=float32 )
 
 		# Colors
-		self.colors = array( [
+		colors = array( [
 			[1, 0, 0], [1, 0, 0],
 			[0, 1, 0], [0, 1, 0],
 			[0, 0, 1], [0, 0, 1] ] , dtype=float32 )
@@ -80,14 +80,14 @@ class AxesViewer :
 		# Vertex buffer object
 		self.vertex_buffer_id = glGenBuffers( 1 )
 		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
-		glBufferData( GL_ARRAY_BUFFER, self.vertices.nbytes, self.vertices, GL_STATIC_DRAW )
+		glBufferData( GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW )
 		glEnableVertexAttribArray( 0 )
 		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
 
 		# Color buffer object
 		self.color_buffer_id = glGenBuffers( 1 )
 		glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
-		glBufferData( GL_ARRAY_BUFFER, self.colors.nbytes, self.colors, GL_STATIC_DRAW )
+		glBufferData( GL_ARRAY_BUFFER, colors.nbytes, colors, GL_STATIC_DRAW )
 		glEnableVertexAttribArray( 1 )
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 
@@ -99,12 +99,12 @@ class AxesViewer :
 		glUseProgram( 0 )
 
 		# Initialise the view matrix
-		self.view_matrix = LookAtMatrix( [0, 0, 2], [0, 0, 0], [0, 1, 0] )
+		self.view_matrix = TranslateMatrix( identity( 4, dtype=float32 ), [0, 0, -1] )
 
 		# Initialise the projection matrix
-		self.projection_matrix = PerspectiveMatrix( 45.0, 1, 0.1, 100.0 )
+		self.projection_matrix = OrthographicMatrix( -1.5, 1.5, -1.5, 1.5, 0.1, 10.0 )
 
-		# Initialise rotation
+		# Initialise the rotation matrix
 		self.trackball_transform = identity( 4, dtype=float32 )
 
 
@@ -128,13 +128,9 @@ class AxesViewer :
 		# Use the shader program
 		glUseProgram( self.shader_program_id )
 
-		# Compute model transformation matrix
-		self.model_matrix = identity( 4, dtype=float32 )
-		self.model_matrix = dot( self.model_matrix, self.trackball_transform )
-
 		# Send the Model-View-Projection matrix to the shader
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE,
-			dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) ) )
+			dot( self.projection_matrix, dot( self.view_matrix, self.trackball_transform ) ) )
 
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )

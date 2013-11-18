@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                              Transformation.py
 #                             -------------------
-#    update               : 2013-11-15
+#    update               : 2013-11-18
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -31,8 +31,14 @@
 #
 
 
+
+
+
+#--
 #
 # External dependencies
+#
+#--
 #
 from math import *
 from numpy import *
@@ -182,7 +188,7 @@ def PerspectiveMatrix( fovy, aspect, znear, zfar ) :
 
 #--
 #
-# LookAt
+# LookAtMatrix
 #
 #--
 #
