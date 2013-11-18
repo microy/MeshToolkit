@@ -68,7 +68,6 @@ class MeshViewer() :
 		self.projection_matrix = identity( 4, dtype=float32 )
 		self.view_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = identity( 4, dtype=float32 )
-		self.mvp_matrix = identity( 4, dtype=float32 )
 		self.model_scale_factor = 1.0
 		self.model_center = array( [0, 0, 0], dtype=float32 )
 		self.model_translation = array( [0, 0, 0], dtype=float32 )
@@ -142,10 +141,6 @@ class MeshViewer() :
 		# Release the shader program
 		glUseProgram( 0 )
 
-		# OpenGL error checking
-		if glGetError() != GL_NO_ERROR :
-			raise RuntimeError('OpenGL error while loading the mesh.' )
-
 		# Compute initial model transformations
 		(center, radius) = GetBoundingSphere( mesh )
 		self.model_scale_factor = 10.0 / radius
@@ -174,14 +169,12 @@ class MeshViewer() :
 		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_center )
 		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
 
-		# Compute Model-View-Projection matrix
-		self.mvp_matrix = dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) )
-
 		# Send the transformation matrices to the shader
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "View_Matrix" ), 1, GL_TRUE, self.view_matrix )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "Model_Matrix" ), 1, GL_TRUE, self.model_matrix )
 		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition_worldspace" ), 4.0, 4.0, 4.0 )
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE,
+			dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) ) )
 
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )
@@ -238,10 +231,6 @@ class MeshViewer() :
 		# Delete vertex array
 		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
 
-		# OpenGL error checking
-		if glGetError() != GL_NO_ERROR :
-			raise RuntimeError('OpenGL error while closing the mesh.' )
-
 		# Initialise member variables
 		self.mesh = None
 		self.shader_program_id = -1
@@ -253,7 +242,6 @@ class MeshViewer() :
 		self.projection_matrix = identity( 4, dtype=float32 )
 		self.view_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = identity( 4, dtype=float32 )
-		self.mvp_matrix = identity( 4, dtype=float32 )
 		self.model_scale_factor = 1.0
 		self.model_center = array( [0, 0, 0], dtype=float32 )
 		self.model_translation = array( [0, 0, 0], dtype=float32 )

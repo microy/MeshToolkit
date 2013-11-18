@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                AxesViewer.py
 #                             -------------------
-#    update               : 2013-11-17
+#    update               : 2013-11-18
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -98,10 +98,6 @@ class AxesViewer :
 		# Release the shader program
 		glUseProgram( 0 )
 
-		# OpenGL error checking
-		if glGetError() != GL_NO_ERROR :
-			raise RuntimeError('Error while creating XYZ axes viewer.' )
-
 		# Initialise the view matrix
 		self.view_matrix = LookAtMatrix( [0, 0, 2], [0, 0, 0], [0, 1, 0] )
 
@@ -176,9 +172,5 @@ class AxesViewer :
 
 		# Delete vertex array
 		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
-
-		# OpenGL error checking
-		if glGetError() != GL_NO_ERROR :
-			raise RuntimeError('OpenGL error while closing the mesh.' )
 
 
