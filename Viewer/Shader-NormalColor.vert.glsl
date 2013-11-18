@@ -2,8 +2,10 @@
 
 layout (location = 0) in vec3 in_Position;
 layout (location = 1) in vec3 in_Normal;
+layout (location = 2) in vec3 in_Color;
 
 // Output data ; will be interpolated for each fragment.
+out vec3 frag_Color;
 out vec3 Position_worldspace;
 out vec3 Normal_cameraspace;
 out vec3 EyeDirection_cameraspace;
@@ -36,5 +38,8 @@ void main(void)
 	// Normal of the the vertex, in camera space
 	// Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
 	Normal_cameraspace = ( View_Matrix * Model_Matrix * vec4(in_Normal,0)).xyz;
+
+	// Send the color
+	frag_Color = in_Color;
 }
 

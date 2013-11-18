@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2013-11-13
+#    update               : 2013-11-18
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -55,7 +55,7 @@ class Mesh :
 	# Display
 	#
 	def __str__( self ) :
-		string = '~~~ Mesh Informations ~~~\n' +\
+		string = '~~~ Mesh informations ~~~\n' +\
 			'  Filename :         ' + self.name + '\n'\
 			'  Vertices :         ' + `len(self.vertices)` + '\n'\
 			'  Faces :            ' + `len(self.faces)` + '\n'\
@@ -114,12 +114,16 @@ def UpdateNormals( mesh ) :
 	mesh.vertex_normals = numpy.zeros( (len(mesh.vertices), 3) )
 	# Add face normals to the normal of their respective vertices
 	for ( i, face ) in enumerate( mesh.faces ) :
-		mesh.vertex_normals[ face ] += mesh.face_normals[ i ]            
+		mesh.vertex_normals[ face ] += mesh.face_normals[ i ]
 	# Normalize the normal vectors
+	for i in range( len(mesh.face_normals) ) :
+		mesh.face_normals[i] /= numpy.linalg.norm( mesh.face_normals[i] )
+	for i in range( len(mesh.vertex_normals) ) :
+		mesh.vertex_normals[i] /= numpy.linalg.norm( mesh.vertex_normals[i] )
 #	mesh.face_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.face_normals ).repeat( 3 ).reshape( mesh.face_normals.shape )
 #	mesh.vertex_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.vertex_normals ).repeat( 3 ).reshape( mesh.vertex_normals.shape )
-	mesh.face_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.face_normals )[:,numpy.newaxis]
-	mesh.vertex_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.vertex_normals )[:,numpy.newaxis]
+#	mesh.face_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.face_normals )[:,numpy.newaxis]
+#	mesh.vertex_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.vertex_normals )[:,numpy.newaxis]
 	return mesh
 
 
@@ -134,45 +138,52 @@ def UpdateNormals( mesh ) :
 # Check several parameters of a given mesh
 #
 def CheckMesh( mesh ) :
+
 	# Initialisation
 	vertex_number = len( mesh.vertices )
 	face_number = len( mesh.faces )
+	log_message = '~~~ Mesh checking informations ~~~\n'
+
 	# Vertex number
 	if vertex_number < 3 :
-		raise RuntimeError( 'Not enough vertices ({})'.format( vertex_number ) )
+		log_message += '  Not enough vertices ({})\n'.format( vertex_number )
 	# Face number
 	if face_number < 1 :
-		raise RuntimeError( 'Not enough faces ({})'.format( face_number ) )
+		log_message += '  Not enough faces ({})\n'.format( face_number )
 	# Face normal number
 	if ( len(mesh.face_normals) > 0 ) and ( len(mesh.face_normals) != face_number ) :
-		raise RuntimeError( 'Face normal number doesn\'t match face number ({}/{})'.format( len(mesh.face_normals), face_number ) )
+		log_message += '  Face normal number doesn\'t match face number ({}/{})\n'.format( len(mesh.face_normals), face_number )
 	# Vertex normal number
 	if ( len(mesh.vertex_normals) > 0 ) and ( len(mesh.vertex_normals) != vertex_number ) :
-		raise RuntimeError( 'Vertex normal number doesn\'t match vertex number ({}/{})'.format( len(mesh.vertex_normals), vertex_number ) )
+		log_message += '  Vertex normal number doesn\'t match vertex number ({}/{})\n'.format( len(mesh.vertex_normals), vertex_number )
 	# Color number
 	if ( len(mesh.colors) > 0 ) and ( len(mesh.colors) != vertex_number ) :
-		raise RuntimeError( 'Color number doesn\'t match vertex number ({}/{})'.format( len(mesh.colors), vertex_number ) )
+		log_message += '  Color number doesn\'t match vertex number ({}/{})\n'.format( len(mesh.colors), vertex_number )
 	# Texture coordinate number
 	if ( len(mesh.textures) > 0 ) and ( len(mesh.textures) != vertex_number ) :
-		raise RuntimeError( 'Texture coordinate number doesn\'t match vertex number ({}/{})'.format( len(mesh.textures), vertex_number ) )
+		log_message += '  Texture coordinate number doesn\'t match vertex number ({}/{})\n'.format( len(mesh.textures), vertex_number )
 	# Texture filename
 	if ( len(mesh.textures) > 0 ) and ( mesh.texture_name == '' ) :
-		raise RuntimeError( 'Empty texture filename' )
+		log_message += '  Empty texture filename\n'
 	# Face indices
 	if ( mesh.faces < 0 ).any() or ( mesh.faces >= vertex_number ).any() :
-		raise RuntimeError( 'Wrong face indices' )
+		log_message += '  Wrong face indices\n'
 	# Degenerate face
 	for (i, face) in enumerate( mesh.faces ) :
+		dvn = []
 		# Calculate face normal vector           
 		face_normal = numpy.cross( mesh.vertices[ face[1] ] - mesh.vertices[ face[0] ],
 					mesh.vertices[ face[2] ] - mesh.vertices[ face[0] ] )
 		# Normal vector length
-		if numpy.linalg.norm( face_normal ) == 0 :
-			raise RuntimeError( 'Face {} is degenerate'.format(i) )
+		if numpy.linalg.norm( face_normal ) <= 0 : dvn.append( i )
+		if len(dvn) > 0 : log_message += '  Degenerated face normal : {}\n'.format(dvn)
 	# Degenerate vertex normals
 	if len(mesh.vertex_normals) > 0 :
+		dvn = []
 		for (i, normal) in enumerate( mesh.vertex_normals ) :
 			# Normal vector length
-			if numpy.linalg.norm( normal ) == 0 :
-				raise RuntimeError( 'Null vertex normal {}'.format(i) )
+			if numpy.linalg.norm( normal ) <= 0 : dvn.append( i )
+		if len(dvn) > 0 : log_message += '  Degenerated vertex normal :{}\n'.format(dvn)
+
+	print log_message
 

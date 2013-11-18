@@ -46,13 +46,13 @@ from .Transformation import *
 
 #--
 #
-# QtViewerWidget
+# QtViewerGLWidget
 #
 #--
 #
 # Create an OpenGL frame with Qt
 #
-class QtViewerWidget( QGLWidget ) :
+class QtViewerGLWidget( QGLWidget ) :
 
 
 	#-
@@ -61,7 +61,7 @@ class QtViewerWidget( QGLWidget ) :
 	#
 	#-
 	#
-	def __init__( self, parent=None, mesh=None ) :
+	def __init__( self, parent=None ) :
 
 		# Initialise QtGLWidget
 		QGLWidget.__init__( self, parent )
@@ -70,10 +70,8 @@ class QtViewerWidget( QGLWidget ) :
 		self.setMouseTracking( True )
 
 		# Initialise member variables
-		self.mesh = mesh
 		self.mesh_viewer = None
 		self.axes_viewer = None
-		self.frame_count = 0
 		self.previous_mouse_position = array( [0, 0] )
 		self.trackball = Trackball( self.width(), self.height() )
 		self.motion_state = 0
@@ -97,10 +95,37 @@ class QtViewerWidget( QGLWidget ) :
 #		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
 		# Mesh viewer initialisation
-		self.mesh_viewer = MeshViewer( self.mesh, self.width(), self.height() )
+		self.mesh_viewer = MeshViewer( self.width(), self.height() )
 
 		# XYZ axes viewer initialisation
 		self.axes_viewer = AxesViewer()
+
+
+	#-
+	#
+	# LoadMesh
+	#
+	#-
+	#
+	def LoadMesh( self, mesh ) :
+
+		self.mesh_viewer.LoadMesh( mesh )
+		self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.update()
+
+
+	#-
+	#
+	# Close
+	#
+	#-
+	#
+	def Close( self ) :
+
+		self.mesh_viewer.Close()
+		self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.update()
+
 
 
 	#-
@@ -110,9 +135,6 @@ class QtViewerWidget( QGLWidget ) :
 	#-
 	#
 	def paintGL( self ) :
-
-		# Framerate counter
-		self.frame_count += 1
 
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
@@ -215,17 +237,31 @@ class QtViewerWidget( QGLWidget ) :
 		# XY translation
                 elif self.motion_state ==  2 :
 
-                        self.mesh_viewer.model_translation[0] -= float(self.previous_mouse_position[0]-mouseEvent.x())*0.001
-                        self.mesh_viewer.model_translation[1] += float(self.previous_mouse_position[1]-mouseEvent.y())*0.001
+                        self.mesh_viewer.model_translation[0] -= float(self.previous_mouse_position[0]-mouseEvent.x())*0.005
+                        self.mesh_viewer.model_translation[1] += float(self.previous_mouse_position[1]-mouseEvent.y())*0.005
                         self.previous_mouse_position = array([ mouseEvent.x(), mouseEvent.y() ])
 			self.update()
 
 		# Z translation
                 elif self.motion_state ==  3 :
 
-                        self.mesh_viewer.model_translation[2] -= float(self.previous_mouse_position[1]-mouseEvent.y()) * 0.001
+                        self.mesh_viewer.model_translation[2] -= float(self.previous_mouse_position[1]-mouseEvent.y()) * 0.005
                         self.previous_mouse_position = array([ mouseEvent.x(), mouseEvent.y() ])
 			self.update()
 
 
+	#-
+	#
+	# PrintInfo
+	#
+	#-
+	#
+	def PrintInfo( self ) :
+
+		# Display OpenGL driver informations
+		print '~~~ OpenGL Informations ~~~'
+		print '  Vendor :   ' + glGetString( GL_VENDOR )
+		print '  Renderer : ' + glGetString( GL_RENDERER )
+		print '  Version :  ' + glGetString( GL_VERSION )
+		print '  Shader :   ' + glGetString( GL_SHADING_LANGUAGE_VERSION )
 
