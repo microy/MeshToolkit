@@ -77,7 +77,7 @@ class MeshViewer() :
 		if mesh : self.LoadMesh( mesh )
 
 		# Initialise the view matrix
-		self.view_matrix = LookAtMatrix( [0, 0, 20], [0, 0, 0], [0, 1, 0] )
+		self.view_matrix = LookAtMatrix( [0, 0, 30], [0, 0, 0], [0, 1, 0] )
 
 		# Initialise the projection matrix
 		self.projection_matrix = PerspectiveMatrix( 45.0, float(width)/float(height), 0.1, 100.0 )
