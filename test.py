@@ -10,7 +10,7 @@ import sys
 
 if __name__ == "__main__":
 
-	m = ReadVrmlFile("swirl.wrl")
+	m = ReadVrmlFile("bunny.wrl")
 
 	UpdateNormals( m )
 #	UpdateNeighbors( m )

@@ -97,7 +97,7 @@ class MeshViewer() :
 		self.mesh = mesh
 
 		# Load the shader
-		self.shader_program_id = LoadShaders( 'Normal' )
+		self.shader_program_id = LoadShaders( 'Simple' )
 
 		# Use the shader program
 		glUseProgram( self.shader_program_id )

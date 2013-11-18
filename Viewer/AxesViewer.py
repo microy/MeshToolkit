@@ -119,8 +119,11 @@ class AxesViewer :
 	#
 	def Display( self ) :
 
+		# Enable line antialiasing
+		glEnable( GL_LINE_SMOOTH )
+
 		# Increase line width
-		glLineWidth( 2.0 )
+		glLineWidth( 1.5 )
 
 		# Use the shader program
 		glUseProgram( self.shader_program_id )
@@ -150,6 +153,8 @@ class AxesViewer :
 		# Restore line width
 		glLineWidth( 1.0 )
 
+		# Enable lien antialiasing
+		glDisable( GL_LINE_SMOOTH )
 
 
 
