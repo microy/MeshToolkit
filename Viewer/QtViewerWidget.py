@@ -37,6 +37,7 @@ from PyQt4.QtOpenGL import *
 from numpy import *
 from .AxesViewer import *
 from .MeshViewer import *
+from .Trackball import *
 from .Transformation import *
 
 
@@ -74,7 +75,7 @@ class QtViewerWidget( QGLWidget ) :
 		self.axes_viewer = None
 		self.frame_count = 0
 		self.previous_mouse_position = array( [0, 0] )
-		self.previous_trackball_position = array( [0.0, 0.0, 0.0] )
+		self.trackball = Trackball( self.width(), self.height() )
 		self.motion_state = 0
 
 
@@ -143,6 +144,8 @@ class QtViewerWidget( QGLWidget ) :
 		# Recompute the perspective matrix
 		self.mesh_viewer.SetPerspectiveMatrix( width, height )
 
+		# Update the trackball
+		self.trackball.Resize( width, height )
 
 
 
@@ -159,7 +162,7 @@ class QtViewerWidget( QGLWidget ) :
 
 			# Trackball rotation
 			self.motion_state = 1
-			self.previous_trackball_position = self.TrackballMapping( mouseEvent.x(), mouseEvent.y() )
+			self.trackball.Update( mouseEvent.x(), mouseEvent.y() )
 
 		# Middle button
 		elif int(mouseEvent.buttons()) & QtCore.Qt.MidButton :
@@ -200,10 +203,7 @@ class QtViewerWidget( QGLWidget ) :
 		# Trackball rotation
                 if self.motion_state == 1 :
 
-                        current_position = self.TrackballMapping( mouseEvent.x(), mouseEvent.y() )
-                        rotation_axis = cross( self.previous_trackball_position, current_position )
-                        rotation_angle = 90.0 * norm(current_position - self.previous_trackball_position) * 1.5
-                        self.previous_trackball_position = current_position
+                        (rotation_angle, rotation_axis) = self.trackball.GetRotation( mouseEvent.x(), mouseEvent.y() )
 			RotateMatrix( self.mesh_viewer.trackball_transform, rotation_angle, rotation_axis[0], rotation_axis[1], rotation_axis[2] )
 			self.axes_viewer.trackball_transform = self.mesh_viewer.trackball_transform
 			self.update()
@@ -222,31 +222,6 @@ class QtViewerWidget( QGLWidget ) :
                         self.mesh_viewer.model_translation[2] -= float(self.previous_mouse_position[1]-mouseEvent.y()) * 0.001
                         self.previous_mouse_position = array([ mouseEvent.x(), mouseEvent.y() ])
 			self.update()
-
-
-
-
-
-	#-
-	#
-	# TrackballMapping
-	#
-	#-
-	#
-	# Map the mouse coordinates to a ball
-	# Adapted from Nate Robins' programs
-	# http://www.xmission.com/~nate
-	#
-	def TrackballMapping( self, x, y ) :
-
-		v = zeros( 3 )
-		v[0] = ( 2.0 * float(x) - float(self.width()) ) / float(self.width())
-		v[1] = ( float(self.height()) - 2.0 * float(y) ) / float(self.height())
-		d = norm( v )
-		if d > 1.0 : d = 1.0
-		v[2] = cos( pi / 2.0 * d )
-
-		return v / norm(v)
 
 
 

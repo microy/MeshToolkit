@@ -14,8 +14,10 @@ if __name__ == "__main__":
 
 	UpdateNormals( m )
 #	UpdateNeighbors( m )
+
 	print m
 #	CheckMesh( m )
+
 #	v = GlutViewer( mesh=m, title="Test" )
 #	v.PrintInfo()
 #	v.Run()

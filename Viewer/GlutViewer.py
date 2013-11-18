@@ -18,8 +18,13 @@
 # ***************************************************************************
 
 
+#-
 #
 # External dependencies
+#
+#-
+#
+# OpenGL, GLUT, NumPy
 #
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
@@ -28,13 +33,11 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-
-from math import *
 from numpy import *
-
-from AxesViewer import *
-from MeshViewer import *
-from Transformation import *
+from .AxesViewer import *
+from .MeshViewer import *
+from .Trackball import *
+from .Transformation import *
 
 
 
@@ -66,7 +69,7 @@ class GlutViewer() :
 		self.height = height
 		self.frame_count = 0
 		self.previous_mouse_position = array([0, 0])
-		self.previous_trackball_position = array([0.0, 0.0, 0.0 ])
+		self.trackball = Trackball( width, height )
 		self.motion_state = 0
 
 		# Initialise OpenGL / GLUT
@@ -123,7 +126,6 @@ class GlutViewer() :
 
 
 
-
 	#-
 	#
 	# Mouse
@@ -140,7 +142,7 @@ class GlutViewer() :
 
 				# Trackball rotation
 				self.motion_state = 1
-				self.previous_trackball_position = self.TrackballMapping( x, y )
+				self.trackball.Update( x, y )
 
 			# Middle button
 			elif button == GLUT_MIDDLE_BUTTON :
@@ -174,10 +176,7 @@ class GlutViewer() :
 		# Trackball rotation
                 if self.motion_state == 1 :
 
-                        current_position = self.TrackballMapping( x, y )
-                        rotation_axis = cross( self.previous_trackball_position, current_position )
-                        rotation_angle = 90.0 * norm(current_position - self.previous_trackball_position) * 1.5
-                        self.previous_trackball_position = current_position
+                        (rotation_angle, rotation_axis) = self.trackball.GetRotation( x, y )
 			RotateMatrix( self.mesh_viewer.trackball_transform, rotation_angle, rotation_axis[0], rotation_axis[1], rotation_axis[2] )
 			self.axes_viewer.trackball_transform = self.mesh_viewer.trackball_transform
 
@@ -198,29 +197,6 @@ class GlutViewer() :
 
 	#-
 	#
-	# TrackballMapping
-	#
-	#-
-	#
-	# Map the mouse coordinates to a ball
-	# Adapted from Nate Robins' programs
-	# http://www.xmission.com/~nate
-	#
-	def TrackballMapping( self, x, y ) :
-
-		v = zeros( 3 )
-		v[0] = ( 2.0 * float(x) - float(self.width) ) / float(self.width)
-		v[1] = ( float(self.height) - 2.0 * float(y) ) / float(self.height)
-		d = norm( v )
-		if d > 1.0 : d = 1.0
-		v[2] = cos( pi / 2.0 * d )
-
-		return v / norm(v)
-
-
-
-	#-
-	#
 	# Reshape
 	#
 	#-
@@ -234,6 +210,9 @@ class GlutViewer() :
 
 		# Recompute the perspective matrix
 		self.mesh_viewer.SetPerspectiveMatrix( width, height )
+
+		# Update the trackball
+		self.trackball.Resize( width, height )
 
 
 

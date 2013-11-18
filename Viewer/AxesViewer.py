@@ -44,7 +44,7 @@ from Transformation import *
 #
 # Display XYZ-axes in OpenGL
 #
-class AxesViewer() :
+class AxesViewer :
 
 
 	#-
