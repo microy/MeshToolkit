@@ -68,7 +68,7 @@ class AxesViewer :
 			[0, 0, 1], [0, 0, 1] ] , dtype=float32 )
 
 		# Load the shader
-		self.shader_program_id = LoadShader( 'Color' )
+		self.shader_program_id = LoadShader( 'Shader-Color' )
 
 		# Use the shader program
 		glUseProgram( self.shader_program_id )

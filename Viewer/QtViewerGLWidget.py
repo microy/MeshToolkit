@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-18
+#    update               : 2013-11-19
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -109,8 +109,13 @@ class QtViewerGLWidget( QGLWidget ) :
 	#
 	def LoadMesh( self, mesh ) :
 
+		# Send the mesh to the OpenGL viewer
 		self.mesh_viewer.LoadMesh( mesh )
+
+		# Initialise the XYZ axes viewer
 		self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
+
+		# Update the display
 		self.update()
 
 
@@ -122,8 +127,45 @@ class QtViewerGLWidget( QGLWidget ) :
 	#
 	def Close( self ) :
 
+		# Initialise the mesh viewer
 		self.mesh_viewer.Close()
+
+		# Initialise the XYZ axes viewer
 		self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
+
+		# Update the display
+		self.update()
+
+
+	#-
+	#
+	# SetShader
+	#
+	#-
+	#
+	def SetShader( self, shader ) :
+
+		# Load a shader for the model
+		self.mesh_viewer.shader_program_id = LoadShader( shader )
+
+		# Update the display
+		self.update()
+
+
+
+	#-
+	#
+	# Reset
+	#
+	#-
+	#
+	def Reset( self ) :
+
+		# Reset model/axes rotation
+		self.mesh_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
+
+		# Update the display
 		self.update()
 
 

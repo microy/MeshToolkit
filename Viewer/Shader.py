@@ -43,7 +43,7 @@ from OpenGL.GL import *
 #
 #-
 #
-def LoadShader( name='Simple' ) :
+def LoadShader( name='SmoothShading' ) :
 
 	# Initialisation
 	vertex_shader_source = ''
@@ -55,12 +55,12 @@ def LoadShader( name='Simple' ) :
 		geometry_shader_enabled = True
 
 	# Load shader source files
-	with open('Viewer/Shaders/Shader-'+name+'.vert.glsl', 'r') as vertex_shader_file :
+	with open('Viewer/Shaders/'+name+'.vert.glsl', 'r') as vertex_shader_file :
 		vertex_shader_source = vertex_shader_file.read()
-	with open('Viewer/Shaders/Shader-'+name+'.frag.glsl', 'r') as fragment_shader_file :
+	with open('Viewer/Shaders/'+name+'.frag.glsl', 'r') as fragment_shader_file :
 		fragment_shader_source = fragment_shader_file.read()
 	if geometry_shader_enabled :
-		with open('Viewer/Shaders/Shader-'+name+'.geom.glsl', 'r') as geometry_shader_file :
+		with open('Viewer/Shaders/'+name+'.geom.glsl', 'r') as geometry_shader_file :
 			geometry_shader_source = geometry_shader_file.read()
 
 	# Create the shaders

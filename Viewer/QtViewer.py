@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-18
+#    update               : 2013-11-19
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -28,8 +28,9 @@
 #
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import *
-from .QtViewerGLWidget import *
-from Core.Vrml import *
+from .QtViewerGLWidget import QtViewerGLWidget
+from Core.Mesh import UpdateNormals
+from Core.Vrml import ReadVrml
 
 
 
@@ -56,6 +57,9 @@ class QtViewer( QMainWindow ) :
 		# Initialise QMainWindow		
 		QMainWindow.__init__( self )
 
+		# Initialise member variables
+		self.mesh = None
+
 		# Set the window title
 		self.setWindowTitle( 'QtViewer' )
 
@@ -68,27 +72,50 @@ class QtViewer( QMainWindow ) :
 		# Set the status bar
 		self.statusBar()
 
-		# Create actions
-		open_action = QtGui.QAction( '&Open...', self )
-		open_action.setShortcut( 'Ctrl+O' )
-		open_action.setStatusTip( 'Open a file' )
-		self.connect( open_action, QtCore.SIGNAL('triggered()'), self.OpenAction )
-		close_action = QtGui.QAction( '&Close', self )
-		close_action.setShortcut( 'Ctrl+W' )
-		close_action.setStatusTip( 'Close the current file' )
-		self.connect( close_action, QtCore.SIGNAL('triggered()'), self.CloseAction )
-		exit_action = QtGui.QAction( '&Exit', self )
-		exit_action.setShortcut( 'Esc' )
-		exit_action.setStatusTip( 'Exit application' )
-		self.connect( exit_action, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()') )
+		# Create the file menu actions
+		file_open_action = QtGui.QAction( '&Open...', self )
+		file_open_action.setShortcut( 'O' )
+		file_open_action.setStatusTip( 'Open a file' )
+		self.connect( file_open_action, QtCore.SIGNAL('triggered()'), self.FileOpenAction )
+		file_close_action = QtGui.QAction( '&Close', self )
+		file_close_action.setShortcut( 'C' )
+		file_close_action.setStatusTip( 'Close the current file' )
+		self.connect( file_close_action, QtCore.SIGNAL('triggered()'), self.FileCloseAction )
+		file_exit_action = QtGui.QAction( '&Exit', self )
+		file_exit_action.setShortcut( 'Esc' )
+		file_exit_action.setStatusTip( 'Exit application' )
+		self.connect( file_exit_action, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()') )
 
-		# Create menu bar
-		menubar = self.menuBar()
-		fileMenu = menubar.addMenu( '&File' )
-		fileMenu.addAction( open_action )
-		fileMenu.addSeparator()
-		fileMenu.addAction( close_action )
-		fileMenu.addAction( exit_action )
+		# Create the view menu actions
+		self.view_flat_action = QtGui.QAction( '&Flat shading', self )
+		self.view_flat_action.setShortcut( 'F' )
+		self.view_flat_action.setCheckable( True )
+		self.view_flat_action.setChecked( False )
+		self.view_flat_action.setStatusTip( 'Render the mesh with flat shading' )
+		self.connect( self.view_flat_action, QtCore.SIGNAL('triggered()'), self.ViewFlatAction )
+		self.view_smooth_action = QtGui.QAction( '&Smooth shading', self )
+		self.view_smooth_action.setShortcut( 'S' )
+		self.view_smooth_action.setCheckable( True )
+		self.view_smooth_action.setChecked( True )
+		self.view_smooth_action.setStatusTip( 'Render the mesh with smooth shading' )
+		self.connect( self.view_smooth_action, QtCore.SIGNAL('triggered()'), self.ViewSmoothAction )
+		view_reset_action = QtGui.QAction( '&Reset', self )
+		view_reset_action.setShortcut( 'R' )
+		view_reset_action.setStatusTip( 'Reset the viewing parameters' )
+		self.connect( view_reset_action, QtCore.SIGNAL('triggered()'), self.ViewResetAction )
+
+		# Create the menu bar
+		menu_bar = self.menuBar()
+		file_menu = menu_bar.addMenu( '&File' )
+		file_menu.addAction( file_open_action )
+		file_menu.addSeparator()
+		file_menu.addAction( file_close_action )
+		file_menu.addAction( file_exit_action )
+		view_menu = menu_bar.addMenu( '&View' )
+		view_menu.addAction( self.view_flat_action )
+		view_menu.addAction( self.view_smooth_action )
+		view_menu.addSeparator()
+		view_menu.addAction( view_reset_action )
 
 		# Create the OpenGL frame
 		self.opengl_widget = QtViewerGLWidget( self )
@@ -97,14 +124,31 @@ class QtViewer( QMainWindow ) :
 
 	#-
 	#
-	# OpenAction
+	# FileOpenAction
 	#
 	#-
 	#
-	def OpenAction( self ) :
+	def FileOpenAction( self ) :
 
- 		filename = QFileDialog.getOpenFileName( self, 'Open VRML input File', '', 'VRML Files (*.wrl)' )
-		if filename : self.opengl_widget.LoadMesh( ReadVrmlFile(filename) )
+		# Open file dialog
+ 		filename = QFileDialog.getOpenFileName( self, 'Open VRML input File', '', 'VRML files (*.vrml *.wrl);;X3D files (*.x3d *.x3dv);;OpenInventor files (*.iv);;All files (*.*)' )
+
+		# Check filename
+		if not filename : return
+
+		# Set smooth shading by default
+		self.view_flat_action.setChecked( False )
+		self.view_smooth_action.setChecked( True )
+
+		# Read VRML/X3D/Inventor file
+		self.mesh = ReadVrml( filename )
+
+		# Compute mesh normals if necessary
+		if len(self.mesh.vertex_normals) != len(self.mesh.vertices) :
+			UpdateNormals( self.mesh )
+
+		# Send the mesh to the OpenGL viewer
+		self.opengl_widget.LoadMesh( self.mesh )
 
 
 
@@ -112,13 +156,58 @@ class QtViewer( QMainWindow ) :
 
 	#-
 	#
-	# CloseAction
+	# FileCloseAction
 	#
 	#-
 	#
-	def CloseAction( self ) :
+	def FileCloseAction( self ) :
 
+		# Close the mesh
 		self.opengl_widget.Close()
+
+
+
+
+	#-
+	#
+	# ViewFlatAction
+	#
+	#-
+	#
+	def ViewFlatAction( self ) :
+
+		# Set flat shading
+		self.view_flat_action.setChecked( True )
+		self.view_smooth_action.setChecked( False )
+		self.opengl_widget.SetShader( 'FlatShading' )
+
+
+
+
+	#-
+	#
+	# ViewSmoothAction
+	#
+	#-
+	#
+	def ViewSmoothAction( self ) :
+
+		# Set smooth shading
+		self.view_flat_action.setChecked( False )
+		self.view_smooth_action.setChecked( True )
+		self.opengl_widget.SetShader( 'SmoothShading' )
+
+
+	#-
+	#
+	# ViewResetAction
+	#
+	#-
+	#
+	def ViewResetAction( self ) :
+
+		# Reset model transformation
+		self.opengl_widget.Reset()
 
 
 

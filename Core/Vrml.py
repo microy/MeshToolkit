@@ -18,22 +18,31 @@
 # ***************************************************************************
 
 
+#-
 #
 # External dependencies
 #
-from Mesh import *
-from numpy import *
+#
+#-
+from numpy import array
+from .Mesh import Mesh
+
+
+
+
+
 
 
 #--
 #
-# ReadVrmlFile
+# ReadVrml
 #
 #--
 #
 # Import mesh from a file in Inventor / VRML / X3D format
 #
-def ReadVrmlFile( filename ) :
+def ReadVrml( filename ) :
+
 	# Initialisation
 	vertices = []
 	faces = []
@@ -45,108 +54,148 @@ def ReadVrmlFile( filename ) :
 	nrbrack = 0
 	level = 0
 	ixyz = 0
-	nodes = ['']
-	vec2d = [0., 0.]
-	vec3d = [0., 0., 0.]
-	vec3i = [0, 0, 0]
+	nodes = [ '' ]
+	vec2d = [ 0.0, 0.0 ]
+	vec3d = [ 0.0, 0.0, 0.0 ]
+	vec3i = [ 0, 0, 0 ]
 	previous_word = ''
-	color_binding=""
-	normal_binding=""
+	color_binding = ''
+	normal_binding = ''
+
 	# Open the file
 	vrmlfile = open( filename, 'r' )
+
 	# Check the header
 	header = vrmlfile.readline().split()
 	if header[0] not in [ '#VRML', '#X3D', '#Inventor' ] :
+
 		vrmlfile.close()
 		raise RuntimeError( 'Wrong file format !' )
+
 	# Read each line in the file
 	for line in vrmlfile :
+
 		# Empty line
 		if line.isspace() : continue
+
 		# Comment
 		if line.startswith( '#' ) : continue
+
 		# Remove comma
 		line = line.replace( ',', ' ' )
+
 		# Add buffer space around brackets and braces
 		line = line.replace( '[', ' [ ' ).replace( '{', ' { ' ).replace( ']', ' ] ' ).replace( '}', ' } ' )
+
 		# Split values in the line
 		for word in line.split() :
+
 			# Left bracket or brace
 			if word in [ '[', '{' ] :
+
 				# Increment left deliminter number
 				nlbrack += 1
+
 				# Get level number
 				level = nlbrack - nrbrack
+
 				# Save level name
 				if level >= len(nodes) : nodes.append( previous_word )
 				else : nodes[level] = previous_word
+
 				# Initialize coordinate index
 				ixyz = 0
+
 			# Right bracket or brace
 			elif word in [ '}', ']' ] :
+
 				# Increment right deliminter number
 				nrbrack += 1
+
 				# Get level number
 				level = nlbrack - nrbrack
+
 				# Sanity check
 				if level < 0 : return None
+
 			# Comment
 			elif word.startswith('#') :
+
 				# Save current word
 				previous_word = word
+
 				# Next line
 				break
+
 			# Point
 			elif nodes[level] == 'point' :
+
 				# Geometry
 				if nodes[level-1] in [ 'Coordinate', 'Coordinate3' ] :
+
 					# Get current value
 					vec3d[ixyz] = float( word )
+
 					# Complete coordinate ?
 					if ixyz == 2 :
 						vertices.append( vec3d[:] )
 						ixyz = 0
 					else :
 						ixyz += 1
+
 				# Texture
 				elif nodes[level-1] in [ 'TextureCoordinate', 'TextureCoordinate2' ] :
+
 					# Get current value
 					vec2d[ixyz] = float( word )
+
 					# Complete coordinate ?
 					if ixyz == 1 :
 						texcoords.append( vec2d[:] ) 
 						ixyz = 0
 					else :
 						ixyz += 1
+
 			# Face
 			elif nodes[level] == 'coordIndex' :
+
 				# Color binding
 				if previous_word == 'colorPerVertex' and word == 'TRUE' :
 					color_binding = 'PER_VERTEX'
 					continue
+
 				# Normal binding
 				elif previous_word == 'normalPerVertex' and word == 'TRUE' :
 					normal_binding = 'PER_VERTEX'
 					continue
+
 				# Face indices
 				elif nodes[level-1] == 'IndexedFaceSet' :
+
 					# -1 value
 					if ixyz == 3 :
+
 						# Next face
 						ixyz = 0
 						continue
+
 					# Get value
 					vec3i[ixyz] = int( word )
+
 					# Complete coordinate ?
 					if ixyz == 2 :
 						faces.append( vec3i[:] )
+
 					# Next coordinate
 					ixyz += 1
+
 			# Color (VRML 2)
 			elif nodes[level] == 'color' :
 				if nodes[level-1] == 'Color' :
+
 					# Get current value
 					vec3d[ixyz] = float( word )
+
 					# Complete coordinate ?
 					if ixyz == 2 :
 						colors.append( vec3d[:] )
@@ -154,11 +203,14 @@ def ReadVrmlFile( filename ) :
 					else :
 						# Next coordinate
 						ixyz += 1
+
 			# Color (VRML 1)
 			elif nodes[level] == 'diffuseColor' :
 				if nodes[level-1] == 'Material' :
+
 					# Get current value
 					vec3d[ixyz] = float( word )
+
 					# Complete coordinate ?
 					if ixyz == 2 :
 						colors.append( vec3d[:] )
@@ -166,11 +218,14 @@ def ReadVrmlFile( filename ) :
 					else :
 						# Next coordinate
 						ixyz += 1
+
 			# Normal
 			elif nodes[level] == 'vector' :
 				if nodes[level-1] == 'Normal' :
+
 					# Get current value
 					vec3d[ixyz] = float( word )
+
 					# Complete coordinate ?
 					if ixyz == 2 :
 						normals.append( vec3d[:] )
@@ -178,24 +233,30 @@ def ReadVrmlFile( filename ) :
 					else :
 						# Next coordinate
 						ixyz += 1
+
 			# Texture filename
 			elif nodes[level] == 'ImageTexture' :
 				if previous_word == 'url' :
 					if len(word) > 2 :
+
 						# Get texture filename
 						# Remove quotes around the filename
 						material = word[ 1 : -1 ]
+
 			# Texture filename
 			elif nodes[level] == 'Texture2' :
 				if previous_word == 'filename' :
 					if len(word) > 2 :
+
 						# Get texture filename
 						# Remove quotes around the filename
 						material = word[ 1 : -1 ]
+
 			# Color binding
 			elif nodes[level] == 'MaterialBinding' :
 				if previous_word == 'value' :
 					color_binding = word
+
 			# Normal binding
 			elif nodes[level] == 'NormalBinding' :
 				if previous_word == 'value' :
@@ -211,25 +272,23 @@ def ReadVrmlFile( filename ) :
 #	if material_binding is not 'PER_VERTEX' : colors=[]
 #	if normal_binding is not 'PER_VERTEX' : normals=[]
 
-	#
-	# TODO: Check mesh
-	#
-
 	# Return the final mesh
 	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
 		vertex_normals=array(normals), colors=array(colors),
 		textures=array(texcoords), texture_name=material )
 
 
+
+
 #--
 #
-# WriteVrmlFile
+# WriteVrml
 #
 #--
 #
 # Export mesh to a VRML V2.0 file
 #
-def WriteVrmlFile( mesh, filename ) :
+def WriteVrml( mesh, filename ) :
 
 	# Open the file
 	vrmlfile = open( filename, 'w' )
@@ -238,12 +297,14 @@ def WriteVrmlFile( mesh, filename ) :
 	vrmlfile.write( '#VRML V2.0 utf8\n\n' );
 
 	# Write comments
-	vrmlfile.write( '# Vertices : {}\n'.format(len(mesh.vertices)) )
-	vrmlfile.write( '# Faces    : {}\n'.format(len(mesh.faces)) )
+	vrmlfile.write( '# Vertices :  {}\n'.format(len(mesh.vertices)) )
+	vrmlfile.write( '# Faces :     {}\n'.format(len(mesh.faces)) )
+	if len(mesh.vertex_normals) == len(mesh.vertices) :
+		vrmlfile.write( '# Normals :   {}\n'.format(len(mesh.vertex_normals)) )
 	if len(mesh.colors) == len(mesh.vertices) :
-		vrmlfile.write( '# Colors   : {}\n'.format(len(mesh.colors)) )
+		vrmlfile.write( '# Colors :    {}\n'.format(len(mesh.colors)) )
 	if ( len(mesh.textures) == len(mesh.vertices) ) and ( mesh.texture_name is not '' ) :
-		vrmlfile.write( '# Texture  : {}\n'.format(mesh.texture_name) )
+		vrmlfile.write( '# Texture :   {}\n'.format(mesh.texture_name) )
 	vrmlfile.write( '\n' )
 
 	# Begin description
@@ -319,6 +380,5 @@ def WriteVrmlFile( mesh, filename ) :
 	# Close the file
 	vrmlfile.close()
 
-	return True
 
 

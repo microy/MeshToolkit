@@ -6,7 +6,7 @@ layout (location = 1) in vec3 Normal;
 uniform mat4 MVP_Matrix;
 uniform mat3 Normal_Matrix;
 
-out vec4 FragColor;
+flat out vec4 FragColor;
 
 void main( void ) {
 

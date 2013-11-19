@@ -92,10 +92,6 @@ class MeshViewer() :
 		# Close previous mesh
 		self.Close()
 
-		# Compute mesh normals
-		if len(mesh.vertex_normals) != len(mesh.vertices) :
-			UpdateNormals( mesh )
-
 		# Cast input data (required for OpenGL)
 		vertices = array( mesh.vertices, dtype=float32 )
 		faces = array( mesh.faces, dtype=uint32 )
@@ -107,7 +103,7 @@ class MeshViewer() :
 #			self.shader_program_id = LoadShaders( 'NormalColor' )
 #		else :
 #			self.shader_program_id = LoadShaders( 'Normal' )
-		self.shader_program_id = LoadShader( 'Test' )
+		self.shader_program_id = LoadShader( 'SmoothShading' )
 
 		# Use the shader program
 		glUseProgram( self.shader_program_id )
