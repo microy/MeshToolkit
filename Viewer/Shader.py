@@ -39,21 +39,20 @@ from OpenGL.GL import *
 
 #-
 #
-#  LoadShaders
+#  LoadShader
 #
 #-
 #
-def LoadShaders( name='Simple' ) :
+def LoadShader( name='Simple' ) :
 
 	# Initialisation
 	vertex_shader_source = ''
 	fragment_shader_source = ''
 	geometry_shader_source = ''
+	geometry_shader_enabled = False
 
 	if name == 'NormalView' :
 		geometry_shader_enabled = True
-	else :
-		geometry_shader_enabled = False
 
 	# Load shader source files
 	with open('Viewer/Shaders/Shader-'+name+'.vert.glsl', 'r') as vertex_shader_file :

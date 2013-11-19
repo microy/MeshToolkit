@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-17
+#    update               : 2013-11-19
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -81,7 +81,6 @@ class MeshViewer() :
 
 
 
-
 	#-
 	#
 	# LoadMesh
@@ -97,14 +96,12 @@ class MeshViewer() :
 		if len(mesh.vertex_normals) != len(mesh.vertices) :
 			UpdateNormals( mesh )
 
-		# Check input mesh
-		CheckMesh( mesh )
-
 		# Load the shader
-		if len(mesh.colors) == len(mesh.vertices) :
-			self.shader_program_id = LoadShaders( 'NormalColor' )
-		else :
-			self.shader_program_id = LoadShaders( 'Normal' )
+#		if len(mesh.colors) == len(mesh.vertices) :
+#			self.shader_program_id = LoadShaders( 'NormalColor' )
+#		else :
+#			self.shader_program_id = LoadShaders( 'Normal' )
+		self.shader_program_id = LoadShader( 'Test' )
 
 		# Use the shader program
 		glUseProgram( self.shader_program_id )
@@ -176,17 +173,18 @@ class MeshViewer() :
 		# Compute model transformation matrix
 		self.model_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = TranslateMatrix( self.model_matrix, self.model_translation )
-		self.model_matrix = dot( self.model_matrix, self.trackball_transform )
 		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_center )
 		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
 
+		viewmatrix = dot( self.view_matrix, self.trackball_transform )
+
 		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "View_Matrix" ), 1, GL_TRUE, self.view_matrix )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "View_Matrix" ), 1, GL_TRUE, viewmatrix )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "Model_Matrix" ), 1, GL_TRUE, self.model_matrix )
-		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition_worldspace" ), 0.0, 0.0, 20.0 )
-#		glUniform1f( glGetUniformLocation( self.shader_program_id, "ScaleFactor" ), self.model_scale_factor / 10.0 )
+		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_TRUE, NormalMatrix( viewmatrix ) )
+		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition" ), 0.0, 0.0, 30.0 )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE,
-			dot( self.projection_matrix, dot( self.view_matrix, self.model_matrix ) ) )
+			dot( self.projection_matrix, dot( viewmatrix, self.model_matrix ) ) )
 
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )
