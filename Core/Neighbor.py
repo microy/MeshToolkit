@@ -23,6 +23,7 @@
 # External dependencies
 #
 #-
+#
 from numpy import array
 
 
@@ -61,5 +62,39 @@ def UpdateNeighbors( mesh ) :
 	# Return the mesh with the neighborhood informations
 	return mesh
 
+
+
+
+
+
+#--
+#
+# IsBorderVertex
+#
+#--
+#
+# Return true if the vertex is on a border edge
+#
+def IsBorderVertex( mesh, vertex ) :
+
+	# Loop through the neighbor vertices
+	for v in mesh.neighbor_vertices[ vertex ] :
+
+		common_face = 0
+
+		# Loop through the neighbor faces
+		for f1 in mesh.neighbor_faces[ v ] :
+
+			for f2 in mesh.neighbor_faces[ vertex ] :
+
+				# Check if it has a face in common
+				if f1 == f2 : common_face += 1
+
+		# If there is only 1 common face with this neighbor,
+		# it is a vertex on the border
+		if common_face < 2 : return True
+
+	# Otherwise, it is not on the border
+	return False
 
 

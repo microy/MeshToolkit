@@ -63,6 +63,7 @@ def ComputeNormalCurvature( mesh ) :
 	for v1 in range( len(mesh.vertices) ) :
 
 		# Check border
+		if IsBorderVertex[v1] : continue
 
 		# Get the 1-ring neighborhood
 		for v2 in mesh.neighbor_vertices[v1] :
@@ -72,13 +73,45 @@ def ComputeNormalCurvature( mesh ) :
 			# Find an edge
 #			for v3 in mesh.neighbor_vertices[v2] :
 #				if edge( v2, v3 ) :
-#					coef += Cotan( mesh.vertices[v3], mesh.vertices[v1], mesh.vertices[v2] )
+#					u = mesh.vertices[v1] - mesh.vertices[v3]
+#					v = mesh.vertices[v2] - mesh.vertices[v3]
+#					coef += Cotangent( u, v )
 #
 #			normal_curvature[v1] += (coef * (mesh.vertices[v1] - mesh.vertices[v2]))
 
 
 	# Return the normal curvature vector array
 	return normal_curvature
+
+
+
+
+#--
+#
+# Cotangent
+#
+#--
+#
+# Cotangent between two vector in nD
+# Discrete Differential-Geometry Operators for Triangulated 2-Manifolds
+# Mark Meyer, Mathieu Desbrun, Peter Schroder, Alan H. Barr
+# VisMath '02, Berlin (Germany)
+#
+def Cotangent( v1, v2 ) :
+
+	# Compute square length
+	l1 = dot( v1, v1 )
+	l2 = dot( v2, v2 )
+
+	# Compute scalar product
+	dot_prod = dot( v1, v2 )
+
+	# Compute denomination
+	double denom = l1 * l2 - dot_prod * dot_prod;
+
+	# Return cotangent between v1 and v2
+	return dot_prod / sqrt(denom)
+
 
 
 
