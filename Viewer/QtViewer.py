@@ -26,11 +26,12 @@
 #
 # Qt
 #
+from Core.Mesh import CheckMesh
+from Core.Normal import UpdateNormals
+from Core.Vrml import ReadVrml
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import *
 from .QtViewerGLWidget import QtViewerGLWidget
-from Core.Mesh import UpdateNormals
-from Core.Vrml import ReadVrml
 
 
 
@@ -142,6 +143,9 @@ class QtViewer( QMainWindow ) :
 
 		# Read VRML/X3D/Inventor file
 		self.mesh = ReadVrml( filename )
+
+		# Check the mesh
+		CheckMesh( self.mesh )
 
 		# Compute mesh normals if necessary
 		if len(self.mesh.vertex_normals) != len(self.mesh.vertices) :
