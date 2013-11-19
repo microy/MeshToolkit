@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                  Vrml.py
 #                             -------------------
-#    update               : 2013-11-13
+#    update               : 2013-11-19
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -216,9 +216,9 @@ def ReadVrmlFile( filename ) :
 	#
 
 	# Return the final mesh
-	return Mesh( name=filename, vertices=array(vertices, dtype=float32), faces=array(faces, dtype=uint32),
-		vertex_normals=array(normals, dtype=float32), colors=array(colors, dtype=float32),
-		textures=array(texcoords, dtype=float32), texture_name=material )
+	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
+		vertex_normals=array(normals), colors=array(colors),
+		textures=array(texcoords), texture_name=material )
 
 
 #--
@@ -290,15 +290,15 @@ def WriteVrmlFile( mesh, filename ) :
 		vrmlfile.write( '        }\n' )
 
 	# Vertex normals
-#	if len(mesh.vertex_normals) == len(mesh.vertices) :
-#		vrmlfile.write( '        normalPerVertex TRUE\n' )
-#		vrmlfile.write( '        normal Normal {\n' )
-#		vrmlfile.write( '          vector [\n' )
-#		for i in range( len(mesh.vertex_normals)-1 ) :
-#			vrmlfile.write( '            {0} {1} {2},\n'.format( mesh.vertex_normals[i,0], mesh.vertex_normals[i,1], mesh.vertex_normals[i,2] ) )
-#		vrmlfile.write( '            {0} {1} {2}\n'.format( mesh.vertex_normals[len(mesh.vertex_normals)-1,0], mesh.vertex_normals[len(mesh.vertex_normals)-1,1], mesh.vertex_normals[len(mesh.vertex_normals)-1,2] ) )
-#		vrmlfile.write( '          ]\n' )
-#		vrmlfile.write( '        }\n' )
+	if len(mesh.vertex_normals) == len(mesh.vertices) :
+		vrmlfile.write( '        normalPerVertex TRUE\n' )
+		vrmlfile.write( '        normal Normal {\n' )
+		vrmlfile.write( '          vector [\n' )
+		for i in range( len(mesh.vertex_normals)-1 ) :
+			vrmlfile.write( '            {0} {1} {2},\n'.format( mesh.vertex_normals[i,0], mesh.vertex_normals[i,1], mesh.vertex_normals[i,2] ) )
+		vrmlfile.write( '            {0} {1} {2}\n'.format( mesh.vertex_normals[len(mesh.vertex_normals)-1,0], mesh.vertex_normals[len(mesh.vertex_normals)-1,1], mesh.vertex_normals[len(mesh.vertex_normals)-1,2] ) )
+		vrmlfile.write( '          ]\n' )
+		vrmlfile.write( '        }\n' )
 
 	# Texture coordinates
 	if ( len(mesh.textures) == len(mesh.vertices) ) and ( mesh.texture_name is not '' ) :

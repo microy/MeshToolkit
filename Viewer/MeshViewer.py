@@ -92,9 +92,15 @@ class MeshViewer() :
 		# Close previous mesh
 		self.Close()
 
-		# Load the shader
+		# Compute mesh normals
 		if len(mesh.vertex_normals) != len(mesh.vertices) :
 			UpdateNormals( mesh )
+
+		# Cast input data (required for OpenGL)
+		vertices = array( mesh.vertices, dtype=float32 )
+		faces = array( mesh.faces, dtype=uint32 )
+		normals = array( mesh.vertex_normals, dtype=float32 )
+		colors = array( mesh.colors, dtype=float32 )
 
 		# Load the shader
 #		if len(mesh.colors) == len(mesh.vertices) :
@@ -113,19 +119,19 @@ class MeshViewer() :
 		# Face buffer object
 		self.face_buffer_id = glGenBuffers( 1 )
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, mesh.faces.nbytes, mesh.faces, GL_STATIC_DRAW )
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, faces.nbytes, faces, GL_STATIC_DRAW )
 
 		# Vertex buffer object
 		self.vertex_buffer_id = glGenBuffers( 1 )
 		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
-		glBufferData( GL_ARRAY_BUFFER, mesh.vertices.nbytes, mesh.vertices, GL_STATIC_DRAW )
+		glBufferData( GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW )
 		glEnableVertexAttribArray( 0 )
 		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
 
 		# Normal buffer object
 		self.normal_buffer_id = glGenBuffers( 1 )
 		glBindBuffer( GL_ARRAY_BUFFER, self.normal_buffer_id )
-		glBufferData( GL_ARRAY_BUFFER, mesh.vertex_normals.nbytes, mesh.vertex_normals, GL_STATIC_DRAW )
+		glBufferData( GL_ARRAY_BUFFER, normals.nbytes, normals, GL_STATIC_DRAW )
 		glEnableVertexAttribArray( 1 )
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 
@@ -133,7 +139,7 @@ class MeshViewer() :
 		if len(mesh.colors) == len(mesh.vertices) :
 			self.color_buffer_id = glGenBuffers( 1 )
 			glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
-			glBufferData( GL_ARRAY_BUFFER, mesh.colors.nbytes, mesh.colors, GL_STATIC_DRAW )
+			glBufferData( GL_ARRAY_BUFFER, colors.nbytes, colors, GL_STATIC_DRAW )
 			glEnableVertexAttribArray( 2 )
 			glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
 
@@ -152,7 +158,7 @@ class MeshViewer() :
 		self.trackball_transform = identity( 4, dtype=float32 )
 
 		# Enable display
-		self.element_number = len(mesh.faces) * 3
+		self.element_number = len(faces) * 3
 
 		
 
