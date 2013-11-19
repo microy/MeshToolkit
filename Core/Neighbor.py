@@ -23,7 +23,7 @@
 # External dependencies
 #
 #-
-from Mesh import Mesh
+from numpy import array
 
 
 
@@ -55,9 +55,10 @@ def UpdateNeighbors( mesh ) :
 		mesh.neighbor_vertices[ mesh.faces[i,2] ].append( mesh.faces[i,1] )
 
 	# Remove duplicates
-	mesh.neighbor_vertices = [ list( set( i ) ) for i in mesh.neighbor_vertices ]
-	mesh.neighbor_faces = [ list( set( i ) ) for i in mesh.neighbor_faces ]
+	mesh.neighbor_vertices = [ array( list( set( i ) ) ) for i in mesh.neighbor_vertices ]
+	mesh.neighbor_faces = [ array( list( set( i ) ) ) for i in mesh.neighbor_faces ]
 
+	# Return the mesh with the neighborhood informations
 	return mesh
 
 
