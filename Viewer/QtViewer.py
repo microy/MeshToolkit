@@ -58,7 +58,7 @@ class QtViewer( QMainWindow ) :
 		# Initialise QMainWindow		
 		QMainWindow.__init__( self )
 
-		# Initialise member variables
+		# Initialise the mesh
 		self.mesh = None
 
 		# Set the window title
@@ -132,7 +132,8 @@ class QtViewer( QMainWindow ) :
 	def FileOpenAction( self ) :
 
 		# Open file dialog
- 		filename = QFileDialog.getOpenFileName( self, 'Open VRML input File', '', 'VRML files (*.vrml *.wrl);;X3D files (*.x3d *.x3dv);;OpenInventor files (*.iv);;All files (*.*)' )
+ 		filename = QFileDialog.getOpenFileName( self, 'Open VRML input File', '',
+			'VRML files (*.vrml *.wrl);;X3D files (*.x3d *.x3dv);;OpenInventor files (*.iv);;All files (*.*)' )
 
 		# Check filename
 		if not filename : return
@@ -168,6 +169,7 @@ class QtViewer( QMainWindow ) :
 
 		# Close the mesh
 		self.opengl_widget.Close()
+		self.mesh = None
 
 
 

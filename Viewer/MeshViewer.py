@@ -239,8 +239,7 @@ class MeshViewer() :
 		# Delete buffer objects
 		glDeleteBuffers( 1, array([ self.face_buffer_id ]) )
 		glDeleteBuffers( 1, array([ self.vertex_buffer_id ]) )
-		if self.normal_buffer_id != -1 :
-			glDeleteBuffers( 1, array([ self.normal_buffer_id ]) )
+		glDeleteBuffers( 1, array([ self.normal_buffer_id ]) )
 		if self.color_buffer_id != -1 :
 			glDeleteBuffers( 1, array([ self.color_buffer_id ]) )
 

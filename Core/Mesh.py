@@ -140,7 +140,7 @@ def CheckMesh( mesh ) :
 		if len(dvn) > 0 : log_message += '  Degenerated vertex normal :{}\n'.format(dvn)
 
 	# Return silently if there is no error
-	if not log_message : return True
+	if not log_message : return
 
 	# Print log message in case of errors
 	print '~~~ Mesh checking informations ~~~\n'
