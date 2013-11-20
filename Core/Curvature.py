@@ -107,7 +107,7 @@ def Cotangent( v1, v2 ) :
 	dot_prod = dot( v1, v2 )
 
 	# Compute denomination
-	double denom = l1 * l2 - dot_prod * dot_prod;
+	denom = l1 * l2 - dot_prod * dot_prod;
 
 	# Return cotangent between v1 and v2
 	return dot_prod / sqrt(denom)
