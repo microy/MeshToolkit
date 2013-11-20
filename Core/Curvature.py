@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Curvature.py
 #                             -------------------
-#    update               : 2013-11-19
+#    update               : 2013-11-20
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -18,18 +18,6 @@
 # ***************************************************************************
 
 
-#-
-#
-# External dependencies
-#
-#-
-from Mesh import Mesh
-from numpy import cross, zeros
-from numpy.linalg import norm
-
-
-
-
 #--
 #
 # Based on :
@@ -40,6 +28,19 @@ from numpy.linalg import norm
 #
 #--
 
+
+
+
+
+#-
+#
+# External dependencies
+#
+#-
+from .Neighbor import IsBorderVertex
+from math import sqrt
+from numpy import dot, cross, zeros
+from numpy.linalg import norm
 
 
 
@@ -63,7 +64,7 @@ def ComputeNormalCurvature( mesh ) :
 	for v1 in range( len(mesh.vertices) ) :
 
 		# Check border
-		if IsBorderVertex[v1] : continue
+		if IsBorderVertex( mesh, v1 ) : continue
 
 		# Get the 1-ring neighborhood
 		for v2 in mesh.neighbor_vertices[v1] :
@@ -71,11 +72,11 @@ def ComputeNormalCurvature( mesh ) :
 			coef = 0.0
 
 			# Find an edge
-#			for v3 in mesh.neighbor_vertices[v2] :
+			for v3 in mesh.neighbor_vertices[v2] :
 #				if edge( v2, v3 ) :
-#					u = mesh.vertices[v1] - mesh.vertices[v3]
-#					v = mesh.vertices[v2] - mesh.vertices[v3]
-#					coef += Cotangent( u, v )
+				u = mesh.vertices[v1] - mesh.vertices[v3]
+				v = mesh.vertices[v2] - mesh.vertices[v3]
+				coef += Cotangent( u, v )
 #
 #			normal_curvature[v1] += (coef * (mesh.vertices[v1] - mesh.vertices[v2]))
 
@@ -110,7 +111,7 @@ def Cotangent( v1, v2 ) :
 	denom = l1 * l2 - dot_prod * dot_prod;
 
 	# Return cotangent between v1 and v2
-	return dot_prod / sqrt(denom)
+	return dot_prod / sqrt( denom )
 
 
 
