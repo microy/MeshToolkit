@@ -4,10 +4,11 @@
 
 
 
+
 if __name__ == "__main__" :
 
-	test = False
-	gui = True
+	test = True
+	gui = False
 
 	if test :
 
@@ -15,29 +16,28 @@ if __name__ == "__main__" :
 		from Core.Normal import *
 		from Core.Neighbor import *
 		from Core.Curvature import *
+		from Core.Color import *
 		from Core.Vrml import *
 		from numpy import array, zeros
+		from numpy.linalg import norm
 		print '~~~ Read file ~~~'
-		mesh = ReadVrml( 'swirl.wrl' )
+		mesh = ReadVrml( 'bunny.wrl' )
 		print '  Done.'
 		print mesh
 		print '~~~ Check mesh ~~~'
 		CheckMesh( mesh )
 		print '  Done.'
 		print '~~~ Compute normals ~~~'
-		UpdateNormals( mesh )
+#		UpdateNormals( mesh )
 		print '  Done.'
 		print '~~~ Register neighbors ~~~'
 		UpdateNeighbors( mesh )
 		print '  Done.'
-		print '~~~ Color vertices on the border ~~~'
-		mesh.colors = zeros( (len(mesh.vertices), 3) )
-		for i in range( len(mesh.vertices) ) :
-			if IsBorderVertex( mesh, i ) : mesh.colors[i] = array( [1.0, 0.0, 0.0] )
-			else : mesh.colors[i] = array( [0.6, 0.6, 0.6] )
-		print '  Done.'
 		print '~~~ Compute normal curvature ~~~'
-		ComputeNormalCurvature( mesh )
+		normal_curvature = GetNormalCurvature( mesh )
+		print '  Done.'
+		print '~~~ Color vertices ~~~'
+		mesh.colors = Array2Color( normal_curvature )
 		print '  Done.'
 		print '~~~ Write file ~~~'
 		WriteVrml( mesh, 'test.wrl' )

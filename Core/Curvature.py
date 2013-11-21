@@ -48,14 +48,14 @@ from numpy.linalg import norm
 
 #--
 #
-# ComputeNormalCurvature
+# GetNormalCurvature
 #
 #--
 #
 # Compute the normal curvature vectors of the mesh
 # for every vertex
 #
-def ComputeNormalCurvature( mesh ) :
+def GetNormalCurvature( mesh ) :
 
 	# Initialise normal curvature array
 	normal_curvature = zeros( (len(mesh.vertices),3 ) )
@@ -73,12 +73,12 @@ def ComputeNormalCurvature( mesh ) :
 
 			# Find an edge
 			for v3 in mesh.neighbor_vertices[v2] :
-#				if edge( v2, v3 ) :
-				u = mesh.vertices[v1] - mesh.vertices[v3]
-				v = mesh.vertices[v2] - mesh.vertices[v3]
-				coef += Cotangent( u, v )
-#
-#			normal_curvature[v1] += (coef * (mesh.vertices[v1] - mesh.vertices[v2]))
+				if v3 in mesh.neighbor_vertices[v1] :
+					u = mesh.vertices[v1] - mesh.vertices[v3]
+					v = mesh.vertices[v2] - mesh.vertices[v3]
+					coef += Cotangent( u, v )
+
+			normal_curvature[v1] += (coef * (mesh.vertices[v1] - mesh.vertices[v2]))
 
 
 	# Return the normal curvature vector array
@@ -100,14 +100,14 @@ def ComputeNormalCurvature( mesh ) :
 #
 def Cotangent( v1, v2 ) :
 
-	# Compute square length
+	# Compute square lengths
 	l1 = dot( v1, v1 )
 	l2 = dot( v2, v2 )
 
-	# Compute scalar product
+	# Compute scalar product between the vectors
 	dot_prod = dot( v1, v2 )
 
-	# Compute denomination
+	# Compute the square of the denominator
 	denom = l1 * l2 - dot_prod * dot_prod;
 
 	# Return cotangent between v1 and v2
