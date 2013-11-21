@@ -37,7 +37,7 @@ OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtOpenGL import *
-from numpy import identity, float32
+from numpy import array, identity, float32
 
 
 
@@ -159,9 +159,10 @@ class QtViewerGLWidget( QGLWidget ) :
 	#
 	def Reset( self ) :
 
-		# Reset model/axes rotation
+		# Reset model/axes transformation
 		self.mesh_viewer.trackball_transform = identity( 4, dtype=float32 )
 		self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.mesh_viewer.model_translation = array( [0, 0, 0], dtype=float32 )
 
 		# Update the display
 		self.update()
