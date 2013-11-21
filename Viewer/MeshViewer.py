@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-19
+#    update               : 2013-11-21
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -98,11 +98,7 @@ class MeshViewer() :
 		normals = array( mesh.vertex_normals, dtype=float32 )
 		colors = array( mesh.colors, dtype=float32 )
 
-		# Load the shader
-#		if len(mesh.colors) == len(mesh.vertices) :
-#			self.shader_program_id = LoadShaders( 'NormalColor' )
-#		else :
-#			self.shader_program_id = LoadShaders( 'Normal' )
+		# Load the shader
 		self.shader_program_id = LoadShader( 'SmoothShading' )
 
 		# Use the shader program
@@ -132,7 +128,7 @@ class MeshViewer() :
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 
 		# Color buffer object
-		if len(mesh.colors) == len(mesh.vertices) :
+		if len(mesh.colors) :
 			self.color_buffer_id = glGenBuffers( 1 )
 			glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
 			glBufferData( GL_ARRAY_BUFFER, colors.nbytes, colors, GL_STATIC_DRAW )
@@ -187,6 +183,10 @@ class MeshViewer() :
 		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition" ), 0.0, 0.0, 30.0 )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE,
 			dot( self.projection_matrix, dot( viewmatrix, self.model_matrix ) ) )
+
+		# Activate default color in the shader if necessary
+		if self.color_buffer_id != -1 :
+			glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
 
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )

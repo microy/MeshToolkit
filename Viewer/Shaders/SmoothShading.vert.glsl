@@ -2,9 +2,11 @@
 
 layout (location = 0) in vec4 Vertex;
 layout (location = 1) in vec3 Normal;
+layout (location = 2) in vec3 Color;
 
 uniform mat4 MVP_Matrix;
 uniform mat3 Normal_Matrix;
+uniform int color_enabled = 0;
 
 out vec4 FragColor;
 
@@ -15,7 +17,13 @@ void main( void ) {
 
 	float Dot = max( 0.0, dot(Norm, LightDir) ); 
 
-	FragColor.xyz = vec3( 0.6, 0.6, 0.6 ) * Dot;
+	if( color_enabled == 0 ) {
+		FragColor.xyz = vec3( 0.7, 0.7, 0.7 ) * Dot;
+	}
+	else {
+		FragColor.xyz = Color * Dot;
+	}
+
 	FragColor.a = 1.0;
 
 	gl_Position = MVP_Matrix * Vertex;

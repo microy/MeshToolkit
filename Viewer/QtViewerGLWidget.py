@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-20
+#    update               : 2013-11-21
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,6 +24,11 @@
 #
 #--
 #
+from .AxesViewer import AxesViewer
+from .MeshViewer import MeshViewer
+from .Shader import LoadShader
+from .Trackball import GetTrackballRotation
+from .Transformation import RotateMatrix
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
@@ -33,10 +38,6 @@ from OpenGL.GL import *
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtOpenGL import *
 from numpy import identity, float32
-from .AxesViewer import AxesViewer
-from .MeshViewer import MeshViewer
-from .Trackball import GetTrackballRotation
-from .Transformation import RotateMatrix
 
 
 

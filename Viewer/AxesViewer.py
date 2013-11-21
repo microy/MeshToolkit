@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                AxesViewer.py
 #                             -------------------
-#    update               : 2013-11-18
+#    update               : 2013-11-21
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,15 +24,15 @@
 #
 #--
 #
+from Shader import LoadShader
+from Transformation import OrthographicMatrix, TranslateMatrix
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
-from numpy import *
-from Shader import *
-from Transformation import *
+from numpy import array, dot, identity, float32
 
 
 
@@ -68,7 +68,7 @@ class AxesViewer :
 			[0, 0, 1], [0, 0, 1] ] , dtype=float32 )
 
 		# Load the shader
-		self.shader_program_id = LoadShader( 'Shader-Color' )
+		self.shader_program_id = LoadShader( 'AxesViewer' )
 
 		# Use the shader program
 		glUseProgram( self.shader_program_id )
