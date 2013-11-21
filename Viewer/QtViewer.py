@@ -100,6 +100,12 @@ class QtViewer( QMainWindow ) :
 		self.view_smooth_action.setChecked( True )
 		self.view_smooth_action.setStatusTip( 'Render the mesh with smooth shading' )
 		self.connect( self.view_smooth_action, QtCore.SIGNAL('triggered()'), self.ViewSmoothAction )
+		self.view_aliasing_action = QtGui.QAction( '&Antialiasing', self )
+		self.view_aliasing_action.setShortcut( 'A' )
+		self.view_aliasing_action.setCheckable( True )
+		self.view_aliasing_action.setChecked( False )
+		self.view_aliasing_action.setStatusTip( 'Activate antialiasing' )
+		self.connect( self.view_aliasing_action, QtCore.SIGNAL('triggered()'), self.ViewAliasingAction )
 		view_reset_action = QtGui.QAction( '&Reset', self )
 		view_reset_action.setShortcut( 'R' )
 		view_reset_action.setStatusTip( 'Reset the viewing parameters' )
@@ -115,6 +121,8 @@ class QtViewer( QMainWindow ) :
 		view_menu = menu_bar.addMenu( '&View' )
 		view_menu.addAction( self.view_flat_action )
 		view_menu.addAction( self.view_smooth_action )
+		view_menu.addSeparator()
+		view_menu.addAction( self.view_aliasing_action )
 		view_menu.addSeparator()
 		view_menu.addAction( view_reset_action )
 
@@ -202,6 +210,37 @@ class QtViewer( QMainWindow ) :
 		self.view_flat_action.setChecked( False )
 		self.view_smooth_action.setChecked( True )
 		self.opengl_widget.SetShader( 'SmoothShading' )
+
+
+
+
+	#-
+	#
+	# ViewAliasingAction
+	#
+	#-
+	#
+	def ViewAliasingAction( self ) :
+
+
+		# Bug !!!!
+
+		print self.view_aliasing_action.isChecked()
+
+		# Set antialiasing
+		if self.view_aliasing_action.isChecked() :
+
+			print 'oui'
+			self.view_aliasing_action.setChecked( False )
+			self.opengl_widget.SetAntialiasing( False )
+
+		else :
+
+			print 'non'
+
+			self.view_aliasing_action.setChecked( True )
+			self.opengl_widget.SetAntialiasing( True )
+
 
 
 	#-

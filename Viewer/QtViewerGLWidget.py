@@ -100,6 +100,10 @@ class QtViewerGLWidget( QGLWidget ) :
 		glEnable( GL_BLEND )
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
+		# Enable antialiasing
+		glEnable( GL_LINE_SMOOTH )
+		glEnable( GL_POLYGON_SMOOTH )
+
 		# Mesh viewer initialisation
 		self.mesh_viewer = MeshViewer( self.width(), self.height() )
 
@@ -154,6 +158,27 @@ class QtViewerGLWidget( QGLWidget ) :
 		# Load a shader for the model
 		self.mesh_viewer.shader_program_id = LoadShader( shader )
 
+		# Update the display
+		self.update()
+
+
+
+	#-
+	#
+	# SetAntialiasing
+	#
+	#-
+	#
+	def SetAntialiasing( self, enabled ) :
+
+		# Enable antialiasing
+		if enabled :
+			glEnable( GL_POLYGON_SMOOTH )
+			glEnable( GL_LINE_SMOOTH )
+		else :
+			glDisable( GL_POLYGON_SMOOTH )
+			glDisable( GL_LINE_SMOOTH )
+			
 		# Update the display
 		self.update()
 
