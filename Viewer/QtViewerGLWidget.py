@@ -62,8 +62,9 @@ class QtViewerGLWidget( QGLWidget ) :
 	#
 	def __init__( self, parent=None ) :
 
-		# Initialise QtGLWidget
-		QGLWidget.__init__( self, parent )
+		
+		# Initialise QtGLWidget with multisampling enabled and OpenGL 3 core only
+		QGLWidget.__init__( self, QGLFormat( QGL.SampleBuffers | QGL.NoDeprecatedFunctions ), parent )
 
 		# Track mouse events
 		self.setMouseTracking( True )
@@ -86,10 +87,6 @@ class QtViewerGLWidget( QGLWidget ) :
 		# Default background color
 		glClearColor( 1, 1, 1, 1 )
 
-		# Hint : nicest antialiasing options
-		glHint( GL_LINE_SMOOTH_HINT, GL_NICEST )
-		glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST )
-
 		# Enable depth test
 		glEnable( GL_DEPTH_TEST )
 
@@ -100,9 +97,8 @@ class QtViewerGLWidget( QGLWidget ) :
 		glEnable( GL_BLEND )
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
-		# Enable antialiasing
-		glEnable( GL_LINE_SMOOTH )
-		glEnable( GL_POLYGON_SMOOTH )
+		# Enable multisampling (antialiasing)
+		glEnable( GL_MULTISAMPLE )
 
 		# Mesh viewer initialisation
 		self.mesh_viewer = MeshViewer( self.width(), self.height() )
@@ -171,14 +167,10 @@ class QtViewerGLWidget( QGLWidget ) :
 	#
 	def SetAntialiasing( self, enabled ) :
 
-		# Enable antialiasing
-		if enabled :
-			glEnable( GL_POLYGON_SMOOTH )
-			glEnable( GL_LINE_SMOOTH )
-		else :
-			glDisable( GL_POLYGON_SMOOTH )
-			glDisable( GL_LINE_SMOOTH )
-			
+		# Enable / Disable antialiasing
+		if enabled : glEnable( GL_MULTISAMPLE )
+		else : glDisable( GL_MULTISAMPLE )
+
 		# Update the display
 		self.update()
 
@@ -211,7 +203,7 @@ class QtViewerGLWidget( QGLWidget ) :
 	def paintGL( self ) :
 
 		# Clear all pixels and depth buffer
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT )
 
 		# Display the mesh
 		self.mesh_viewer.Display()

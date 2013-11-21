@@ -78,10 +78,12 @@ class QtViewer( QMainWindow ) :
 		file_open_action.setShortcut( 'O' )
 		file_open_action.setStatusTip( 'Open a file' )
 		self.connect( file_open_action, QtCore.SIGNAL('triggered()'), self.FileOpenAction )
+
 		file_close_action = QtGui.QAction( '&Close', self )
 		file_close_action.setShortcut( 'C' )
 		file_close_action.setStatusTip( 'Close the current file' )
 		self.connect( file_close_action, QtCore.SIGNAL('triggered()'), self.FileCloseAction )
+
 		file_exit_action = QtGui.QAction( '&Exit', self )
 		file_exit_action.setShortcut( 'Esc' )
 		file_exit_action.setStatusTip( 'Exit application' )
@@ -94,18 +96,21 @@ class QtViewer( QMainWindow ) :
 		self.view_flat_action.setChecked( False )
 		self.view_flat_action.setStatusTip( 'Render the mesh with flat shading' )
 		self.connect( self.view_flat_action, QtCore.SIGNAL('triggered()'), self.ViewFlatAction )
+
 		self.view_smooth_action = QtGui.QAction( '&Smooth shading', self )
 		self.view_smooth_action.setShortcut( 'S' )
 		self.view_smooth_action.setCheckable( True )
 		self.view_smooth_action.setChecked( True )
 		self.view_smooth_action.setStatusTip( 'Render the mesh with smooth shading' )
 		self.connect( self.view_smooth_action, QtCore.SIGNAL('triggered()'), self.ViewSmoothAction )
+
 		self.view_aliasing_action = QtGui.QAction( '&Antialiasing', self )
 		self.view_aliasing_action.setShortcut( 'A' )
 		self.view_aliasing_action.setCheckable( True )
-		self.view_aliasing_action.setChecked( False )
-		self.view_aliasing_action.setStatusTip( 'Activate antialiasing' )
+		self.view_aliasing_action.setChecked( True )
+		self.view_aliasing_action.setStatusTip( 'Enable / Disable antialiasing' )
 		self.connect( self.view_aliasing_action, QtCore.SIGNAL('triggered()'), self.ViewAliasingAction )
+
 		view_reset_action = QtGui.QAction( '&Reset', self )
 		view_reset_action.setShortcut( 'R' )
 		view_reset_action.setStatusTip( 'Reset the viewing parameters' )
@@ -113,11 +118,13 @@ class QtViewer( QMainWindow ) :
 
 		# Create the menu bar
 		menu_bar = self.menuBar()
+
 		file_menu = menu_bar.addMenu( '&File' )
 		file_menu.addAction( file_open_action )
 		file_menu.addSeparator()
 		file_menu.addAction( file_close_action )
 		file_menu.addAction( file_exit_action )
+
 		view_menu = menu_bar.addMenu( '&View' )
 		view_menu.addAction( self.view_flat_action )
 		view_menu.addAction( self.view_smooth_action )
@@ -223,20 +230,15 @@ class QtViewer( QMainWindow ) :
 	def ViewAliasingAction( self ) :
 
 
-		# Bug !!!!
-
-		print self.view_aliasing_action.isChecked()
+		# isChecked Bug ????!!!!
 
 		# Set antialiasing
-		if self.view_aliasing_action.isChecked() :
+		if not self.view_aliasing_action.isChecked() :
 
-			print 'oui'
 			self.view_aliasing_action.setChecked( False )
 			self.opengl_widget.SetAntialiasing( False )
 
 		else :
-
-			print 'non'
 
 			self.view_aliasing_action.setChecked( True )
 			self.opengl_widget.SetAntialiasing( True )
