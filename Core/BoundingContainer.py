@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                             BoundingContainer.py
 #                             --------------------
-#    update               : 2013-11-16
+#    update               : 2013-11-21
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -19,12 +19,14 @@
 
 
 
+#-
 #
 # External dependencies
 #
-from numpy import *
-from numpy.linalg import *
-from Mesh import *
+#-
+#
+from numpy import array, inf
+from numpy.linalg import norm
 
 
 
@@ -51,7 +53,7 @@ def GetAxisAlignedBoundingBox( mesh ) :
 			if v[i] > max_point[i] : max_point[i] = v[i]
 
 	# Return result
-	return (min_point, max_point)
+	return ( min_point, max_point )
 
 
 
@@ -68,7 +70,7 @@ def GetAxisAlignedBoundingBox( mesh ) :
 def GetBoundingSphere( mesh ) :
 
 	# Compute axis-aligned bounding box
-	(pmin, pmax) = GetAxisAlignedBoundingBox( mesh )
+	( pmin, pmax ) = GetAxisAlignedBoundingBox( mesh )
 
 	# Compute center
 	center = 0.5 * (pmin + pmax)
@@ -79,7 +81,7 @@ def GetBoundingSphere( mesh ) :
 		radius = max( radius, norm( center - v ) )
 
 	# Return result
-	return (center, radius)
+	return ( center, radius )
 
 
 
