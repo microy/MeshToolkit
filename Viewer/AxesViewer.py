@@ -119,14 +119,14 @@ class AxesViewer :
 	#
 	def Display( self ) :
 
+		# Use the shader program
+		glUseProgram( self.shader_program_id )
+
 		# Enable line antialiasing
 		glEnable( GL_LINE_SMOOTH )
 
 		# Increase line width
-		glLineWidth( 1.5 )
-
-		# Use the shader program
-		glUseProgram( self.shader_program_id )
+		glLineWidth( 2.0 )
 
 		# Send the Model-View-Projection matrix to the shader
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE,
@@ -141,14 +141,14 @@ class AxesViewer :
 		# Release the vertex array object
 		glBindVertexArray( 0 )
 
-		# Release the shader program
-		glUseProgram( 0 )
-
 		# Restore line width
 		glLineWidth( 1.0 )
 
 		# Disable line antialiasing
 		glDisable( GL_LINE_SMOOTH )
+
+		# Release the shader program
+		glUseProgram( 0 )
 
 
 

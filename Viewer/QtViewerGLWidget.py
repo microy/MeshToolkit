@@ -83,14 +83,22 @@ class QtViewerGLWidget( QGLWidget ) :
 	#
 	def initializeGL( self ) :
 
-		# OpenGL configuration
+		# Default background color
 		glClearColor( 1, 1, 1, 1 )
+
+		# Hint : nicest antialiasing options
 		glHint( GL_LINE_SMOOTH_HINT, GL_NICEST )
 		glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST )
+
+		# Enable depth test
 		glEnable( GL_DEPTH_TEST )
+
+		# Enable face culling
 		glEnable( GL_CULL_FACE )
+
+		# Enable blending function
 		glEnable( GL_BLEND )
-#		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
 		# Mesh viewer initialisation
 		self.mesh_viewer = MeshViewer( self.width(), self.height() )
