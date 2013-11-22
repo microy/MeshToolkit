@@ -4,7 +4,7 @@
 
 from Core.Mesh import CheckMesh
 from Core.Normal import UpdateNormals
-from Core.Neighbor import UpdateNeighbors, RemoveIsolatedVertices, CheckNeighbors
+from Core.Neighbor import UpdateNeighborhood, RemoveIsolatedVertices, CheckNeighborhood
 from Core.Curvature import GetNormalCurvature
 from Core.Color import Array2Color
 from Core.Vrml import ReadVrml, WriteVrml
@@ -35,18 +35,25 @@ if __name__ == "__main__" :
 	UpdateNormals( mesh )
 	print '  Done.'
 
-	print '~~~ Register neighbors ~~~'
-	UpdateNeighbors( mesh )
+	print '~~~ Register neighborhood ~~~'
+	UpdateNeighborhood( mesh )
+	print '  Done.'
+
+	print '~~~ Check neighborhood ~~~'
+	CheckNeighborhood( mesh )
 	print '  Done.'
 
 	print '~~~ Remove isolated vertices ~~~'
 	RemoveIsolatedVertices( mesh )
 	print '  Done.'
 
-	print '~~~ Check neighbors ~~~'
-	CheckNeighbors( mesh )
+	print '~~~ Register neighborhood ~~~'
+	UpdateNeighborhood( mesh )
 	print '  Done.'
 
+	print '~~~ Check neighborhood ~~~'
+	CheckNeighborhood( mesh )
+	print '  Done.'
 
 #	print '~~~ Compute normal curvature ~~~'
 #	normal_curvature = GetNormalCurvature( mesh )
@@ -63,10 +70,9 @@ if __name__ == "__main__" :
 	CheckMesh( mesh )
 	print '  Done.'
 
-	if len(sys.argv) < 3 : filename = 'test.wrl'
-	else : filename = sys.argv[2]
+	if len(sys.argv) >= 3 :
 
-	print '~~~ Write file ' + filename + ' ~~~'
-	WriteVrml( mesh, filename )
-	print '  Done.'
+		print '~~~ Write file ' + sys.argv[2] + ' ~~~'
+		WriteVrml( mesh, sys.argv[2] )
+		print '  Done.'
 
