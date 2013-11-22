@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2013-11-19
+#    update               : 2013-11-21
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -23,8 +23,7 @@
 # External dependencies
 #
 #-
-from numpy import cross
-from numpy.linalg import norm
+from numpy import cross, dot, sqrt
 
 
 
@@ -127,16 +126,16 @@ def CheckMesh( mesh ) :
 		face_normal = cross( mesh.vertices[ face[1] ] - mesh.vertices[ face[0] ],
 					mesh.vertices[ face[2] ] - mesh.vertices[ face[0] ] )
 		# Normal vector length
-		if norm( face_normal ) <= 0 : dvn.append( i )
+		if sqrt( dot(face_normal, face_normal) ) <= 0 : dvn.append( i )
 		if len(dvn) > 0 : log_message += '  Degenerated face normal : {}\n'.format(dvn)
 
 	# Degenerate vertex normals
 	if len(mesh.vertex_normals) > 0 :
 		dvn = []
 		for (i, normal) in enumerate( mesh.vertex_normals ) :
-			length = norm( normal )
+			length = sqrt( dot(normal, normal) )
 			# Normal vector length
-			if (length <= 0) or (length > 1) : dvn.append( i )
+			if (length <= 0) or (length > 1.0001) : dvn.append( i )
 		if len(dvn) > 0 : log_message += '  Degenerated vertex normal :{}\n'.format(dvn)
 
 	# Return silently if there is no error
