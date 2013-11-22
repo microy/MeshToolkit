@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-21
+#    update               : 2013-11-22
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -159,9 +159,6 @@ class QtViewer( QMainWindow ) :
 
 		# Read VRML/X3D/Inventor file
 		self.mesh = ReadVrml( filename )
-
-		# Check the mesh
-		CheckMesh( self.mesh )
 
 		# Compute mesh normals if necessary
 		if len(self.mesh.vertex_normals) != len(self.mesh.vertices) :
