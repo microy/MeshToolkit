@@ -269,8 +269,9 @@ def ReadVrml( filename ) :
 	vrmlfile.close()
 
 	# Only accept per vertex binding
-#	if material_binding is not 'PER_VERTEX' : colors=[]
-#	if normal_binding is not 'PER_VERTEX' : normals=[]
+	if (color_binding is not 'PER_VERTEX') or (len(colors) != len(vertices)) : colors=[]
+	if (normal_binding is not 'PER_VERTEX') or (len(normals) != len(vertices)) : normals=[]
+
 
 	# Return the final mesh
 	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
