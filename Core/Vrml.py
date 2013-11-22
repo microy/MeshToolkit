@@ -63,7 +63,7 @@ def ReadVrml( filename ) :
 	normal_binding = ''
 
 	# Open the file
-	vrmlfile = open( unicode(filename), 'r' )
+	vrmlfile = open( filename, 'r' )
 
 	# Check the header
 	header = vrmlfile.readline().split()

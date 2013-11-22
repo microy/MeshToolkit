@@ -158,7 +158,7 @@ class QtViewer( QMainWindow ) :
 		self.view_smooth_action.setChecked( True )
 
 		# Read VRML/X3D/Inventor file
-		self.mesh = ReadVrml( filename )
+		self.mesh = ReadVrml( unicode(filename) )
 
 		# Compute mesh normals if necessary
 		if len(self.mesh.vertex_normals) != len(self.mesh.vertices) :
