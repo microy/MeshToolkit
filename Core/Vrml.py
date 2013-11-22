@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                  Vrml.py
 #                             -------------------
-#    update               : 2013-11-19
+#    update               : 2013-11-22
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -63,7 +63,7 @@ def ReadVrml( filename ) :
 	normal_binding = ''
 
 	# Open the file
-	vrmlfile = open( filename, 'r' )
+	vrmlfile = open( unicode(filename), 'r' )
 
 	# Check the header
 	header = vrmlfile.readline().split()
