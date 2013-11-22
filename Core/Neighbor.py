@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 Neighbor.py
 #                             -------------------
-#    update               : 2013-11-19
+#    update               : 2013-11-22
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,20 +24,20 @@
 #
 #-
 #
-from numpy import array
+from numpy import array, empty, zeros
 
 
 
 
 #--
 #
-# UpdateNeighbors
+# UpdateNeighborhood
 #
 #--
 #
 # Collect vertex neighborhoods of a given mesh
 #
-def UpdateNeighbors( mesh ) :
+def UpdateNeighborhood( mesh ) :
 
 	# Initialization
 	mesh.neighbor_vertices = [ [] for i in xrange(len(mesh.vertices)) ]
@@ -45,9 +45,13 @@ def UpdateNeighbors( mesh ) :
 
 	# Create a list of neighbor vertices and faces for every vertex of the mesh
 	for i in range( len(mesh.faces) ) :
+
+		# Add faces bound to each vertex
 		mesh.neighbor_faces[ mesh.faces[i,0] ].append( i )
 		mesh.neighbor_faces[ mesh.faces[i,1] ].append( i )
 		mesh.neighbor_faces[ mesh.faces[i,2] ].append( i )
+
+		# Add vertices link by a face
 		mesh.neighbor_vertices[ mesh.faces[i,0] ].append( mesh.faces[i,1] )
 		mesh.neighbor_vertices[ mesh.faces[i,0] ].append( mesh.faces[i,2] )
 		mesh.neighbor_vertices[ mesh.faces[i,1] ].append( mesh.faces[i,0] )
@@ -62,6 +66,77 @@ def UpdateNeighbors( mesh ) :
 	# Return the mesh with the neighborhood informations
 	return mesh
 
+
+#--
+#
+# RemoveIsolatedVertices
+#
+#--
+#
+# Remove isolated vertices in the mesh
+#
+def RemoveIsolatedVertices( mesh ) :
+
+	# Register isolated vertices
+	isolated_vertices = zeros( (len(mesh.vertices),1), dtype=bool )
+	for i, n in enumerate( mesh.neighbor_faces ) :
+		if len(n) == 0 : isolated_vertices[i] = True
+
+	# Do nothing if there is no isolated vertex
+	if not isolated_vertices.any() : return
+
+	# Create the new vertex array
+	new_vertices = []
+	for (v, isolated) in enumerate(isolated_vertices) :
+		if not isolated : new_vertices.append(mesh.vertices[v])
+
+	# Create a lookup table for the vertex indices
+	lut = empty( (len(mesh.vertices),1), dtype=int )
+	index = 0
+	for (v, isolated) in enumerate(isolated_vertices) :
+		if isolated : lut[v] = -1
+		else :
+			lut[v] = index
+			index += 1
+	
+	# Create a new face array
+	new_faces = lut[mesh.faces].reshape( len(mesh.faces), 3 )
+	
+	# Update the mesh
+	mesh.vertices = array( new_vertices )
+	mesh.faces = new_faces
+
+	# Remove previous normals
+	mesh.vertex_normals = []
+	mesh.face_normals = []
+
+
+
+
+#--
+#
+# CheckNeighborhood
+#
+#--
+#
+# Check neighborhood parameters
+#
+def CheckNeighborhood( mesh ) :
+
+	log_message = ''
+
+	# Check isolated vertices
+	dvn = []
+	for i,n in enumerate(mesh.neighbor_faces) :
+		if len(n) == 0 : dvn.append( i )
+	if dvn : log_message += '  Isolated vertices : {}\n'.format(dvn)
+
+	# Return silently if there is no error
+	if not log_message : return
+
+	# Print log message in case of errors
+	print '~~~ Neighborhood checking informations ~~~\n'
+	print log_message
 
 
 
