@@ -68,7 +68,6 @@ def ReadVrml( filename ) :
 	# Check the header
 	header = vrmlfile.readline().split()
 	if header[0] not in [ '#VRML', '#X3D', '#Inventor' ] :
-
 		vrmlfile.close()
 		raise RuntimeError( 'Wrong file format !' )
 
@@ -118,7 +117,7 @@ def ReadVrml( filename ) :
 				# Sanity check
 				if level < 0 : return None
 
-			# Comment
+			# Comments
 			elif word.startswith('#') :
 
 				# Save current word
@@ -127,7 +126,7 @@ def ReadVrml( filename ) :
 				# Next line
 				break
 
-			# Point
+			# Points
 			elif nodes[level] == 'point' :
 
 				# Geometry
@@ -156,21 +155,9 @@ def ReadVrml( filename ) :
 					else :
 						ixyz += 1
 
-			# Face
+			# Faces
 			elif nodes[level] == 'coordIndex' :
-
-				# Color binding
-				if previous_word == 'colorPerVertex' and word == 'TRUE' :
-					color_binding = 'PER_VERTEX'
-					continue
-
-				# Normal binding
-				elif previous_word == 'normalPerVertex' and word == 'TRUE' :
-					normal_binding = 'PER_VERTEX'
-					continue
-
-				# Face indices
-				elif nodes[level-1] == 'IndexedFaceSet' :
+				if nodes[level-1] == 'IndexedFaceSet' :
 
 					# -1 value
 					if ixyz == 3 :
@@ -189,7 +176,7 @@ def ReadVrml( filename ) :
 					# Next coordinate
 					ixyz += 1
 
-			# Color (VRML 2)
+			# Colors (VRML 2)
 			elif nodes[level] == 'color' :
 				if nodes[level-1] == 'Color' :
 
@@ -234,7 +221,7 @@ def ReadVrml( filename ) :
 						# Next coordinate
 						ixyz += 1
 
-			# Texture filename
+			# Texture filename (VRML 2)
 			elif nodes[level] == 'ImageTexture' :
 				if previous_word == 'url' :
 					if len(word) > 2 :
@@ -243,7 +230,7 @@ def ReadVrml( filename ) :
 						# Remove quotes around the filename
 						material = word[ 1 : -1 ]
 
-			# Texture filename
+			# Texture filename (VRML 1)
 			elif nodes[level] == 'Texture2' :
 				if previous_word == 'filename' :
 					if len(word) > 2 :
@@ -252,12 +239,25 @@ def ReadVrml( filename ) :
 						# Remove quotes around the filename
 						material = word[ 1 : -1 ]
 
-			# Color binding
+			# Color and normal bindings (VRML 2)
+			elif nodes[level] == 'IndexedFaceSet' :
+
+				# Color binding
+				if previous_word == 'colorPerVertex' and word == 'TRUE' :
+					color_binding = 'PER_VERTEX'
+					continue
+
+				# Normal binding
+				elif previous_word == 'normalPerVertex' and word == 'TRUE' :
+					normal_binding = 'PER_VERTEX'
+					continue
+
+			# Color binding (VRML 1)
 			elif nodes[level] == 'MaterialBinding' :
 				if previous_word == 'value' :
 					color_binding = word
 
-			# Normal binding
+			# Normal binding (VRML 1)
 			elif nodes[level] == 'NormalBinding' :
 				if previous_word == 'value' :
 					normal_binding = word
@@ -269,14 +269,14 @@ def ReadVrml( filename ) :
 	vrmlfile.close()
 
 	# Only accept per vertex binding
-	if (color_binding is not 'PER_VERTEX') or (len(colors) != len(vertices)) : colors=[]
-	if (normal_binding is not 'PER_VERTEX') or (len(normals) != len(vertices)) : normals=[]
-
+	if (color_binding != 'PER_VERTEX') or (len(colors) != len(vertices)) : colors=[]
+	if (normal_binding != 'PER_VERTEX') or (len(normals) != len(vertices)) : normals=[]
 
 	# Return the final mesh
 	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
 		vertex_normals=array(normals), colors=array(colors),
 		textures=array(texcoords), texture_name=material )
+
 
 
 
