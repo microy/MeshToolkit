@@ -80,21 +80,20 @@ def Array2Color( values ) :
 	# Compute value vector lengths
 	value_lengths = sqrt( (values ** 2).sum( axis=1 ) )
 
-	# Compute minimum and maximum value
+	# Compute minimum value
 	min_value = value_lengths.min()
-	max_value = value_lengths.max()
 
 	# Compute the range of the values
-	value_range = max_value - min_value
+	value_range = value_lengths.max() - min_value
 
 	# Normalize the value lengths
-	normalized_values = value_lengths - min_value
-	normalized_values /= value_range
+	value_lengths -= min_value
+	value_lengths /= value_range
 
 	# Convert each value to a pseudo-color
 	colors = zeros( (len(values), 3) )
 	for i in range( len(values) ) :
-		colors[i] = Value2ColorAlternate( normalized_values[i] )
+		colors[i] = Value2ColorAlternate( value_lengths[i] )
 
 	# Return result
 	return colors
