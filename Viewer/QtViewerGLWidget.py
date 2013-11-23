@@ -25,6 +25,7 @@
 #--
 #
 from .AxisViewer import AxisViewer
+from .ColorBar import ColorBar
 from .MeshViewer import MeshViewer
 from .Shader import LoadShader
 from .Trackball import GetTrackballRotation
@@ -72,6 +73,7 @@ class QtViewerGLWidget( QGLWidget ) :
 		# Initialise member variables
 		self.mesh_viewer = None
 		self.axis_viewer = None
+		self.colorbar_viewer = None
 		self.previous_mouse_position = [0, 0]
 		self.motion_state = 0
 
@@ -105,6 +107,9 @@ class QtViewerGLWidget( QGLWidget ) :
 
 		# XYZ axes viewer initialisation
 		self.axis_viewer = AxisViewer()
+
+		# Color bar
+		self.colorbar_viewer = ColorBar()
 
 
 	#-
@@ -208,6 +213,25 @@ class QtViewerGLWidget( QGLWidget ) :
 		# Display the mesh
 		self.mesh_viewer.Display()
 
+		# Display the XYZ-axes
+		self.DrawAxis()
+
+		# Display the color bar
+		self.DrawColorBar()
+
+		# Swap buffers
+		self.swapBuffers()
+
+
+
+	#-
+	#
+	# DrawAxis
+	#
+	#-
+	#
+	def DrawAxis( self ) :
+
 		# Resize the viewport
 		glViewport( 0, 0, 100, 100 )
 
@@ -217,8 +241,27 @@ class QtViewerGLWidget( QGLWidget ) :
 		# Restore the viewport
 		glViewport( 0, 0, self.width(), self.height() )
 
-		# Swap buffers
-		self.swapBuffers()
+
+	#-
+	#
+	# DrawColorBar
+	#
+	#-
+	#
+	def DrawColorBar( self ) :
+
+		# Resize the viewport
+		glViewport( self.width()-50, self.height()/2-300, 50, 600 )
+
+		# Display the XYZ axes
+		self.colorbar_viewer.Display()
+
+		# Restore the viewport
+		glViewport( 0, 0, self.width(), self.height() )
+
+
+
+
 
 
 	#-
