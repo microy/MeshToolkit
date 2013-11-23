@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                  Normal.py
 #                             -------------------
-#    update               : 2013-11-21
+#    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,7 +24,7 @@
 #
 #-
 #
-from numpy import cross, zeros, sqrt, dot
+from numpy import cross, zeros, sqrt
 
 
 
@@ -41,53 +41,29 @@ from numpy import cross, zeros, sqrt, dot
 #
 def UpdateNormals( mesh ) :
 
-	# Compute face normals
-	mesh.face_normals = zeros( (len(mesh.faces),3) )
-	for (i, face) in enumerate( mesh.faces ) :
-		# Calculate face normal vector           
-		mesh.face_normals[i] = cross( mesh.vertices[ face[1] ] - mesh.vertices[ face[0] ],
-					mesh.vertices[ face[2] ] - mesh.vertices[ face[0] ] )
-		# Normal vector length
-		length = sqrt( dot(mesh.face_normals[i], mesh.face_normals[i]) )
-		mesh.face_normals[i] /= length
+	# Create an indexed view
+	tris = mesh.vertices[ mesh.faces ]
 
-	# Compute vertex normals
-	mesh.vertex_normals = zeros( (len(mesh.vertices),3) )
-	for (i, face) in enumerate( mesh.faces ) :
-		# Add face normal vector
-		mesh.vertex_normals[ face ] += mesh.face_normals[ i ]
+	# Calculate the normal for all the triangles
+	mesh.face_normals = cross( tris[::,1 ] - tris[::,0]  , tris[::,2 ] - tris[::,0] )
 
-	# Normalise vertex normals
-	for (i, n) in enumerate( mesh.vertex_normals ) :
-		# Degenerated vertex normal
-		if (n == 0).all() : continue
-		# Normal vector length
-		length = sqrt( dot(n, n) )
-		mesh.vertex_normals[i] /= length
+	# Intialise the vertex normals
+	mesh.vertex_normals = zeros( mesh.vertices.shape, dtype=mesh.vertices.dtype )
 
+	# Add the face normals to the vertex normals
+	mesh.vertex_normals[ mesh.faces[:,0] ] += mesh.face_normals
+	mesh.vertex_normals[ mesh.faces[:,1] ] += mesh.face_normals
+	mesh.vertex_normals[ mesh.faces[:,2] ] += mesh.face_normals
 
-	# Calculate the normal for all the triangles, by taking the cross product of the vectors v1-v0, and v2-v0 in each triangle             
-#	mesh.face_normals = cross( mesh.vertices[ mesh.faces[:,1] ] - mesh.vertices[ mesh.faces[:,0] ],
-#					mesh.vertices[ mesh.faces[:,2] ] - mesh.vertices[ mesh.faces[:,0] ] )
+	# Normalise the face normals
+	lengths = sqrt( (mesh.face_normals ** 2).sum( axis=1 ) )
+	mesh.face_normals /= lengths.reshape( len(mesh.face_normals), 1 )
 
-	# Initialize the vertex normal array
-#	mesh.vertex_normals = zeros( (len(mesh.vertices), 3) )
+	# Normalise the vertex normals
+	lengths = sqrt( (mesh.vertex_normals ** 2).sum( axis=1 ) )
+	mesh.vertex_normals /= lengths.reshape( len(mesh.vertex_normals), 1 )
 
-	# Add face normals to the normal of their respective vertices
-#	for ( i, face ) in enumerate( mesh.faces ) :
-#		mesh.vertex_normals[ face ] += mesh.face_normals[ i ]
-
-	# Normalize the normal vectors
-#	for i in range( len(mesh.face_normals) ) :
-#		mesh.face_normals[i] /= norm( mesh.face_normals[i] )
-#	for i in range( len(mesh.vertex_normals) ) :
-#		mesh.vertex_normals[i] /= norm( mesh.vertex_normals[i] )
-
-#	mesh.face_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.face_normals ).repeat( 3 ).reshape( mesh.face_normals.shape )
-#	mesh.vertex_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.vertex_normals ).repeat( 3 ).reshape( mesh.vertex_normals.shape )
-#	mesh.face_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.face_normals )[:,numpy.newaxis]
-#	mesh.vertex_normals /= numpy.apply_along_axis( numpy.linalg.norm, 1, mesh.vertex_normals )[:,numpy.newaxis]
-
+	# Return the mesh with the new normals
 	return mesh
 
 
