@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                              Transformation.py
 #                             -------------------
-#    update               : 2013-11-18
+#    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -225,16 +225,3 @@ def LookAtMatrix( eye, center, up ) :
 
 
 
-#--
-#
-# NormalMatrix
-#
-#--
-#
-def NormalMatrix( view ) :
-
-	NM = zeros( (3,3), dtype=float32 )
-	NM[0] = view[0,0:3]
-	NM[1] = view[1,0:3]
-	NM[2] = view[2,0:3]
-	return NM
