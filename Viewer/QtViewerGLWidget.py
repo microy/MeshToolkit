@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*- 
 
 # ***************************************************************************
-#                                 QtViewer.py
+#                             QtViewerGLWidget.py
 #                             -------------------
-#    update               : 2013-11-21
+#    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,7 +24,7 @@
 #
 #--
 #
-from .AxesViewer import AxesViewer
+from .AxisViewer import AxisViewer
 from .MeshViewer import MeshViewer
 from .Shader import LoadShader
 from .Trackball import GetTrackballRotation
@@ -71,7 +71,7 @@ class QtViewerGLWidget( QGLWidget ) :
 
 		# Initialise member variables
 		self.mesh_viewer = None
-		self.axes_viewer = None
+		self.axis_viewer = None
 		self.previous_mouse_position = [0, 0]
 		self.motion_state = 0
 
@@ -104,7 +104,7 @@ class QtViewerGLWidget( QGLWidget ) :
 		self.mesh_viewer = MeshViewer( self.width(), self.height() )
 
 		# XYZ axes viewer initialisation
-		self.axes_viewer = AxesViewer()
+		self.axis_viewer = AxisViewer()
 
 
 	#-
@@ -119,7 +119,7 @@ class QtViewerGLWidget( QGLWidget ) :
 		self.mesh_viewer.LoadMesh( mesh )
 
 		# Initialise the XYZ axes viewer
-		self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.axis_viewer.trackball_transform = identity( 4, dtype=float32 )
 
 		# Update the display
 		self.update()
@@ -137,7 +137,7 @@ class QtViewerGLWidget( QGLWidget ) :
 		self.mesh_viewer.Close()
 
 		# Initialise the XYZ axes viewer
-		self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.axis_viewer.trackball_transform = identity( 4, dtype=float32 )
 
 		# Update the display
 		self.update()
@@ -186,7 +186,7 @@ class QtViewerGLWidget( QGLWidget ) :
 
 		# Reset model/axes transformation
 		self.mesh_viewer.trackball_transform = identity( 4, dtype=float32 )
-		self.axes_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.axis_viewer.trackball_transform = identity( 4, dtype=float32 )
 		self.mesh_viewer.model_translation = array( [0, 0, 0], dtype=float32 )
 
 		# Update the display
@@ -212,7 +212,7 @@ class QtViewerGLWidget( QGLWidget ) :
 		glViewport( 0, 0, 100, 100 )
 
 		# Display the XYZ axes
-		self.axes_viewer.Display()
+		self.axis_viewer.Display()
 
 		# Restore the viewport
 		glViewport( 0, 0, self.width(), self.height() )
@@ -297,7 +297,7 @@ class QtViewerGLWidget( QGLWidget ) :
 				self.previous_mouse_position, [mouseEvent.x(), mouseEvent.y()] )
 			self.mesh_viewer.trackball_transform = RotateMatrix( self.mesh_viewer.trackball_transform,
 				rotation_angle, rotation_axis )
-			self.axes_viewer.trackball_transform = self.mesh_viewer.trackball_transform
+			self.axis_viewer.trackball_transform = self.mesh_viewer.trackball_transform
 			self.previous_mouse_position = [ mouseEvent.x(), mouseEvent.y() ]
 			self.update()
 
