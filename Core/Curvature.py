@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Curvature.py
 #                             -------------------
-#    update               : 2013-11-20
+#    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -38,9 +38,7 @@
 #
 #-
 from .Neighbor import IsBorderVertex
-from math import sqrt
-from numpy import dot, cross, zeros
-from numpy.linalg import norm
+from numpy import dot, zeros, sqrt
 
 
 
@@ -58,7 +56,7 @@ from numpy.linalg import norm
 def GetNormalCurvature( mesh ) :
 
 	# Initialise normal curvature array
-	normal_curvature = zeros( (len(mesh.vertices),3 ) )
+	normal_curvature = zeros( mesh.vertices.shape, dtype=mesh.vertices.dtype )
 
 	# Loop through the vertices
 	for v1 in range( len(mesh.vertices) ) :
