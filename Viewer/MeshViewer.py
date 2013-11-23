@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-21
+#    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -18,9 +18,17 @@
 # ***************************************************************************
 
 
+
+
+#-
 #
 # External dependencies
 #
+#-
+#
+from Core.Container import GetBoundingSphere
+from Shader import LoadShader
+from Transformation import *
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
@@ -28,12 +36,6 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 
-from numpy import *
-
-from Core.Mesh import *
-from Core.BoundingContainer import *
-from Shader import *
-from Transformation import *
 
 
 
@@ -128,7 +130,7 @@ class MeshViewer() :
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 
 		# Color buffer object
-		if len(mesh.colors) :
+		if len(colors) :
 			self.color_buffer_id = glGenBuffers( 1 )
 			glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
 			glBufferData( GL_ARRAY_BUFFER, colors.nbytes, colors, GL_STATIC_DRAW )
@@ -229,9 +231,6 @@ class MeshViewer() :
 		# Need to initialise ?
 		if not self.element_number : return
 
-		# Disable display
-		self.element_number = 0
-
 		# Delete shader program
 		glUseProgram( 0 )
 		glDeleteProgram( self.shader_program_id )
@@ -247,6 +246,7 @@ class MeshViewer() :
 		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
 
 		# Initialise member variables
+		self.element_number = 0
 		self.shader_program_id = -1
 		self.vertex_array_id = -1
 		self.vertex_buffer_id = -1
