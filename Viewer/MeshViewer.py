@@ -173,8 +173,10 @@ class MeshViewer() :
 		# Compute model transformation matrix
 		self.model_matrix = identity( 4, dtype=float32 )
 		self.model_matrix = TranslateMatrix( self.model_matrix, self.model_translation )
-		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_center )
+
+		# Bounding sphere adaptation
 		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
+		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_center )
 
 		viewmatrix = dot( self.view_matrix, self.trackball_transform )
 
