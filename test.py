@@ -38,22 +38,22 @@ if __name__ == "__main__" :
 #	UpdateNormals( mesh )
 #	print '  Done.'
 
-#	print '~~~ Register neighborhood ~~~'
-#	UpdateNeighborhood( mesh )
-#	print '  Done.'
+	print '~~~ Register neighborhood ~~~'
+	UpdateNeighborhood( mesh )
+	print '  Done.'
 
 #	print '~~~ Check neighborhood ~~~'
 #	CheckNeighborhood( mesh )
 #	print '  Done.'
 #
 
-#	print '~~~ Compute normal curvature ~~~'
-#	normal_curvature = GetNormalCurvature( mesh )
-#	print '  Done.'
+	print '~~~ Compute normal curvature ~~~'
+	normal_curvature = GetNormalCurvature( mesh )
+	print '  Done.'
 
-#	print '~~~ Color vertices ~~~'
-#	mesh.colors = Array2Color( normal_curvature )
-#	print '  Done.'
+	print '~~~ Color vertices ~~~'
+	mesh.colors = Array2Color( normal_curvature )
+	print '  Done.'
 
 #	print mesh
 
