@@ -41,11 +41,15 @@ from numpy import cross, zeros, sqrt
 #
 def UpdateNormals( mesh ) :
 
-	# Create an indexed view
+	# Create an indexed view of the triangles
 	tris = mesh.vertices[ mesh.faces ]
 
 	# Calculate the normal for all the triangles
 	mesh.face_normals = cross( tris[::,1 ] - tris[::,0]  , tris[::,2 ] - tris[::,0] )
+
+	# Normalise the face normals
+	lengths = sqrt( (mesh.face_normals ** 2).sum( axis=1 ) )
+	mesh.face_normals /= lengths.reshape( len(mesh.face_normals), 1 )
 
 	# Intialise the vertex normals
 	mesh.vertex_normals = zeros( mesh.vertices.shape, dtype=mesh.vertices.dtype )
@@ -54,10 +58,6 @@ def UpdateNormals( mesh ) :
 	mesh.vertex_normals[ mesh.faces[:,0] ] += mesh.face_normals
 	mesh.vertex_normals[ mesh.faces[:,1] ] += mesh.face_normals
 	mesh.vertex_normals[ mesh.faces[:,2] ] += mesh.face_normals
-
-	# Normalise the face normals
-	lengths = sqrt( (mesh.face_normals ** 2).sum( axis=1 ) )
-	mesh.face_normals /= lengths.reshape( len(mesh.face_normals), 1 )
 
 	# Normalise the vertex normals
 	lengths = sqrt( (mesh.vertex_normals ** 2).sum( axis=1 ) )
