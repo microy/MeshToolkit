@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Shader.py
 #                             -------------------
-#    update               : 2013-11-18
+#    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -45,50 +45,9 @@ from OpenGL.GL import *
 #
 def LoadShader( name='SmoothShading' ) :
 
-	# Initialisation
-	vertex_shader_source = ''
-	fragment_shader_source = ''
-	geometry_shader_source = ''
-	geometry_shader_enabled = False
-
-	if name == 'NormalView' :
-		geometry_shader_enabled = True
-
-	# Load shader source files
-	with open('Viewer/Shaders/'+name+'.vert.glsl', 'r') as vertex_shader_file :
-		vertex_shader_source = vertex_shader_file.read()
-	with open('Viewer/Shaders/'+name+'.frag.glsl', 'r') as fragment_shader_file :
-		fragment_shader_source = fragment_shader_file.read()
-	if geometry_shader_enabled :
-		with open('Viewer/Shaders/'+name+'.geom.glsl', 'r') as geometry_shader_file :
-			geometry_shader_source = geometry_shader_file.read()
-
-	# Create the shaders
-	vertex_shader = glCreateShader( GL_VERTEX_SHADER )
-	fragment_shader = glCreateShader( GL_FRAGMENT_SHADER )
-	if geometry_shader_enabled :
-		geometry_shader = glCreateShader( GL_GEOMETRY_SHADER )
-
-	# Load shader source codes
-	glShaderSource( vertex_shader, vertex_shader_source )
-	glShaderSource( fragment_shader, fragment_shader_source )
-	if geometry_shader_enabled :
-		glShaderSource( geometry_shader, geometry_shader_source )
-
-	# Compile the shaders
-	glCompileShader( vertex_shader )
-	glCompileShader( fragment_shader )
-	if geometry_shader_enabled :
-		glCompileShader( geometry_shader )
-
-	# Check the shaders
-	if not glGetShaderiv( vertex_shader, GL_COMPILE_STATUS ) :
-		raise RuntimeError( 'Vertex shader compilation failed.\n' + glGetShaderInfoLog( vertex_shader ) )
-	if not glGetShaderiv( fragment_shader, GL_COMPILE_STATUS ) :
-		raise RuntimeError( 'Fragment shader compilation failed.\n' + glGetShaderInfoLog( fragment_shader ) )
-	if geometry_shader_enabled :
-		if not glGetShaderiv( geometry_shader, GL_COMPILE_STATUS ) :
-			raise RuntimeError( 'Geometry shader compilation failed.\n' + glGetShaderInfoLog( geometry_shader ) )
+	# Create the shaders
+	vertex_shader = CreateShader( 'Viewer/Shaders/'+name+'.vert.glsl', GL_VERTEX_SHADER )
+	fragment_shader = CreateShader( 'Viewer/Shaders/'+name+'.frag.glsl', GL_FRAGMENT_SHADER )
 
 	# Create the program
 	program_id = glCreateProgram()
@@ -96,8 +55,6 @@ def LoadShader( name='SmoothShading' ) :
 	# Attach the shaders to the program
 	glAttachShader( program_id, vertex_shader )
 	glAttachShader( program_id, fragment_shader )
-	if geometry_shader_enabled :
-		glAttachShader( program_id, geometry_shader )
 
 	# Link the program
 	glLinkProgram( program_id )
@@ -109,16 +66,49 @@ def LoadShader( name='SmoothShading' ) :
 	# Detach the shaders from the program
 	glDetachShader( program_id, vertex_shader )
 	glDetachShader( program_id, fragment_shader )
-	if geometry_shader_enabled :
-		glDetachShader( program_id, geometry_shader )
 
 	# Delete the shaders
 	glDeleteShader( vertex_shader )
 	glDeleteShader( fragment_shader )
-	if geometry_shader_enabled :
-		glDeleteShader( geometry_shader )
 
 	# Return shader program ID
 	return program_id
+
+
+
+
+
+
+#-
+#
+#  CreateShader
+#
+#-
+#
+def CreateShader( filename, shader_type ) :
+
+	# Initialisation
+	shader_source = ''
+
+	# Load shader source files
+	with open( filename, 'r') as vertex_shader_file :
+		shader_source = vertex_shader_file.read()
+
+	# Create the shaders
+	shader = glCreateShader( shader_type )
+
+	# Load shader source codes
+	glShaderSource( shader, shader_source )
+
+	# Compile the shaders
+	glCompileShader( shader )
+
+	# Check the shaders
+	if not glGetShaderiv( shader, GL_COMPILE_STATUS ) :
+		raise RuntimeError( 'Shader compilation failed.\n' + glGetShaderInfoLog( shader ) )
+
+	# Return the shader ID
+	return shader
+
 
 
