@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Color.py
 #                             -------------------
-#    update               : 2013-11-21
+#    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -23,13 +23,14 @@
 # External dependencies
 #
 #-
-from numpy import empty
-from numpy.linalg import norm
+from numpy import zeros, sqrt
+
+
 
 
 #--
 #
-# Double2Color
+# Value2Color
 #
 #--
 #
@@ -46,6 +47,25 @@ def Value2Color( value ) :
 
 
 
+#--
+#
+# Value2ColorAlternate
+#
+#--
+#
+# Convert a value in range [ 0.0, 1.0 ] to a pseudo-color
+#
+def Value2ColorAlternate( value ) :
+
+	if( value < 0.0  ) : return [ 1.0, 0.0 , 1.0 ]
+	if( value < 0.2  ) : return [ 1.0 - value * 5.0, 0.0 , 1.0 ]
+	if( value < 0.4  ) : return [ 0.0, (value - 0.2) * 5.0, 1.0 ]
+	if( value < 0.6  ) : return [ 0.0, 1.0, 1.0 - (value - 0.4) * 5.0 ]
+	if( value < 0.8  ) : return [ (value - 0.6) * 5.0, 1.0, 0.0 ]
+	if( value < 1.0  ) : return [ 1.0, 1.0 - (value - 0.8) * 5.0, 0.0 ]
+	return [ 1.0, 0.0, 0.0 ]
+
+
 
 #--
 #
@@ -57,13 +77,8 @@ def Value2Color( value ) :
 #
 def Array2Color( values ) :
 
-	# Initialize variables
-	colors = empty( (len(values), 3) )
-	value_lengths = empty( (len(values), 1) )
-
-	# Compute value vector length
-	for i in range( len(values) ) :
-		value_lengths[i] = norm( values[i] )
+	# Compute value vector lengths
+	value_lengths = sqrt( (values ** 2).sum( axis=1 ) )
 
 	# Compute minimum and maximum value
 	min_value = value_lengths.min()
@@ -72,9 +87,14 @@ def Array2Color( values ) :
 	# Compute the range of the values
 	value_range = max_value - min_value
 
+	# Normalize the value lengths
+	normalized_values = value_lengths - min_value
+	normalized_values /= value_range
+
 	# Convert each value to a pseudo-color
+	colors = zeros( (len(values), 3) )
 	for i in range( len(values) ) :
-		colors[i] = Value2Color( (value_lengths[i] - min_value) / value_range )
+		colors[i] = Value2ColorAlternate( normalized_values[i] )
 
 	# Return result
 	return colors
