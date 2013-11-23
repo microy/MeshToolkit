@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-22
+#    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -26,12 +26,11 @@
 #
 # Qt
 #
-from Core.Mesh import CheckMesh
 from Core.Normal import UpdateNormals
 from Core.Vrml import ReadVrml
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import *
-from .QtViewerGLWidget import QtViewerGLWidget
+from .OpenGLWidget import OpenGLWidget
 
 
 
@@ -111,6 +110,18 @@ class QtViewer( QMainWindow ) :
 		self.view_aliasing_action.setStatusTip( 'Enable / Disable antialiasing' )
 		self.connect( self.view_aliasing_action, QtCore.SIGNAL('triggered()'), self.ViewAliasingAction )
 
+		self.view_axis_action = QtGui.QAction( '&XYZ-axes', self )
+		self.view_axis_action.setCheckable( True )
+		self.view_axis_action.setChecked( True )
+		self.view_axis_action.setStatusTip( 'Enable / Disable XYZ-axes display' )
+		self.connect( self.view_axis_action, QtCore.SIGNAL('triggered()'), self.ViewAxisAction )
+
+		self.view_colorbar_action = QtGui.QAction( '&Color bar', self )
+		self.view_colorbar_action.setCheckable( True )
+		self.view_colorbar_action.setChecked( False )
+		self.view_colorbar_action.setStatusTip( 'Enable / Disable color bar display' )
+		self.connect( self.view_colorbar_action, QtCore.SIGNAL('triggered()'), self.ViewColorBarAction )
+
 		view_reset_action = QtGui.QAction( '&Reset', self )
 		view_reset_action.setShortcut( 'R' )
 		view_reset_action.setStatusTip( 'Reset the viewing parameters' )
@@ -131,10 +142,13 @@ class QtViewer( QMainWindow ) :
 		view_menu.addSeparator()
 		view_menu.addAction( self.view_aliasing_action )
 		view_menu.addSeparator()
+		view_menu.addAction( self.view_axis_action )
+		view_menu.addAction( self.view_colorbar_action )
+		view_menu.addSeparator()
 		view_menu.addAction( view_reset_action )
 
 		# Create the OpenGL frame
-		self.opengl_widget = QtViewerGLWidget( self )
+		self.opengl_widget = OpenGLWidget( self )
 		self.setCentralWidget( self.opengl_widget )
 
 
@@ -169,8 +183,6 @@ class QtViewer( QMainWindow ) :
 
 
 
-
-
 	#-
 	#
 	# FileCloseAction
@@ -182,8 +194,6 @@ class QtViewer( QMainWindow ) :
 		# Close the mesh
 		self.opengl_widget.Close()
 		self.mesh = None
-
-
 
 
 	#-
@@ -200,8 +210,6 @@ class QtViewer( QMainWindow ) :
 		self.opengl_widget.SetShader( 'FlatShading' )
 
 
-
-
 	#-
 	#
 	# ViewSmoothAction
@@ -216,8 +224,6 @@ class QtViewer( QMainWindow ) :
 		self.opengl_widget.SetShader( 'SmoothShading' )
 
 
-
-
 	#-
 	#
 	# ViewAliasingAction
@@ -226,20 +232,35 @@ class QtViewer( QMainWindow ) :
 	#
 	def ViewAliasingAction( self ) :
 
+		# Enable / Disable antialiasing
+		self.view_aliasing_action.setChecked( self.view_aliasing_action.isChecked() )
+		self.opengl_widget.SetAntialiasing( self.view_aliasing_action.isChecked() )
 
-		# isChecked Bug ????!!!!
 
-		# Set antialiasing
-		if not self.view_aliasing_action.isChecked() :
+	#-
+	#
+	# ViewAxisAction
+	#
+	#-
+	#
+	def ViewAxisAction( self ) :
 
-			self.view_aliasing_action.setChecked( False )
-			self.opengl_widget.SetAntialiasing( False )
+		# Enable / Disable XYZ-axes display
+		self.view_axis_action.setChecked( self.view_axis_action.isChecked() )
+		self.opengl_widget.SetAxis( self.view_axis_action.isChecked() )
 
-		else :
 
-			self.view_aliasing_action.setChecked( True )
-			self.opengl_widget.SetAntialiasing( True )
+	#-
+	#
+	# ViewColorBarAction
+	#
+	#-
+	#
+	def ViewColorBarAction( self ) :
 
+		# Enable / Disable color bar display
+		self.view_colorbar_action.setChecked( self.view_colorbar_action.isChecked() )
+		self.opengl_widget.SetColorBar( self.view_colorbar_action.isChecked() )
 
 
 	#-

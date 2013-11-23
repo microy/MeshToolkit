@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*- 
 
 # ***************************************************************************
-#                                AxisViewer.py
+#                                   Axis.py
 #                             -------------------
 #    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
@@ -38,13 +38,13 @@ from numpy import array, dot, identity, float32
 
 #--
 #
-# AxisViewer
+# Axis
 #
 #--
 #
-# Display XYZ-axes in OpenGL
+# Display XYZ-axes with OpenGL
 #
-class AxisViewer :
+class Axis :
 
 
 	#-
@@ -68,7 +68,7 @@ class AxisViewer :
 			[0, 0, 1], [0, 0, 1] ] , dtype=float32 )
 
 		# Load the shader
-		self.shader_program_id = LoadShader( 'AxisViewer' )
+		self.shader_program_id = LoadShader( 'SimpleColor' )
 
 		# Use the shader program
 		glUseProgram( self.shader_program_id )

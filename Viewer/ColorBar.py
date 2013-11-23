@@ -67,7 +67,7 @@ class ColorBar :
 			colors[i*2+1] = Value2ColorAlternate( float(i)/float(self.size-1) )
 
 		# Load the shader
-		self.shader_program_id = LoadShader( 'AxisViewer' )
+		self.shader_program_id = LoadShader( 'SimpleColor' )
 
 		# Use the shader program
 		glUseProgram( self.shader_program_id )

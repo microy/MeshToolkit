@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*- 
 
 # ***************************************************************************
-#                             QtViewerGLWidget.py
+#                               OpenGLWidget.py
 #                             -------------------
 #    update               : 2013-11-23
 #    copyright            : (C) 2013 by Michaël Roy
@@ -24,7 +24,7 @@
 #
 #--
 #
-from .AxisViewer import AxisViewer
+from .Axis import Axis
 from .ColorBar import ColorBar
 from .MeshViewer import MeshViewer
 from .Shader import LoadShader
@@ -46,13 +46,13 @@ from numpy import array, identity, float32
 
 #--
 #
-# QtViewerGLWidget
+# OpenGLWidget
 #
 #--
 #
 # Create an OpenGL frame with Qt
 #
-class QtViewerGLWidget( QGLWidget ) :
+class OpenGLWidget( QGLWidget ) :
 
 
 	#-
@@ -72,10 +72,12 @@ class QtViewerGLWidget( QGLWidget ) :
 
 		# Initialise member variables
 		self.mesh_viewer = None
-		self.axis_viewer = None
-		self.colorbar_viewer = None
+		self.axis = None
+		self.colorbar = None
 		self.previous_mouse_position = [0, 0]
 		self.motion_state = 0
+		self.axis_enabled = True
+		self.colorbar_enabled = False
 
 
 	#-
@@ -106,10 +108,10 @@ class QtViewerGLWidget( QGLWidget ) :
 		self.mesh_viewer = MeshViewer( self.width(), self.height() )
 
 		# XYZ axes viewer initialisation
-		self.axis_viewer = AxisViewer()
+		self.axis = Axis()
 
 		# Color bar
-		self.colorbar_viewer = ColorBar()
+		self.colorbar = ColorBar()
 
 
 	#-
@@ -124,7 +126,7 @@ class QtViewerGLWidget( QGLWidget ) :
 		self.mesh_viewer.LoadMesh( mesh )
 
 		# Initialise the XYZ axes viewer
-		self.axis_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.axis.trackball_transform = identity( 4, dtype=float32 )
 
 		# Update the display
 		self.update()
@@ -142,7 +144,7 @@ class QtViewerGLWidget( QGLWidget ) :
 		self.mesh_viewer.Close()
 
 		# Initialise the XYZ axes viewer
-		self.axis_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.axis.trackball_transform = identity( 4, dtype=float32 )
 
 		# Update the display
 		self.update()
@@ -180,6 +182,36 @@ class QtViewerGLWidget( QGLWidget ) :
 		self.update()
 
 
+	#-
+	#
+	# SetAxis
+	#
+	#-
+	#
+	def SetAxis( self, enabled ) :
+
+		# Enable / Disable XYZ-axes
+		self.axis_enabled = enabled
+
+		# Update the display
+		self.update()
+
+
+	#-
+	#
+	# SetColorBar
+	#
+	#-
+	#
+	def SetColorBar( self, enabled ) :
+
+		# Enable / Disable color bar
+		self.colorbar_enabled = enabled
+
+		# Update the display
+		self.update()
+
+
 
 	#-
 	#
@@ -191,7 +223,7 @@ class QtViewerGLWidget( QGLWidget ) :
 
 		# Reset model/axes transformation
 		self.mesh_viewer.trackball_transform = identity( 4, dtype=float32 )
-		self.axis_viewer.trackball_transform = identity( 4, dtype=float32 )
+		self.axis.trackball_transform = identity( 4, dtype=float32 )
 		self.mesh_viewer.model_translation = array( [0, 0, 0], dtype=float32 )
 
 		# Update the display
@@ -232,11 +264,14 @@ class QtViewerGLWidget( QGLWidget ) :
 	#
 	def DrawAxis( self ) :
 
+		# Axis enabled ?
+		if not self.axis_enabled : return
+
 		# Resize the viewport
 		glViewport( 0, 0, 100, 100 )
 
 		# Display the XYZ axes
-		self.axis_viewer.Display()
+		self.axis.Display()
 
 		# Restore the viewport
 		glViewport( 0, 0, self.width(), self.height() )
@@ -250,11 +285,14 @@ class QtViewerGLWidget( QGLWidget ) :
 	#
 	def DrawColorBar( self ) :
 
+		# Color bar enabled ?
+		if not self.colorbar_enabled : return
+
 		# Resize the viewport
 		glViewport( self.width()-50, self.height()/2-300, 50, 600 )
 
 		# Display the XYZ axes
-		self.colorbar_viewer.Display()
+		self.colorbar.Display()
 
 		# Restore the viewport
 		glViewport( 0, 0, self.width(), self.height() )
@@ -340,7 +378,7 @@ class QtViewerGLWidget( QGLWidget ) :
 				self.previous_mouse_position, [mouseEvent.x(), mouseEvent.y()] )
 			self.mesh_viewer.trackball_transform = RotateMatrix( self.mesh_viewer.trackball_transform,
 				rotation_angle, rotation_axis )
-			self.axis_viewer.trackball_transform = self.mesh_viewer.trackball_transform
+			self.axis.trackball_transform = self.mesh_viewer.trackball_transform
 			self.previous_mouse_position = [ mouseEvent.x(), mouseEvent.y() ]
 			self.update()
 
