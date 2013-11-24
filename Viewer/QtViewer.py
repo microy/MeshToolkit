@@ -24,17 +24,11 @@
 #
 #--
 #
-# Qt
-#
-from Core.Mesh import CheckMesh
-from Core.Neighbor import UpdateNeighborhood, CheckNeighborhood
-from Core.Normal import UpdateNormals
+from Core.Mesh import CheckMesh, CheckNeighborhood
 from Core.Vrml import ReadVrml, WriteVrml
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import *
 from .OpenGLWidget import OpenGLWidget
-
-
 
 
 #--
@@ -184,10 +178,10 @@ class QtViewer( QMainWindow ) :
 
 		# Compute mesh normals if necessary
 		if len(self.mesh.vertex_normals) != len(self.mesh.vertices) :
-			UpdateNormals( self.mesh )
+			self.mesh.UpdateNormals()
 
 		# Record neighborhood informations
-		UpdateNeighborhood( self.mesh )
+		self.mesh.UpdateNeighbors()
 
 		# Send the mesh to the OpenGL viewer
 		self.opengl_widget.LoadMesh( self.mesh )

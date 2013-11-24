@@ -24,7 +24,6 @@
 #
 #-
 #
-from Core.Container import GetBoundingSphere
 from Shader import LoadShader
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
@@ -57,7 +56,6 @@ class MeshViewer :
 
 		# Initialise the model parameters
 		self.element_number = 0
-		self.color_enabled = False
 
 		# Initialise the trackball transformation matrix
 		self.trackball_transform = identity( 4, dtype=float32 )
@@ -89,7 +87,7 @@ class MeshViewer :
 		colors = array( mesh.colors, dtype=float32 )
 
 		# Normalize the model
-		(center, radius) = GetBoundingSphere( mesh )
+		(center, radius) = mesh.GetBoundingSphere()
 		vertices -= center
 		vertices /= radius
 
@@ -117,7 +115,8 @@ class MeshViewer :
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 
 		# Color buffer object
-		if len(colors) :
+		if len(colors) == 0 : self.color_enabled = False
+		else :
 			self.color_enabled = True
 			self.color_buffer_id = glGenBuffers( 1 )
 			glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
@@ -173,15 +172,13 @@ class MeshViewer :
 		# Apply trackball transformation to the model matrix
 		modelview_matrix = dot( modelview_matrix, self.trackball_transform )
 
-		# Set the normal matrix
-		normal_matrix = array( self.trackball_transform[ :3, :3 ], dtype=float32 )
-
 		# Send the transformation matrices to the shader
 		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_TRUE, array( self.trackball_transform[ :3, :3 ], dtype=float32 ) )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, dot( self.projection_matrix, modelview_matrix ) )
 
 		# Activate color in the shader if necessary
 		if self.color_enabled :	glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
+		else : glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 0 )
 
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )
@@ -250,7 +247,6 @@ class MeshViewer :
 
 		# Initialise the model parameters
 		self.element_number = 0
-		self.color_enabled = False
 
 		# Initialise the shader
 		self.shader_program_id = self.smooth_shader_id

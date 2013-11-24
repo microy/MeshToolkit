@@ -37,7 +37,6 @@
 # External dependencies
 #
 #-
-from .Neighbor import IsBorderVertex
 from numpy import dot, zeros, sqrt
 
 
@@ -62,7 +61,7 @@ def GetNormalCurvature( mesh ) :
 	for v1 in range( len(mesh.vertices) ) :
 
 		# Check border
-		if IsBorderVertex( mesh, v1 ) : continue
+		if mesh.IsBorderVertex( v1 ) : continue
 
 		# Get the 1-ring neighborhood
 		for v2 in mesh.neighbor_vertices[v1] :
