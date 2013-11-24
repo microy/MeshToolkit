@@ -167,10 +167,10 @@ class MeshViewer :
 		# Initialise Model-View transformation matrix
 		modelview_matrix = identity( 4, dtype=float32 )
 
-		# Position the scene
+		# Position the scene (camera)
 		modelview_matrix[3,2] = -30.0
 
-		# Apply trackball transformation to the model matrix
+		# Apply trackball transformation
 		modelview_matrix = dot( self.trackball_transform, modelview_matrix )
 
 		# Send the transformation matrices to the shader

@@ -36,7 +36,7 @@
 #--
 #
 from math import cos, sin, pi
-from numpy import array, identity, zeros, float32, dot, cross, sqrt, copy, allclose
+from numpy import array, identity, zeros, float32, dot, cross, sqrt, copy
 
 
 #--
@@ -137,7 +137,7 @@ class Trackball :
 		translation[2] -= delta * 2.0
 
 		# Compute the translation according to the camera view
-		translation = dot( self.transformation[:3,:3], translation )
+		translation = self.Camera2Model( translation )
 
 		# Update the transformation matrix
 		self.transformation = self.TranslateMatrix( self.transformation, translation )
@@ -172,7 +172,7 @@ class Trackball :
 			translation[1] += (self.previous_mouse_position[1] - current_mouse_position[1])*0.02
 
 			# Compute the translation according to the camera view
-			translation = dot( self.transformation[:3,:3], translation )
+			translation = self.Camera2Model( translation )
 
 			# Update the transformation matrix
 			self.transformation = self.TranslateMatrix( self.transformation, translation )
@@ -202,7 +202,7 @@ class Trackball :
 		current_position = self.TrackballMapping( current_mouse_position )
 
 		# Compute the rotation axis according to the camera view
-		rotation_axis = dot( self.transformation[:3,:3], cross( previous_position, current_position ) )
+		rotation_axis = self.Camera2Model( cross( previous_position, current_position ) )
 
 		# Rotation angle
 	        rotation_angle = 90.0 * sqrt( ((current_position - previous_position)**2).sum() ) * 1.5
@@ -227,6 +227,18 @@ class Trackball :
 		if d > 1.0 : d = 1.0
 		v[2] = cos( pi / 2.0 * d )
 		return v / sqrt(( v**2 ).sum())
+
+
+	#--
+	#
+	# Camera2Model
+	#
+	#--
+	#
+	def Camera2Model( self, vector ) :
+
+		# Transform the vector from the camera space to the model space
+		return dot( self.transformation[:3,:3], vector )
 
 
 	#--
