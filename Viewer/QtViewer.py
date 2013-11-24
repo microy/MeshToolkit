@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-23
+#    update               : 2013-11-24
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -26,8 +26,10 @@
 #
 # Qt
 #
+from Core.Mesh import CheckMesh
+from Core.Neighbor import UpdateNeighborhood, CheckNeighborhood
 from Core.Normal import UpdateNormals
-from Core.Vrml import ReadVrml
+from Core.Vrml import ReadVrml, WriteVrml
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import *
 from .OpenGLWidget import OpenGLWidget
@@ -78,8 +80,17 @@ class QtViewer( QMainWindow ) :
 		file_open_action.setStatusTip( 'Open a file' )
 		self.connect( file_open_action, QtCore.SIGNAL('triggered()'), self.FileOpenAction )
 
+		file_save_action = QtGui.QAction( '&Save...', self )
+		file_save_action.setShortcut( 'S' )
+		file_save_action.setStatusTip( 'Save the current mesh' )
+		self.connect( file_save_action, QtCore.SIGNAL('triggered()'), self.FileSaveAction )
+
+		file_check_action = QtGui.QAction( '&Check', self )
+		file_check_action.setStatusTip( 'Check different parameters of the mesh' )
+		self.connect( file_check_action, QtCore.SIGNAL('triggered()'), self.FileCheckAction )
+
 		file_close_action = QtGui.QAction( '&Close', self )
-		file_close_action.setShortcut( 'C' )
+		file_close_action.setShortcut( 'W' )
 		file_close_action.setStatusTip( 'Close the current file' )
 		self.connect( file_close_action, QtCore.SIGNAL('triggered()'), self.FileCloseAction )
 
@@ -97,7 +108,7 @@ class QtViewer( QMainWindow ) :
 		self.connect( self.view_flat_action, QtCore.SIGNAL('triggered()'), self.ViewFlatAction )
 
 		self.view_smooth_action = QtGui.QAction( '&Smooth shading', self )
-		self.view_smooth_action.setShortcut( 'S' )
+		self.view_smooth_action.setShortcut( 'G' )
 		self.view_smooth_action.setCheckable( True )
 		self.view_smooth_action.setChecked( True )
 		self.view_smooth_action.setStatusTip( 'Render the mesh with smooth shading' )
@@ -110,13 +121,8 @@ class QtViewer( QMainWindow ) :
 		self.view_aliasing_action.setStatusTip( 'Enable / Disable antialiasing' )
 		self.connect( self.view_aliasing_action, QtCore.SIGNAL('triggered()'), self.ViewAliasingAction )
 
-		self.view_axis_action = QtGui.QAction( '&XYZ-axes', self )
-		self.view_axis_action.setCheckable( True )
-		self.view_axis_action.setChecked( True )
-		self.view_axis_action.setStatusTip( 'Enable / Disable XYZ-axes display' )
-		self.connect( self.view_axis_action, QtCore.SIGNAL('triggered()'), self.ViewAxisAction )
-
 		self.view_colorbar_action = QtGui.QAction( '&Color bar', self )
+		self.view_colorbar_action.setShortcut( 'C' )
 		self.view_colorbar_action.setCheckable( True )
 		self.view_colorbar_action.setChecked( False )
 		self.view_colorbar_action.setStatusTip( 'Enable / Disable color bar display' )
@@ -132,6 +138,9 @@ class QtViewer( QMainWindow ) :
 
 		file_menu = menu_bar.addMenu( '&File' )
 		file_menu.addAction( file_open_action )
+		file_menu.addAction( file_save_action )
+		file_menu.addSeparator()
+		file_menu.addAction( file_check_action )
 		file_menu.addSeparator()
 		file_menu.addAction( file_close_action )
 		file_menu.addAction( file_exit_action )
@@ -142,7 +151,6 @@ class QtViewer( QMainWindow ) :
 		view_menu.addSeparator()
 		view_menu.addAction( self.view_aliasing_action )
 		view_menu.addSeparator()
-		view_menu.addAction( self.view_axis_action )
 		view_menu.addAction( self.view_colorbar_action )
 		view_menu.addSeparator()
 		view_menu.addAction( view_reset_action )
@@ -161,7 +169,7 @@ class QtViewer( QMainWindow ) :
 	def FileOpenAction( self ) :
 
 		# Open file dialog
- 		filename = QFileDialog.getOpenFileName( self, 'Open VRML input File', '',
+ 		filename = QFileDialog.getOpenFileName( self, 'Open a VRML File', '',
 			'VRML files (*.vrml *.wrl);;X3D files (*.x3d *.x3dv);;OpenInventor files (*.iv);;All files (*.*)' )
 
 		# Check filename
@@ -178,9 +186,49 @@ class QtViewer( QMainWindow ) :
 		if len(self.mesh.vertex_normals) != len(self.mesh.vertices) :
 			UpdateNormals( self.mesh )
 
+		# Record neighborhood informations
+		UpdateNeighborhood( self.mesh )
+
 		# Send the mesh to the OpenGL viewer
 		self.opengl_widget.LoadMesh( self.mesh )
 
+
+	#-
+	#
+	# FileSaveAction
+	#
+	#-
+	#
+	def FileSaveAction( self ) :
+
+		# Nothing to save
+		if not self.mesh : return
+
+		# Open file dialog
+ 		filename = QFileDialog.getSaveFileName( self, 'Save to a VRML File', '',
+			'VRML files (*.vrml *.wrl);;X3D files (*.x3d *.x3dv);;OpenInventor files (*.iv);;All files (*.*)' )
+
+		# Check filename
+		if not filename : return
+
+		# Save VRML/X3D/Inventor file
+		WriteVrml( self.mesh, unicode(filename) )
+
+
+	#-
+	#
+	# FileCheckAction
+	#
+	#-
+	#
+	def FileCheckAction( self ) :
+
+		# Nothing to check
+		if not self.mesh : return
+
+		# Check different parameters of the mesh
+		CheckMesh( self.mesh )
+		CheckNeighborhood( self.mesh )
 
 
 	#-
@@ -235,19 +283,6 @@ class QtViewer( QMainWindow ) :
 		# Enable / Disable antialiasing
 		self.view_aliasing_action.setChecked( self.view_aliasing_action.isChecked() )
 		self.opengl_widget.SetAntialiasing( self.view_aliasing_action.isChecked() )
-
-
-	#-
-	#
-	# ViewAxisAction
-	#
-	#-
-	#
-	def ViewAxisAction( self ) :
-
-		# Enable / Disable XYZ-axes display
-		self.view_axis_action.setChecked( self.view_axis_action.isChecked() )
-		self.opengl_widget.SetAxis( self.view_axis_action.isChecked() )
 
 
 	#-

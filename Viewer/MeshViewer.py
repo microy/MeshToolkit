@@ -18,8 +18,6 @@
 # ***************************************************************************
 
 
-
-
 #-
 #
 # External dependencies
@@ -28,17 +26,14 @@
 #
 from Core.Container import GetBoundingSphere
 from Shader import LoadShader
-from Transformation import PerspectiveMatrix, TranslateMatrix
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
+from math import tan, pi
 from numpy import array, identity, dot, float32, uint32
-
-
-
 
 
 #--
@@ -49,7 +44,7 @@ from numpy import array, identity, dot, float32, uint32
 #
 # Display a mesh with OpenGL
 #
-class MeshViewer() :
+class MeshViewer :
 
 
 	#-
@@ -60,22 +55,20 @@ class MeshViewer() :
 	#
 	def __init__( self, width=1024, height=768 ) :
 
-		# Initialise the OpenGL buffer IDs
-		self.shader_program_id = -1
-		self.vertex_array_id = -1
-		self.vertex_buffer_id = -1
-		self.face_buffer_id = -1
-		self.normal_buffer_id = -1
-		self.color_buffer_id = -1
-
 		# Initialise the model parameters
 		self.element_number = 0
+		self.color_enabled = False
 
 		# Initialise the trackball transformation matrix
 		self.trackball_transform = identity( 4, dtype=float32 )
 
 		# Initialise the Projection transformation matrix
-		self.projection_matrix = PerspectiveMatrix( 45.0, float(width)/float(height), 0.1, 100.0 )
+		self.SetProjectionMatrix( width, height )
+
+		# Load the shaders
+		self.smooth_shader_id = LoadShader( 'SmoothShading' )
+		self.flat_shader_id = LoadShader( 'FlatShading' )
+		self.shader_program_id = self.smooth_shader_id
 
 
 	#-
@@ -99,12 +92,6 @@ class MeshViewer() :
 		(center, radius) = GetBoundingSphere( mesh )
 		vertices -= center
 		vertices /= radius
-
-		# Load the shader
-		self.shader_program_id = LoadShader( 'SmoothShading' )
-
-		# Use the shader program
-		glUseProgram( self.shader_program_id )
 
 		# Vertex array object
 		self.vertex_array_id = glGenVertexArrays( 1 )
@@ -131,6 +118,7 @@ class MeshViewer() :
 
 		# Color buffer object
 		if len(colors) :
+			self.color_enabled = True
 			self.color_buffer_id = glGenBuffers( 1 )
 			glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
 			glBufferData( GL_ARRAY_BUFFER, colors.nbytes, colors, GL_STATIC_DRAW )
@@ -142,12 +130,24 @@ class MeshViewer() :
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
 		glBindVertexArray( 0 )
 
-		# Release the shader program
-		glUseProgram( 0 )
-
 		# Setup model element number
 		self.element_number = len(faces) * 3
 
+
+	#-
+	#
+	# SetShader
+	#
+	#-
+	#
+	def SetShader( self, shader ) :
+
+		# Need to initialise ?
+		if not self.element_number : return
+
+		# Setup the shader program
+		if shader == 'SmoothShading' : self.shader_program_id = self.smooth_shader_id
+		elif shader == 'FlatShading' : self.shader_program_id = self.flat_shader_id
 		
 
 	#-
@@ -168,7 +168,7 @@ class MeshViewer() :
 		modelview_matrix = identity( 4, dtype=float32 )
 
 		# Position the scene
-		modelview_matrix = TranslateMatrix( modelview_matrix, [ 0.0, 0.0, -3.0 ] )
+		modelview_matrix[2,3] = -3.0
 
 		# Apply trackball transformation to the model matrix
 		modelview_matrix = dot( modelview_matrix, self.trackball_transform )
@@ -177,13 +177,11 @@ class MeshViewer() :
 		normal_matrix = array( self.trackball_transform[ :3, :3 ], dtype=float32 )
 
 		# Send the transformation matrices to the shader
-		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_TRUE, normal_matrix )
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE,
-			dot( self.projection_matrix, modelview_matrix ) )
+		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_TRUE, array( self.trackball_transform[ :3, :3 ], dtype=float32 ) )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, dot( self.projection_matrix, modelview_matrix ) )
 
 		# Activate color in the shader if necessary
-		if self.color_buffer_id != -1 :
-			glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
+		if self.color_enabled :	glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
 
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )
@@ -208,7 +206,26 @@ class MeshViewer() :
 	def Resize( self, width, height ) :
 
 		# Compute perspective projection matrix
-		self.projection_matrix = PerspectiveMatrix( 45.0, float(width)/float(height), 0.1, 100.0 )
+		self.SetProjectionMatrix( width, height )
+
+
+	#--
+	#
+	# SetProjectionMatrix
+	#
+	#--
+	#
+	def SetProjectionMatrix( self, width, height ) :
+
+		fovy, aspect, near, far = 45.0, float(width)/float(height), 0.1, 10.0
+		f = tan( pi * fovy / 360.0 )
+		# Compute the perspective matrix
+		self.projection_matrix = identity( 4, dtype=float32 )
+		self.projection_matrix[0,0] = 1.0 / (f * aspect)
+		self.projection_matrix[1,1] = 1.0 / f
+		self.projection_matrix[2,2] = - (far + near) / (far - near)
+		self.projection_matrix[2,3] = - 2.0 * near * far / (far - near)
+		self.projection_matrix[3,2] = - 1.0
 
 
 	#-
@@ -222,30 +239,21 @@ class MeshViewer() :
 		# Need to initialise ?
 		if not self.element_number : return
 
-		# Delete shader program
-		glUseProgram( 0 )
-		glDeleteProgram( self.shader_program_id )
-
 		# Delete buffer objects
 		glDeleteBuffers( 1, array([ self.face_buffer_id ]) )
 		glDeleteBuffers( 1, array([ self.vertex_buffer_id ]) )
 		glDeleteBuffers( 1, array([ self.normal_buffer_id ]) )
-		if self.color_buffer_id != -1 :
-			glDeleteBuffers( 1, array([ self.color_buffer_id ]) )
+		if self.color_enabled :	glDeleteBuffers( 1, array([ self.color_buffer_id ]) )
 
 		# Delete vertex array
 		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
 
-		# Initialise the OpenGL buffer IDs
-		self.shader_program_id = -1
-		self.vertex_array_id = -1
-		self.vertex_buffer_id = -1
-		self.face_buffer_id = -1
-		self.normal_buffer_id = -1
-		self.color_buffer_id = -1
-
-		# Initialise the model element number
+		# Initialise the model parameters
 		self.element_number = 0
+		self.color_enabled = False
+
+		# Initialise the shader
+		self.shader_program_id = self.smooth_shader_id
 
 		# Initialise the trackball transformation matrix
 		self.trackball_transform = identity( 4, dtype=float32 )

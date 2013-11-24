@@ -24,7 +24,6 @@
 #
 #--
 #
-from .Axis import Axis
 from .ColorBar import ColorBar
 from .MeshViewer import MeshViewer
 from .Shader import LoadShader
@@ -66,15 +65,13 @@ class OpenGLWidget( QGLWidget ) :
 		self.setMouseTracking( True )
 
 		# Initialise mouse position
-		self.previous_mouse_position = [0, 0]
+		self.previous_mouse_position = [ 0, 0 ]
 
 		# Initialise OpenGL viewers
 		self.mesh_viewer = None
-		self.axis_viewer = None
-		self.colorbar_viewer = None
+		self.colorbar = None
 
 		# Initialise viewing parameters
-		self.axis_enabled = True
 		self.colorbar_enabled = False
 
 		# Trackball initialisation
@@ -108,11 +105,8 @@ class OpenGLWidget( QGLWidget ) :
 		# Mesh viewer initialisation
 		self.mesh_viewer = MeshViewer( self.width(), self.height() )
 
-		# XYZ axes viewer initialisation
-		self.axis_viewer = Axis()
-
 		# Color bar viewer initialisation
-		self.colorbar_viewer = ColorBar()
+		self.colorbar = ColorBar()
 
 
 	#-
@@ -154,7 +148,7 @@ class OpenGLWidget( QGLWidget ) :
 	def SetShader( self, shader ) :
 
 		# Load a shader for the model
-		self.mesh_viewer.shader_program_id = LoadShader( shader )
+		self.mesh_viewer.SetShader( shader )
 
 		# Update the display
 		self.update()
@@ -171,21 +165,6 @@ class OpenGLWidget( QGLWidget ) :
 		# Enable / Disable antialiasing
 		if enabled : glEnable( GL_MULTISAMPLE )
 		else : glDisable( GL_MULTISAMPLE )
-
-		# Update the display
-		self.update()
-
-
-	#-
-	#
-	# SetAxis
-	#
-	#-
-	#
-	def SetAxis( self, enabled ) :
-
-		# Enable / Disable XYZ-axes
-		self.axis_enabled = enabled
 
 		# Update the display
 		self.update()
@@ -217,7 +196,6 @@ class OpenGLWidget( QGLWidget ) :
 		# Reset transformation matrices
 		self.trackball.Reset()
 		self.mesh_viewer.trackball_transform = self.trackball.transformation
-		self.axis_viewer.trackball_transform = self.trackball.transformation
 
 		# Update the display
 		self.update()
@@ -237,35 +215,11 @@ class OpenGLWidget( QGLWidget ) :
 		# Display the mesh
 		self.mesh_viewer.Display()
 
-		# Display the XYZ-axes
-		self.DrawAxis()
-
 		# Display the color bar
 		self.DrawColorBar()
 
 		# Swap buffers
 		self.swapBuffers()
-
-
-	#-
-	#
-	# DrawAxis
-	#
-	#-
-	#
-	def DrawAxis( self ) :
-
-		# Axis enabled ?
-		if not self.axis_enabled : return
-
-		# Resize the viewport
-		glViewport( 0, 0, 100, 100 )
-
-		# Display the XYZ axes
-		self.axis_viewer.Display()
-
-		# Restore the viewport
-		glViewport( 0, 0, self.width(), self.height() )
 
 
 	#-
@@ -283,7 +237,7 @@ class OpenGLWidget( QGLWidget ) :
 		glViewport( self.width()-50, self.height()/2-300, 50, 600 )
 
 		# Display the XYZ axes
-		self.colorbar_viewer.Display()
+		self.colorbar.Display()
 
 		# Restore the viewport
 		glViewport( 0, 0, self.width(), self.height() )
@@ -352,9 +306,8 @@ class OpenGLWidget( QGLWidget ) :
 		# Update the trackball
 		if self.trackball.Motion( [ mouseEvent.x(), mouseEvent.y() ] ) :
 
-			# Update the transformation matrix of the viewers
+			# Update the transformation matrix of the mesh viewer
 			self.mesh_viewer.trackball_transform = self.trackball.transformation
-			self.axis_viewer.trackball_transform = self.trackball.transformation
 
 			# Refresh display
 			self.update()

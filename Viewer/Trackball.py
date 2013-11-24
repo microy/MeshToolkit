@@ -35,9 +35,8 @@
 #
 #--
 #
-from .Transformation import RotateMatrix
-from math import cos, pi
-from numpy import identity, zeros, float32, dot, cross, sqrt
+from math import cos, sin, pi
+from numpy import array, identity, zeros, float32, dot, cross, sqrt
 
 
 #--
@@ -147,8 +146,17 @@ class Trackball :
 
 		# XY translation
 		elif self.button ==  2 :
+			translation = zeros( 3 )
+			translation[0] -= (self.previous_mouse_position[0] - current_mouse_position[0])*0.005
+			translation[1] += (self.previous_mouse_position[1] - current_mouse_position[1])*0.005
 
-			return False
+			self.transformation = self.TranslateMatrix( self.transformation, translation )
+
+			# Save the mouse position
+			self.previous_mouse_position = current_mouse_position
+
+			# Require a display update
+			return True
 
 		# Z translation
 		elif self.button ==  3 :
@@ -180,7 +188,7 @@ class Trackball :
 	        rotation_angle = 90.0 * sqrt( ((current_position - previous_position)**2).sum() ) * 1.5
 
 		# Update transformation matrix
-		self.transformation = RotateMatrix( self.transformation, rotation_angle, rotation_axis )
+		self.transformation = self.RotateMatrix( self.transformation, rotation_angle, rotation_axis )
 
 
 	#-
@@ -200,5 +208,41 @@ class Trackball :
 		v[2] = cos( pi / 2.0 * d )
 		return v / sqrt(( v**2 ).sum())
 
+
+	#--
+	#
+	# TranslateMatrix
+	#
+	#--
+	#
+	def TranslateMatrix( self, matrix, direction ) :
+
+		# Translate the matrix
+		T = identity( 4, dtype=float32 )
+		T[:3, 3] = direction[:3]
+		return dot( matrix, T )
+
+
+	#--
+	#
+	# RotateMatrix
+	#
+	#--
+	#
+	def RotateMatrix( self, matrix, angle, axis ) :
+
+		# Rotate the matrix according to the given angle and axis
+		angle = pi * angle / 180.0
+		c, s = cos( angle ), sin( angle )
+		n = sqrt( (axis**2).sum() )
+		if n == 0 : n = 1.0
+		axis /= n
+		x, y, z = axis[0], axis[1], axis[2]
+		cx, cy, cz = (1 - c) * x, (1 - c) * y, (1 - c) * z
+		R = array([ [   cx*x + c, cy*x - z*s, cz*x + y*s, 0],
+			    [ cx*y + z*s,   cy*y + c, cz*y - x*s, 0],
+			    [ cx*z - y*s, cy*z + x*s,   cz*z + c, 0],
+			    [          0,          0,          0, 1] ], dtype=float32 )
+		return dot( matrix, R )
 
 
