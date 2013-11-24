@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 ColorBar.py
 #                             -------------------
-#    update               : 2013-11-23
+#    update               : 2013-11-24
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -26,14 +26,13 @@
 #
 from Core.Color import Value2Color, Value2ColorAlternate
 from .Shader import LoadShader
-from .Transformation import OrthographicMatrix
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
-from numpy import array, float32, zeros
+from numpy import zeros, float32
 
 
 
@@ -57,12 +56,12 @@ class ColorBar :
 	def __init__( self ) :
 
 		# Generate vertices and colors
-		self.size = 50
+		self.size = 8
 		vertices = zeros( (self.size * 2, 3), dtype=float32 )
 		colors = zeros( (self.size * 2, 3), dtype=float32 )
 		for i in range( self.size ) :
-			vertices[i*2]   = [ -0.5, float(i) / (self.size-1) - 0.5, -0.5 ]
-			vertices[i*2+1] = [ 0.5, float(i) / (self.size-1) - 0.5, -0.5 ]
+			vertices[i*2]   = [ -0.5, float(i) / (self.size-1) - 0.5, 0 ]
+			vertices[i*2+1] = [ 0.5, float(i) / (self.size-1) - 0.5, 0 ]
 			colors[i*2] = Value2ColorAlternate( float(i)/float(self.size-1) )
 			colors[i*2+1] = Value2ColorAlternate( float(i)/float(self.size-1) )
 
@@ -97,12 +96,6 @@ class ColorBar :
 		# Release the shader program
 		glUseProgram( 0 )
 
-		# Initialise the Model-View-Projection matrix
-		self.mvp_matrix = OrthographicMatrix( -1, 1, -1, 1, 0.1, 10.0 )
-
-
-
-
 
 	#-
 	#
@@ -115,9 +108,6 @@ class ColorBar :
 		# Use the shader program
 		glUseProgram( self.shader_program_id )
 
-		# Send the Model-View-Projection matrix to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, self.mvp_matrix )
-
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )
 
@@ -129,8 +119,6 @@ class ColorBar :
 
 		# Release the shader program
 		glUseProgram( 0 )
-
-
 
 
 	#-
