@@ -66,6 +66,7 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Initialise mouse position
 		self.previous_mouse_position = [ 0, 0 ]
+		self.x = 0
 
 		# Initialise OpenGL viewers
 		self.mesh_viewer = None
@@ -270,11 +271,8 @@ class OpenGLWidget( QGLWidget ) :
 		# Left button
 		if int(mouseEvent.buttons()) & QtCore.Qt.LeftButton : button = 1
 
-		# Middle button
-		elif int(mouseEvent.buttons()) & QtCore.Qt.MidButton : button = 2
-
 		# Right button
-		elif int(mouseEvent.buttons()) & QtCore.Qt.RightButton : button = 3
+		elif int(mouseEvent.buttons()) & QtCore.Qt.RightButton : button = 2
 
 		# Unmanaged
 		else : button = 0; return
@@ -311,6 +309,27 @@ class OpenGLWidget( QGLWidget ) :
 
 			# Refresh display
 			self.update()
+
+
+	#-
+	#
+	# wheelEvent
+	#
+	#-
+	#
+	def wheelEvent( self, event ) :
+
+		# Get the mouse wheel delta for normalisation
+		delta = event.delta()
+
+		# Update the trackball
+		self.trackball.WheelEvent( delta and delta // abs(delta) )
+
+		# Update the transformation matrix of the mesh viewer
+		self.mesh_viewer.trackball_transform = self.trackball.transformation
+
+		# Refresh display
+		self.update()
 
 
 	#-

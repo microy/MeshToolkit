@@ -89,7 +89,7 @@ class MeshViewer :
 		# Normalize the model
 		(center, radius) = mesh.GetBoundingSphere()
 		vertices -= center
-		vertices /= radius
+		vertices *= 10.0 / radius
 
 		# Vertex array object
 		self.vertex_array_id = glGenVertexArrays( 1 )
@@ -133,6 +133,7 @@ class MeshViewer :
 		self.element_number = len(faces) * 3
 
 
+
 	#-
 	#
 	# SetShader
@@ -167,14 +168,14 @@ class MeshViewer :
 		modelview_matrix = identity( 4, dtype=float32 )
 
 		# Position the scene
-		modelview_matrix[2,3] = -3.0
+		modelview_matrix[3,2] = -30.0
 
 		# Apply trackball transformation to the model matrix
-		modelview_matrix = dot( modelview_matrix, self.trackball_transform )
+		modelview_matrix = dot( self.trackball_transform, modelview_matrix )
 
 		# Send the transformation matrices to the shader
-		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_TRUE, array( self.trackball_transform[ :3, :3 ], dtype=float32 ) )
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE, dot( self.projection_matrix, modelview_matrix ) )
+		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_FALSE, array( self.trackball_transform[ :3, :3 ] ) )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_FALSE, dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
 		if self.color_enabled :	glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
@@ -214,15 +215,15 @@ class MeshViewer :
 	#
 	def SetProjectionMatrix( self, width, height ) :
 
-		fovy, aspect, near, far = 45.0, float(width)/float(height), 0.1, 10.0
+		fovy, aspect, near, far = 45.0, float(width)/float(height), 0.1, 100.0
 		f = tan( pi * fovy / 360.0 )
 		# Compute the perspective matrix
 		self.projection_matrix = identity( 4, dtype=float32 )
 		self.projection_matrix[0,0] = 1.0 / (f * aspect)
 		self.projection_matrix[1,1] = 1.0 / f
 		self.projection_matrix[2,2] = - (far + near) / (far - near)
-		self.projection_matrix[2,3] = - 2.0 * near * far / (far - near)
-		self.projection_matrix[3,2] = - 1.0
+		self.projection_matrix[2,3] = - 1.0
+		self.projection_matrix[3,2] = - 2.0 * near * far / (far - near)
 
 
 	#-
