@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Color.py
 #                             -------------------
-#    update               : 2013-11-23
+#    update               : 2013-11-24
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -93,7 +93,7 @@ def Array2Color( values ) :
 	# Convert each value to a pseudo-color
 	colors = zeros( (len(values), 3) )
 	for i in range( len(values) ) :
-		colors[i] = Value2ColorAlternate( value_lengths[i] )
+		colors[i] = Value2Color( value_lengths[i] )
 
 	# Return result
 	return colors

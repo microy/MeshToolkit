@@ -56,14 +56,14 @@ class ColorBar :
 	def __init__( self ) :
 
 		# Generate vertices and colors
-		self.size = 8
+		self.size = 22
 		vertices = zeros( (self.size * 2, 3), dtype=float32 )
 		colors = zeros( (self.size * 2, 3), dtype=float32 )
 		for i in range( self.size ) :
 			vertices[i*2]   = [ -0.5, float(i) / (self.size-1) - 0.5, 0 ]
 			vertices[i*2+1] = [ 0.5, float(i) / (self.size-1) - 0.5, 0 ]
-			colors[i*2] = Value2ColorAlternate( float(i)/float(self.size-1) )
-			colors[i*2+1] = Value2ColorAlternate( float(i)/float(self.size-1) )
+			colors[i*2] = Value2Color( float(i)/float(self.size-1) )
+			colors[i*2+1] = Value2Color( float(i)/float(self.size-1) )
 
 		# Load the shader
 		self.shader_program_id = LoadShader( 'SimpleColor' )
@@ -120,24 +120,5 @@ class ColorBar :
 		# Release the shader program
 		glUseProgram( 0 )
 
-
-	#-
-	#
-	# Close
-	#
-	#-
-	#
-	def Close( self ) :
-
-		# Delete shader program
-		glUseProgram( 0 )
-		glDeleteProgram( self.shader_program_id )
-
-		# Delete buffer objects
-		glDeleteBuffers( 1, array([ self.vertex_buffer_id ]) )
-		glDeleteBuffers( 1, array([ self.color_buffer_id ]) )
-
-		# Delete vertex array
-		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
 
 
