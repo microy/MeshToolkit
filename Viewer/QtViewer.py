@@ -108,6 +108,13 @@ class QtViewer( QMainWindow ) :
 		self.view_smooth_action.setStatusTip( 'Render the mesh with smooth shading' )
 		self.connect( self.view_smooth_action, QtCore.SIGNAL('triggered()'), self.ViewSmoothAction )
 
+		self.view_wireframe_action = QtGui.QAction( '&Wireframe', self )
+		self.view_wireframe_action.setShortcut( 'D' )
+		self.view_wireframe_action.setCheckable( True )
+		self.view_wireframe_action.setChecked( False )
+		self.view_wireframe_action.setStatusTip( 'Enable / Disable wireframe rendering' )
+		self.connect( self.view_wireframe_action, QtCore.SIGNAL('triggered()'), self.ViewWireframeAction )
+
 		self.view_aliasing_action = QtGui.QAction( '&Antialiasing', self )
 		self.view_aliasing_action.setShortcut( 'A' )
 		self.view_aliasing_action.setCheckable( True )
@@ -143,6 +150,7 @@ class QtViewer( QMainWindow ) :
 		view_menu.addAction( self.view_flat_action )
 		view_menu.addAction( self.view_smooth_action )
 		view_menu.addSeparator()
+		view_menu.addAction( self.view_wireframe_action )
 		view_menu.addAction( self.view_aliasing_action )
 		view_menu.addSeparator()
 		view_menu.addAction( self.view_colorbar_action )
@@ -264,6 +272,19 @@ class QtViewer( QMainWindow ) :
 		self.view_flat_action.setChecked( False )
 		self.view_smooth_action.setChecked( True )
 		self.opengl_widget.SetShader( 'SmoothShading' )
+
+
+	#-
+	#
+	# ViewWireframeAction
+	#
+	#-
+	#
+	def ViewWireframeAction( self ) :
+
+		# Enable / Disable antialiasing
+		self.view_wireframe_action.setChecked( self.view_wireframe_action.isChecked() )
+		self.opengl_widget.SetWireframe( self.view_wireframe_action.isChecked() )
 
 
 	#-

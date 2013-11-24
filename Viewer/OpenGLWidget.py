@@ -74,6 +74,7 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Initialise viewing parameters
 		self.colorbar_enabled = False
+		self.wireframe_enabled = False
 
 		# Trackball initialisation
 		self.trackball = Trackball( self.width(), self.height() )
@@ -188,6 +189,21 @@ class OpenGLWidget( QGLWidget ) :
 
 	#-
 	#
+	# SetWireframe
+	#
+	#-
+	#
+	def SetWireframe( self, enabled ) :
+
+		# Enable / Disable color bar
+		self.wireframe_enabled = enabled
+
+		# Update the display
+		self.update()
+
+
+	#-
+	#
 	# Reset
 	#
 	#-
@@ -211,10 +227,18 @@ class OpenGLWidget( QGLWidget ) :
 	def paintGL( self ) :
 
 		# Clear all pixels and depth buffer
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT )
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 
 		# Display the mesh
-		self.mesh_viewer.Display()
+		if( self.wireframe_enabled ) :
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
+			self.mesh_viewer.Display()
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
+			glEnable( GL_POLYGON_OFFSET_FILL )
+			glPolygonOffset( 1.0, 1.0 )
+			self.mesh_viewer.Display( True )
+			glDisable( GL_POLYGON_OFFSET_FILL )
+		else : self.mesh_viewer.Display()
 
 		# Display the color bar
 		self.DrawColorBar()

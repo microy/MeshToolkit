@@ -156,7 +156,7 @@ class MeshViewer :
 	#
 	#-
 	#
-	def Display( self ) :
+	def Display( self, hidden_lines=False ) :
 
 		# Is there a mesh to display ?
 		if not self.element_number : return
@@ -180,6 +180,10 @@ class MeshViewer :
 		# Activate color in the shader if necessary
 		if self.color_enabled :	glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
 		else : glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 0 )
+
+		# Activate hidden lines in the shader for wireframe rendering
+		if hidden_lines : glUniform1i( glGetUniformLocation( self.shader_program_id, "hidden_lines" ), 1 )
+		else : glUniform1i( glGetUniformLocation( self.shader_program_id, "hidden_lines" ), 0 )
 
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )

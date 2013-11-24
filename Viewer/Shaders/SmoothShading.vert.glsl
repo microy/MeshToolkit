@@ -7,6 +7,7 @@ layout (location = 2) in vec3 Color;
 uniform mat4 MVP_Matrix;
 uniform mat3 Normal_Matrix;
 uniform int color_enabled = 0;
+uniform int hidden_lines = 0;
 
 out vec4 FragColor;
 
@@ -17,7 +18,10 @@ void main( void ) {
 
 	float Dot = max( 0.0, dot(Norm, LightDir) ); 
 
-	if( color_enabled == 0 ) {
+	if( hidden_lines == 1 ) {
+		FragColor.xyz = vec3( 1.0, 1.0, 1.0 );
+	}	
+	else if( color_enabled == 0 ) {
 		FragColor.xyz = vec3( 0.7, 0.7, 0.7 ) * Dot;
 	}
 	else {
