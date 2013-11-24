@@ -253,11 +253,5 @@ class MeshViewer :
 		# Initialise the model parameters
 		self.element_number = 0
 
-		# Initialise the shader
-		self.shader_program_id = self.smooth_shader_id
-
-		# Initialise the trackball transformation matrix
-		self.trackball_transform = identity( 4, dtype=float32 )
-
 
 

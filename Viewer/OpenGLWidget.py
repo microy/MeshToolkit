@@ -36,6 +36,7 @@ OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtOpenGL import *
+from numpy import identity, float32
 
 
 #--
@@ -66,7 +67,6 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Initialise mouse position
 		self.previous_mouse_position = [ 0, 0 ]
-		self.x = 0
 
 		# Initialise OpenGL viewers
 		self.mesh_viewer = None
@@ -134,12 +134,11 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def Close( self ) :
 
-		# Initialise the mesh viewer
+		# Close the current mesh
 		self.mesh_viewer.Close()
 
-		# Reset current transformations
-		self.Reset()
-
+		# Update the display
+		self.update()
 
 	#-
 	#
@@ -211,8 +210,8 @@ class OpenGLWidget( QGLWidget ) :
 	def Reset( self ) :
 
 		# Reset transformation matrices
-		self.trackball.Reset()
-		self.mesh_viewer.trackball_transform = self.trackball.transformation
+		self.trackball.transformation = identity( 4, dtype=float32 )
+		self.mesh_viewer.trackball_transform = identity( 4, dtype=float32 )
 
 		# Update the display
 		self.update()
@@ -229,15 +228,21 @@ class OpenGLWidget( QGLWidget ) :
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 
-		# Display the mesh
+		# Display the mesh with wireframe rendering
 		if( self.wireframe_enabled ) :
+
+			# 1st pass : wireframe model
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
 			self.mesh_viewer.Display()
+
+			# 2nd pass : hidden line removal
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
 			glEnable( GL_POLYGON_OFFSET_FILL )
 			glPolygonOffset( 1.0, 1.0 )
 			self.mesh_viewer.Display( True )
 			glDisable( GL_POLYGON_OFFSET_FILL )
+
+		# Display the mesh
 		else : self.mesh_viewer.Display()
 
 		# Display the color bar
@@ -261,7 +266,7 @@ class OpenGLWidget( QGLWidget ) :
 		# Resize the viewport
 		glViewport( self.width()-50, self.height()/2-300, 50, 600 )
 
-		# Display the XYZ axes
+		# Display the color bar
 		self.colorbar.Display()
 
 		# Restore the viewport
@@ -279,8 +284,10 @@ class OpenGLWidget( QGLWidget ) :
 		# Resize the viewport
 		glViewport( 0, 0, width, height )
 
-		# Recompute the perspective matrix
+		# Recompute the perspective matrix of the mesh viewer
 		self.mesh_viewer.Resize( width, height )
+
+		# Resize the trackball
 		self.trackball.Resize( width, height )
 
 
@@ -299,7 +306,7 @@ class OpenGLWidget( QGLWidget ) :
 		elif int(mouseEvent.buttons()) & QtCore.Qt.RightButton : button = 2
 
 		# Unmanaged
-		else : button = 0; return
+		else : return
 
 		# Update the trackball
 		self.trackball.MousePress( [ mouseEvent.x(), mouseEvent.y() ], button )

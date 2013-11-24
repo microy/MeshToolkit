@@ -177,10 +177,6 @@ class QtViewer( QMainWindow ) :
 		# Check filename
 		if not filename : return
 
-		# Set smooth shading by default
-		self.view_flat_action.setChecked( False )
-		self.view_smooth_action.setChecked( True )
-
 		# Read VRML/X3D/Inventor file
 		self.mesh = ReadVrml( unicode(filename) )
 
@@ -282,7 +278,7 @@ class QtViewer( QMainWindow ) :
 	#
 	def ViewWireframeAction( self ) :
 
-		# Enable / Disable antialiasing
+		# Enable / Disable wireframe
 		self.view_wireframe_action.setChecked( self.view_wireframe_action.isChecked() )
 		self.opengl_widget.SetWireframe( self.view_wireframe_action.isChecked() )
 

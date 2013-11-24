@@ -87,18 +87,6 @@ class Trackball :
 
 	#-
 	#
-	# Reset
-	#
-	#-
-	#
-	def Reset( self ) :
-
-		# Reset the transformation matrix
-		self.transformation = identity( 4, dtype=float32 )
-
-
-	#-
-	#
 	# MousePress
 	#
 	#-
