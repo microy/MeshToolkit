@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-23
+#    update               : 2013-11-24
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -28,13 +28,14 @@
 #
 from Core.Container import GetBoundingSphere
 from Shader import LoadShader
-from Transformation import *
+from Transformation import PerspectiveMatrix, TranslateMatrix
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
+from numpy import array, identity, dot, float32, uint32
 
 
 
@@ -59,28 +60,22 @@ class MeshViewer() :
 	#
 	def __init__( self, width=1024, height=768 ) :
 
-		# Initialise member variables
-		self.element_number = 0
+		# Initialise the OpenGL buffer IDs
 		self.shader_program_id = -1
 		self.vertex_array_id = -1
 		self.vertex_buffer_id = -1
 		self.face_buffer_id = -1
 		self.normal_buffer_id = -1
 		self.color_buffer_id = -1
-		self.projection_matrix = identity( 4, dtype=float32 )
-		self.view_matrix = identity( 4, dtype=float32 )
-		self.model_matrix = identity( 4, dtype=float32 )
-		self.model_scale_factor = 1.0
-		self.model_center = array( [0, 0, 0], dtype=float32 )
-		self.model_translation = array( [0, 0, 0], dtype=float32 )
+
+		# Initialise the model parameters
+		self.element_number = 0
+
+		# Initialise the trackball transformation matrix
 		self.trackball_transform = identity( 4, dtype=float32 )
 
-		# Initialise the view matrix
-		self.view_matrix = LookAtMatrix( [0, 0, 30], [0, 0, 0], [0, 1, 0] )
-
-		# Initialise the projection matrix
+		# Initialise the Projection transformation matrix
 		self.projection_matrix = PerspectiveMatrix( 45.0, float(width)/float(height), 0.1, 100.0 )
-
 
 
 	#-
@@ -99,6 +94,11 @@ class MeshViewer() :
 		faces = array( mesh.faces, dtype=uint32 )
 		normals = array( mesh.vertex_normals, dtype=float32 )
 		colors = array( mesh.colors, dtype=float32 )
+
+		# Normalize the model
+		(center, radius) = GetBoundingSphere( mesh )
+		vertices -= center
+		vertices /= radius
 
 		# Load the shader
 		self.shader_program_id = LoadShader( 'SmoothShading' )
@@ -145,13 +145,7 @@ class MeshViewer() :
 		# Release the shader program
 		glUseProgram( 0 )
 
-		# Compute initial model transformations
-		(center, radius) = GetBoundingSphere( mesh )
-		self.model_scale_factor = 10.0 / radius
-		self.model_center = array( center, dtype=float32 )
-		self.trackball_transform = identity( 4, dtype=float32 )
-
-		# Enable display
+		# Setup model element number
 		self.element_number = len(faces) * 3
 
 		
@@ -170,25 +164,24 @@ class MeshViewer() :
 		# Use the shader program
 		glUseProgram( self.shader_program_id )
 
-		# Compute model transformation matrix
-		self.model_matrix = identity( 4, dtype=float32 )
-		self.model_matrix = TranslateMatrix( self.model_matrix, self.model_translation )
+		# Initialise Model-View transformation matrix
+		modelview_matrix = identity( 4, dtype=float32 )
 
-		# Bounding sphere adaptation
-		self.model_matrix = ScaleMatrix( self.model_matrix, self.model_scale_factor )
-		self.model_matrix = TranslateMatrix( self.model_matrix, -self.model_center )
+		# Position the scene
+		modelview_matrix = TranslateMatrix( modelview_matrix, [ 0.0, 0.0, -3.0 ] )
 
-		viewmatrix = dot( self.view_matrix, self.trackball_transform )
+		# Apply trackball transformation to the model matrix
+		modelview_matrix = dot( modelview_matrix, self.trackball_transform )
+
+		# Set the normal matrix
+		normal_matrix = array( self.trackball_transform[ :3, :3 ], dtype=float32 )
 
 		# Send the transformation matrices to the shader
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "View_Matrix" ), 1, GL_TRUE, viewmatrix )
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "Model_Matrix" ), 1, GL_TRUE, self.model_matrix )
-		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_TRUE, NormalMatrix( viewmatrix ) )
-		glUniform3f( glGetUniformLocation( self.shader_program_id, "LightPosition" ), 0.0, 0.0, 30.0 )
+		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_TRUE, normal_matrix )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_TRUE,
-			dot( self.projection_matrix, dot( viewmatrix, self.model_matrix ) ) )
+			dot( self.projection_matrix, modelview_matrix ) )
 
-		# Activate default color in the shader if necessary
+		# Activate color in the shader if necessary
 		if self.color_buffer_id != -1 :
 			glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
 
@@ -206,20 +199,16 @@ class MeshViewer() :
 		glUseProgram( 0 )
 
 
-
-
 	#-
 	#
-	# SetPerspectiveMatrix
+	# Resize
 	#
 	#-
 	#
-	def SetPerspectiveMatrix( self, width, height ) :
+	def Resize( self, width, height ) :
 
 		# Compute perspective projection matrix
 		self.projection_matrix = PerspectiveMatrix( 45.0, float(width)/float(height), 0.1, 100.0 )
-
-
 
 
 	#-
@@ -247,17 +236,18 @@ class MeshViewer() :
 		# Delete vertex array
 		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
 
-		# Initialise member variables
-		self.element_number = 0
+		# Initialise the OpenGL buffer IDs
 		self.shader_program_id = -1
 		self.vertex_array_id = -1
 		self.vertex_buffer_id = -1
 		self.face_buffer_id = -1
 		self.normal_buffer_id = -1
 		self.color_buffer_id = -1
-		self.model_scale_factor = 1.0
-		self.model_center = array( [0, 0, 0], dtype=float32 )
-		self.model_translation = array( [0, 0, 0], dtype=float32 )
+
+		# Initialise the model element number
+		self.element_number = 0
+
+		# Initialise the trackball transformation matrix
 		self.trackball_transform = identity( 4, dtype=float32 )
 
 

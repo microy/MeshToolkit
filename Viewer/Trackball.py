@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Trackball.py
 #                             -------------------
-#    update               : 2013-11-20
+#    update               : 2013-11-24
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -18,17 +18,27 @@
 # ***************************************************************************
 
 
+
+#
+# Inspired from :
+#
+#	- NeHe Productions - ArcBall Rotation Tutorial
+#         http://nehe.gamedev.net
+#
+#       - Nate Robins' Programs
+#         http://www.xmission.com/~nate
+#
+
+
+
 #--
 #
 # External dependencies
 #
 #--
 #
-from .Transformation import RotateMatrix
 from math import cos, pi
-from numpy import zeros, cross
-from numpy.linalg import norm
-
+from numpy import identity, zeros, float32, dot, cross, sqrt, copy
 
 
 
@@ -62,6 +72,10 @@ class Trackball :
 		# Mouse position
 		self.previous_mouse_position = [ 0, 0 ]
 
+		# Tranformation matrices
+		self.transform = identity( 4, dtype=float32 )
+		self.last_rot = identity( 3, dtype=float32 )
+		self.this_rot = identity( 3, dtype=float32 )
 
 
 	#-
@@ -72,8 +86,23 @@ class Trackball :
 	#
 	def Resize( self, width=1024, height=768 ) :
 
+		# Change window size
 		self.width = width
 		self.height = height
+
+
+	#-
+	#
+	# Reset
+	#
+	#-
+	#
+	def Reset( self ) :
+
+		# Reset the transformation matrices
+		self.transform = identity( 4, dtype=float32 )
+		self.last_rot = identity( 3, dtype=float32 )
+		self.this_rot = identity( 3, dtype=float32 )
 
 
 	#-
@@ -84,8 +113,14 @@ class Trackball :
 	#
 	def MousePress( self, mouse_position, button ) :
 
+		# Record mouse position
 		self.previous_mouse_position = mouse_position
+
+		# Record button pressed
 		self.button = button
+
+		# Initialise the rotation matrix
+		self.last_rot = copy( self.this_rot )
 
 
 	#-
@@ -96,7 +131,8 @@ class Trackball :
 	#
 	def MouseRelease( self ) :
 
-		self.motion_state = 0
+		self.last_rot = copy( self.this_rot )
+		self.button = 0
 
 
 	#-
@@ -110,22 +146,25 @@ class Trackball :
 		# Trackball rotation
 		if self.button == 1 :
 
-			(rotation_angle, rotation_axis) = GetTrackballRotation( current_mouse_position )
-			self.trackball_transform = RotateMatrix( self.trackball_transform, rotation_angle, rotation_axis )
+                        quaternion = self.GetTrackballRotation( current_mouse_position )
+			self.this_rot = self.Matrix3fSetRotationFromQuat4f( quaternion )
+			self.this_rot = dot( self.last_rot, self.this_rot )
+			self.last_rot = copy( self.this_rot )
+			self.transform = self.Matrix4fSetRotationFromMatrix3f( self.transform, self.this_rot )
 			self.previous_mouse_position = current_mouse_position
+			return True
 
 		# XY translation
 		elif self.button ==  2 :
 
-			self.model_translation[0] -= float(self.previous_mouse_position[0]-current_mouse_position[0])*0.005
-			self.model_translation[1] += float(self.previous_mouse_position[1]-current_mouse_position[1])*0.005
-			self.previous_mouse_position = current_mouse_position
+			pass
 
 		# Z translation
 		elif self.button ==  3 :
 
-			self.mesh_viewer.model_translation[2] -= float(self.previous_mouse_position[1]-current_mouse_position[1]) * 0.005
-			self.previous_mouse_position = current_mouse_position
+			pass
+
+		return False
 
 
 	
@@ -137,18 +176,23 @@ class Trackball :
 	#
 	# Compute a trackball rotation
 	#
-	def GetTrackballRotation( current_mouse_position ) :
+	def GetTrackballRotation( self, current_mouse_position ) :
+
+		# Initialise the quaternion representing the rotation
+		quaternion = zeros( 4 )
 
 		# Map the mouse positions
-		previous_position = TrackballMapping( self.previous_mouse_position )
-		current_position = TrackballMapping( current_mouse_position )
+		previous_position = self.TrackballMapping( self.previous_mouse_position )
+		current_position = self.TrackballMapping( current_mouse_position )
 
-		# Compute the rotation parameters
-		rotation_axis = cross( previous_position, current_position )
-		rotation_angle = 90.0 * norm( current_position - previous_position ) * 1.5
+		# Transform the rotation axis according to the camera view
+		quaternion[:3] = dot( self.last_rot.T, cross( previous_position, current_position ) )
+
+		# Rotation angle
+		quaternion[3] = dot( current_position, previous_position )
 
 		# Return result
-		return ( rotation_angle, rotation_axis )
+		return quaternion
 
 
 
@@ -160,77 +204,98 @@ class Trackball :
 	#
 	#-
 	#
-	# Map the mouse coordinates to a ball
-	# Adapted from Nate Robins' programs
-	# http://www.xmission.com/~nate
-	#
-	def TrackballMapping( mouse_position ) :
+	def TrackballMapping( self, mouse_position ) :
 
 		v = zeros( 3 )
 		v[0] = ( 2.0 * mouse_position[0] - self.width ) / self.width
 		v[1] = ( self.height - 2.0 * mouse_position[1] ) / self.height
-		d = norm( v )
+		d = sqrt(( v**2 ).sum())
 		if d > 1.0 : d = 1.0
 		v[2] = cos( pi / 2.0 * d )
 
-		return v / norm(v)
+		return v / sqrt(( v**2 ).sum())
 
 
 
 
+	#-
+	#
+	# Matrix3fSetRotationFromQuat4f
+	#
+	#-
+	#
+	def Matrix3fSetRotationFromQuat4f( self, q1 ) :
+
+		# Converts the H quaternion q1 into a new equivalent 3x3 rotation matrix. 
+		X = 0
+		Y = 1
+		Z = 2
+		W = 3
+
+		NewObj = identity( 3, dtype=float32 )
+		n = (q1**2).sum()
+		s = 0.0
+		if (n > 0.0):
+			s = 2.0 / n
+		xs = q1 [X] * s;  ys = q1 [Y] * s;  zs = q1 [Z] * s
+		wx = q1 [W] * xs; wy = q1 [W] * ys; wz = q1 [W] * zs
+		xx = q1 [X] * xs; xy = q1 [X] * ys; xz = q1 [X] * zs
+		yy = q1 [Y] * ys; yz = q1 [Y] * zs; zz = q1 [Z] * zs
+		# This math all comes about by way of algebra, complex math, and trig identities.
+		# See Lengyel pages 88-92
+		NewObj [X][X] = 1.0 - (yy + zz);	NewObj [Y][X] = xy - wz; 		NewObj [Z][X] = xz + wy;
+		NewObj [X][Y] =       xy + wz; 		NewObj [Y][Y] = 1.0 - (xx + zz);	NewObj [Z][Y] = yz - wx;
+		NewObj [X][Z] =       xz - wy; 		NewObj [Y][Z] = yz + wx;          	NewObj [Z][Z] = 1.0 - (xx + yy)
+
+		return NewObj
+
+
+
+	#-
+	#
+	# Matrix4fSetRotationFromMatrix3f
+	#
+	#-
+	#
+	def Matrix4fSetRotationFromMatrix3f( self, NewObj, three_by_three_matrix ) :
+
+		scale = self.SVD( NewObj )
+		NewObj = self.Matrix4fSetRotationScaleFromMatrix3f( NewObj, three_by_three_matrix )
+		scaled_NewObj = NewObj * scale
+		return scaled_NewObj
+
+
+
+	#-
+	#
+	# Matrix4fSetRotationScaleFromMatrix3f
+	#
+	#-
+	#
+	def Matrix4fSetRotationScaleFromMatrix3f( self, NewObj, three_by_three_matrix ) :
+
+		NewObj [0:3,0:3] = three_by_three_matrix
+		return NewObj
 
 
 
 
+	#-
+	#
+	# SVD
+	#
+	#-
+	#
+	def SVD( self, NewObj ) :
 
-
-
-#-
-#
-# GetTrackballRotation
-#
-#-
-#
-# Compute a trackball rotation
-#
-def GetTrackballRotation( window_size, previous_mouse_position, current_mouse_position ) :
-
-	# Map the mouse positions
-	previous_position = TrackballMapping( window_size, previous_mouse_position )
-        current_position = TrackballMapping( window_size, current_mouse_position )
-
-	# Compute the rotation parameters
-        rotation_axis = cross( previous_position, current_position )
-        rotation_angle = 90.0 * norm( current_position - previous_position ) * 1.5
-
-	# Return result
-	return ( rotation_angle, rotation_axis )
-
-
-
-
-
-#-
-#
-# TrackballMapping
-#
-#-
-#
-# Map the mouse coordinates to a ball
-# Adapted from Nate Robins' programs
-# http://www.xmission.com/~nate
-#
-def TrackballMapping( window_size, mouse_position ) :
-
-	v = zeros( 3 )
-	v[0] = ( 2.0 * mouse_position[0] - window_size[0] ) / window_size[0]
-	v[1] = ( window_size[1] - 2.0 * mouse_position[1] ) / window_size[1]
-	d = norm( v )
-	if d > 1.0 : d = 1.0
-	v[2] = cos( pi / 2.0 * d )
-
-	return v / norm(v)
-
+		X = 0
+		Y = 1
+		Z = 2
+		s = sqrt ( 
+			( (NewObj [X][X] * NewObj [X][X]) + (NewObj [X][Y] * NewObj [X][Y]) + (NewObj [X][Z] * NewObj [X][Z]) +
+			(NewObj [Y][X] * NewObj [Y][X]) + (NewObj [Y][Y] * NewObj [Y][Y]) + (NewObj [Y][Z] * NewObj [Y][Z]) +
+			(NewObj [Z][X] * NewObj [Z][X]) + (NewObj [Z][Y] * NewObj [Z][Y]) + (NewObj [Z][Z] * NewObj [Z][Z]) ) / 3.0 )
+		return s
 
 
 
