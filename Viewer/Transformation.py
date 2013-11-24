@@ -29,20 +29,14 @@
 #
 
 
-
-
-
 #--
 #
 # External dependencies
 #
 #--
 #
-from math import tan, pi
-from numpy import identity, dot, float32
-
-
-
+from math import cos, sin, tan, pi
+from numpy import array, identity, dot, sqrt, float32
 
 
 #--
@@ -54,11 +48,32 @@ from numpy import identity, dot, float32
 def TranslateMatrix( matrix, direction ) :
 
 	# Translate the matrix
-	translation = identity( 4, dtype=float32 )
-	translation[:3, 3] = direction[:3]
-	return dot( matrix, translation )
+	T = identity( 4, dtype=float32 )
+	T[:3, 3] = direction[:3]
+	return dot( matrix, T )
 
 
+#--
+#
+# RotateMatrix
+#
+#--
+#
+def RotateMatrix( matrix, angle, axis ) :
+
+	# Rotate the matrix according to the given angle and axis
+	angle = pi * angle / 180.0
+	c, s = cos( angle ), sin( angle )
+	n = sqrt( (axis**2).sum() )
+	if n == 0 : n = 1.0
+	axis /= n
+	x, y, z = axis[0], axis[1], axis[2]
+	cx, cy, cz = (1 - c) * x, (1 - c) * y, (1 - c) * z
+	R = array([ [   cx*x + c, cy*x - z*s, cz*x + y*s, 0],
+		    [ cx*y + z*s,   cy*y + c, cz*y - x*s, 0],
+		    [ cx*z - y*s, cy*z + x*s,   cz*z + c, 0],
+		    [          0,          0,          0, 1] ], dtype=float32 )
+	return dot( matrix, R )
 
 
 #--
@@ -78,7 +93,6 @@ def OrthographicMatrix( left, right, bottom, top, near, far ) :
 	M[1,3] = - (top + bottom) / (top - bottom)
 	M[2,3] = - (far + near) / (far - near)
 	return M
-
 
 
 #--

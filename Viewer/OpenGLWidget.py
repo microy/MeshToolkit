@@ -18,9 +18,6 @@
 # ***************************************************************************
 
 
-
-
-
 #--
 #
 # External dependencies
@@ -40,10 +37,6 @@ OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtOpenGL import *
-
-
-
-
 
 
 #--
@@ -86,8 +79,6 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Trackball initialisation
 		self.trackball = Trackball( self.width(), self.height() )
-
-
 
 
 	#-
@@ -223,10 +214,10 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def Reset( self ) :
 
-		# Reset trackball transformation matrix
+		# Reset transformation matrices
 		self.trackball.Reset()
-		self.mesh_viewer.trackball_transform = self.trackball.transform
-		self.axis_viewer.trackball_transform = self.trackball.transform
+		self.mesh_viewer.trackball_transform = self.trackball.transformation
+		self.axis_viewer.trackball_transform = self.trackball.transformation
 
 		# Update the display
 		self.update()
@@ -322,14 +313,20 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def mousePressEvent( self, mouseEvent ) :
 
-		button = 0
 		# Left button
 		if int(mouseEvent.buttons()) & QtCore.Qt.LeftButton : button = 1
+
 		# Middle button
 		elif int(mouseEvent.buttons()) & QtCore.Qt.MidButton : button = 2
+
 		# Right button
 		elif int(mouseEvent.buttons()) & QtCore.Qt.RightButton : button = 3
-		self.trackball.MousePress( [ self.width()-mouseEvent.x(), self.height()-mouseEvent.y() ], button )
+
+		# Unmanaged
+		else : button = 0; return
+
+		# Update the trackball
+		self.trackball.MousePress( [ mouseEvent.x(), mouseEvent.y() ], button )
 
 
 	#-
@@ -340,6 +337,7 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def mouseReleaseEvent( self, mouseEvent ) :
 
+		# Update the trackball
 		self.trackball.MouseRelease()
 
 
@@ -351,9 +349,14 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def mouseMoveEvent( self, mouseEvent ) :
 
-		if self.trackball.Motion( [ self.width()-mouseEvent.x(), self.height()-mouseEvent.y() ] ) :
-			self.mesh_viewer.trackball_transform = self.trackball.transform
-			self.axis_viewer.trackball_transform = self.trackball.transform
+		# Update the trackball
+		if self.trackball.Motion( [ mouseEvent.x(), mouseEvent.y() ] ) :
+
+			# Update the transformation matrix of the viewers
+			self.mesh_viewer.trackball_transform = self.trackball.transformation
+			self.axis_viewer.trackball_transform = self.trackball.transformation
+
+			# Refresh display
 			self.update()
 
 
