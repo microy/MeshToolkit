@@ -51,12 +51,12 @@ from numpy import identity, dot, float32
 #
 #--
 #
-def TranslateMatrix( M, direction ) :
+def TranslateMatrix( matrix, direction ) :
 
-	T = identity( 4, dtype=float32 )
-	T[:3, 3] = direction[:3]
-
-	return dot( M, T )
+	# Translate the matrix
+	translation = identity( 4, dtype=float32 )
+	translation[:3, 3] = direction[:3]
+	return dot( matrix, translation )
 
 
 
@@ -67,20 +67,16 @@ def TranslateMatrix( M, direction ) :
 #
 #--
 #
-def OrthographicMatrix( left, right, bottom, top, znear, zfar ) :
+def OrthographicMatrix( left, right, bottom, top, near, far ) :
 
-	# Initialise matrix
+	# Compute the orthographic matrix
 	M = identity( 4, dtype=float32 )
-
-	# Compute orthographic matrix
-	M[0,0] = 2.0 / float(right - left)
-	M[1,1] = 2.0 / float(top - bottom)
-	M[2,2] = - 2.0 / float(zfar - znear)
-	M[0,3] = - float(right + left) / float(right - left)
-	M[1,3] = - float(top + bottom) / float(top - bottom)
-	M[2,3] = - float(zfar + znear) / float(zfar - znear)
-
-	# Return result
+	M[0,0] = 2.0 / (right - left)
+	M[1,1] = 2.0 / (top - bottom)
+	M[2,2] = - 2.0 / (far - near)
+	M[0,3] = - (right + left) / (right - left)
+	M[1,3] = - (top + bottom) / (top - bottom)
+	M[2,3] = - (far + near) / (far - near)
 	return M
 
 
@@ -91,20 +87,16 @@ def OrthographicMatrix( left, right, bottom, top, znear, zfar ) :
 #
 #--
 #
-def PerspectiveMatrix( fovy, aspect, znear, zfar ) :
+def PerspectiveMatrix( fovy, aspect, near, far ) :
 
-	# Initialise matrix
+	# Compute the perspective matrix
 	M = identity( 4, dtype=float32 )
-
-	# Compute perspective matrix
-	f = tan( pi * float(fovy) / 360.0 )
-	M[0,0] = 1.0 / ( f * float(aspect) )
+	f = tan( pi * fovy / 360.0 )
+	M[0,0] = 1.0 / (f * aspect)
 	M[1,1] = 1.0 / f
-	M[2,2] = - float(zfar + znear) / float(zfar - znear)
-	M[2,3] = - 2.0 * float(znear) * float(zfar) / float(zfar - znear)
+	M[2,2] = - (far + near) / (far - near)
+	M[2,3] = - 2.0 * near * far / (far - near)
 	M[3,2] = - 1.0
-
-	# Return result
 	return M
 
 
