@@ -5,4 +5,4 @@
 #
 find . -type f -name '*.py[co]' -exec rm -v {} \;
 find . -type f -name '*~' -exec rm -v {} \;
-find . -type d -name '__pycache__' -exec rm -rv {} \;
+find . -type d -name '__pycache__' -exec rmdir -v {} \;

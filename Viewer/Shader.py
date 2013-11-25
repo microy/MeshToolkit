@@ -82,15 +82,14 @@ def LoadShader( name, geometry_enabled=False ) :
 #
 def CreateShader( filename, shader_type ) :
 
-	# Initialisation
-	shader_source = ''
-
 	# Load shader source files
-	with open( filename, 'rb') as shader_file :
-		shader_source = shader_file.read().decode('utf-8')
+	with open( filename, 'r') as shader_file :
+		shader_source = shader_file.read()
 
 	# Create the shaders
 	shader_id = glCreateShader( shader_type )
+
+	print( type( shader_source ) )
 
 	# Load shader source codes
 	glShaderSource( shader_id, shader_source )
