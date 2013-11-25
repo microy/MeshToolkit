@@ -89,8 +89,6 @@ def CreateShader( filename, shader_type ) :
 	# Create the shaders
 	shader_id = glCreateShader( shader_type )
 
-	print( type( shader_source ) )
-
 	# Load shader source codes
 	glShaderSource( shader_id, shader_source )
 
