@@ -93,7 +93,7 @@ def CreateShader( filename, shader_type ) :
 	shader_id = glCreateShader( shader_type )
 
 	# Load shader source codes
-	glShaderSource_compat( shader_id, shader_source )
+	glShaderSource( shader_id, shader_source )
 
 	# Compile the shaders
 	glCompileShader( shader_id )
