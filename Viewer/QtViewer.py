@@ -28,9 +28,10 @@
 from PySide import QtGui, QtCore
 from PySide.QtGui import *
 
-from .OpenGLWidget import OpenGLWidget
 from Core.Mesh import CheckMesh, CheckNeighborhood
 from Core.Vrml import ReadVrml, WriteVrml
+
+from QtViewerUI import Ui_MainWindow
 
 
 #--
@@ -41,7 +42,7 @@ from Core.Vrml import ReadVrml, WriteVrml
 #
 # Create a mesh viewer with Qt
 #
-class QtViewer( QMainWindow ) :
+class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 
 	#-
@@ -50,127 +51,25 @@ class QtViewer( QMainWindow ) :
 	#
 	#-
 	#
-	def __init__( self ) :
+	def __init__( self, parent=None ) :
 
-		# Initialise QMainWindow		
-		QMainWindow.__init__( self )
+		# Initialise the main window
+		super( QtViewer, self ).__init__( parent) 
+
+		# Initialise the UI
+		self.setupUi( self )
 
 		# Initialise the mesh
 		self.mesh = None
 
-		# Set the window title
-		self.setWindowTitle( 'QtViewer' )
-
-		# Resize the main window
-		self.resize( 1024, 768 )
-
-		# Move the main window
-		self.move( 100, 100 )
-
-		# Set the status bar
-		self.statusBar()
-
-		# Create the file menu actions
-		file_open_action = QtGui.QAction( '&Open...', self )
-		file_open_action.setShortcut( 'O' )
-		file_open_action.setStatusTip( 'Open a file' )
-		self.connect( file_open_action, QtCore.SIGNAL('triggered()'), self.FileOpenAction )
-
-		file_save_action = QtGui.QAction( '&Save...', self )
-		file_save_action.setShortcut( 'S' )
-		file_save_action.setStatusTip( 'Save the current mesh' )
-		self.connect( file_save_action, QtCore.SIGNAL('triggered()'), self.FileSaveAction )
-
-		file_check_action = QtGui.QAction( '&Check', self )
-		file_check_action.setStatusTip( 'Check different parameters of the mesh' )
-		self.connect( file_check_action, QtCore.SIGNAL('triggered()'), self.FileCheckAction )
-
-		file_close_action = QtGui.QAction( '&Close', self )
-		file_close_action.setShortcut( 'W' )
-		file_close_action.setStatusTip( 'Close the current file' )
-		self.connect( file_close_action, QtCore.SIGNAL('triggered()'), self.FileCloseAction )
-
-		file_exit_action = QtGui.QAction( '&Exit', self )
-		file_exit_action.setShortcut( 'Esc' )
-		file_exit_action.setStatusTip( 'Exit application' )
-		self.connect( file_exit_action, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()') )
-
-		# Create the view menu actions
-		self.view_flat_action = QtGui.QAction( '&Flat shading', self )
-		self.view_flat_action.setShortcut( 'F' )
-		self.view_flat_action.setCheckable( True )
-		self.view_flat_action.setChecked( False )
-		self.view_flat_action.setStatusTip( 'Render the mesh with flat shading' )
-		self.connect( self.view_flat_action, QtCore.SIGNAL('triggered()'), self.ViewFlatAction )
-
-		self.view_smooth_action = QtGui.QAction( '&Smooth shading', self )
-		self.view_smooth_action.setShortcut( 'G' )
-		self.view_smooth_action.setCheckable( True )
-		self.view_smooth_action.setChecked( True )
-		self.view_smooth_action.setStatusTip( 'Render the mesh with smooth shading' )
-		self.connect( self.view_smooth_action, QtCore.SIGNAL('triggered()'), self.ViewSmoothAction )
-
-		self.view_wireframe_action = QtGui.QAction( '&Wireframe', self )
-		self.view_wireframe_action.setShortcut( 'D' )
-		self.view_wireframe_action.setCheckable( True )
-		self.view_wireframe_action.setChecked( False )
-		self.view_wireframe_action.setStatusTip( 'Enable / Disable wireframe rendering' )
-		self.connect( self.view_wireframe_action, QtCore.SIGNAL('triggered()'), self.ViewWireframeAction )
-
-		self.view_aliasing_action = QtGui.QAction( '&Antialiasing', self )
-		self.view_aliasing_action.setShortcut( 'A' )
-		self.view_aliasing_action.setCheckable( True )
-		self.view_aliasing_action.setChecked( True )
-		self.view_aliasing_action.setStatusTip( 'Enable / Disable antialiasing' )
-		self.connect( self.view_aliasing_action, QtCore.SIGNAL('triggered()'), self.ViewAliasingAction )
-
-		self.view_colorbar_action = QtGui.QAction( '&Color bar', self )
-		self.view_colorbar_action.setShortcut( 'C' )
-		self.view_colorbar_action.setCheckable( True )
-		self.view_colorbar_action.setChecked( False )
-		self.view_colorbar_action.setStatusTip( 'Enable / Disable color bar display' )
-		self.connect( self.view_colorbar_action, QtCore.SIGNAL('triggered()'), self.ViewColorBarAction )
-
-		view_reset_action = QtGui.QAction( '&Reset', self )
-		view_reset_action.setShortcut( 'R' )
-		view_reset_action.setStatusTip( 'Reset the viewing parameters' )
-		self.connect( view_reset_action, QtCore.SIGNAL('triggered()'), self.ViewResetAction )
-
-		# Create the menu bar
-		menu_bar = self.menuBar()
-
-		file_menu = menu_bar.addMenu( '&File' )
-		file_menu.addAction( file_open_action )
-		file_menu.addAction( file_save_action )
-		file_menu.addSeparator()
-		file_menu.addAction( file_check_action )
-		file_menu.addSeparator()
-		file_menu.addAction( file_close_action )
-		file_menu.addAction( file_exit_action )
-
-		view_menu = menu_bar.addMenu( '&View' )
-		view_menu.addAction( self.view_flat_action )
-		view_menu.addAction( self.view_smooth_action )
-		view_menu.addSeparator()
-		view_menu.addAction( self.view_wireframe_action )
-		view_menu.addAction( self.view_aliasing_action )
-		view_menu.addSeparator()
-		view_menu.addAction( self.view_colorbar_action )
-		view_menu.addSeparator()
-		view_menu.addAction( view_reset_action )
-
-		# Create the OpenGL frame
-		self.opengl_widget = OpenGLWidget( self )
-		self.setCentralWidget( self.opengl_widget )
-
 
 	#-
 	#
-	# FileOpenAction
+	# FileOpen
 	#
 	#-
 	#
-	def FileOpenAction( self ) :
+	def FileOpen( self ) :
 
 		# Open file dialog
 		(filename, selected_filter) = QFileDialog.getOpenFileName( self, 'Open a VRML File', '',
@@ -195,11 +94,11 @@ class QtViewer( QMainWindow ) :
 
 	#-
 	#
-	# FileSaveAction
+	# FileSave
 	#
 	#-
 	#
-	def FileSaveAction( self ) :
+	def FileSave( self ) :
 
 		# Nothing to save
 		if not self.mesh : return
@@ -217,11 +116,11 @@ class QtViewer( QMainWindow ) :
 
 	#-
 	#
-	# FileCheckAction
+	# FileCheck
 	#
 	#-
 	#
-	def FileCheckAction( self ) :
+	def FileCheck( self ) :
 
 		# Nothing to check
 		if not self.mesh : return
@@ -233,11 +132,11 @@ class QtViewer( QMainWindow ) :
 
 	#-
 	#
-	# FileCloseAction
+	# FileClose
 	#
 	#-
 	#
-	def FileCloseAction( self ) :
+	def FileClose( self ) :
 
 		# Close the mesh
 		self.opengl_widget.Close()
@@ -246,78 +145,78 @@ class QtViewer( QMainWindow ) :
 
 	#-
 	#
-	# ViewFlatAction
+	# ViewFlat
 	#
 	#-
 	#
-	def ViewFlatAction( self ) :
+	def ViewFlat( self ) :
 
 		# Set flat shading
-		self.view_flat_action.setChecked( True )
-		self.view_smooth_action.setChecked( False )
+		self.action_view_flat.setChecked( True )
+		self.action_view_smooth.setChecked( False )
 		self.opengl_widget.SetShader( 'FlatShading' )
 
 
 	#-
 	#
-	# ViewSmoothAction
+	# ViewSmooth
 	#
 	#-
 	#
-	def ViewSmoothAction( self ) :
+	def ViewSmooth( self ) :
 
 		# Set smooth shading
-		self.view_flat_action.setChecked( False )
-		self.view_smooth_action.setChecked( True )
+		self.action_view_flat.setChecked( False )
+		self.action_view_smooth.setChecked( True )
 		self.opengl_widget.SetShader( 'SmoothShading' )
 
 
 	#-
 	#
-	# ViewWireframeAction
+	# ViewWireframe
 	#
 	#-
 	#
-	def ViewWireframeAction( self ) :
+	def ViewWireframe( self ) :
 
 		# Enable / Disable wireframe
-		self.view_wireframe_action.setChecked( self.view_wireframe_action.isChecked() )
-		self.opengl_widget.SetWireframe( self.view_wireframe_action.isChecked() )
+		self.action_view_wireframe.setChecked( self.action_view_wireframe.isChecked() )
+		self.opengl_widget.SetWireframe( self.action_view_wireframe.isChecked() )
 
 
 	#-
 	#
-	# ViewAliasingAction
+	# ViewAntialiasing
 	#
 	#-
 	#
-	def ViewAliasingAction( self ) :
+	def ViewAntialiasing( self ) :
 
 		# Enable / Disable antialiasing
-		self.view_aliasing_action.setChecked( self.view_aliasing_action.isChecked() )
-		self.opengl_widget.SetAntialiasing( self.view_aliasing_action.isChecked() )
+		self.action_view_antialiasing.setChecked( self.action_view_antialiasing.isChecked() )
+		self.opengl_widget.SetAntialiasing( self.action_view_antialiasing.isChecked() )
 
 
 	#-
 	#
-	# ViewColorBarAction
+	# ViewColorbar
 	#
 	#-
 	#
-	def ViewColorBarAction( self ) :
+	def ViewColorbar( self ) :
 
 		# Enable / Disable color bar display
-		self.view_colorbar_action.setChecked( self.view_colorbar_action.isChecked() )
-		self.opengl_widget.SetColorBar( self.view_colorbar_action.isChecked() )
+		self.action_view_colorbar.setChecked( self.action_view_colorbar.isChecked() )
+		self.opengl_widget.SetColorBar( self.action_view_colorbar.isChecked() )
 
 
 	#-
 	#
-	# ViewResetAction
+	# ViewReset
 	#
 	#-
 	#
-	def ViewResetAction( self ) :
+	def ViewReset( self ) :
 
 		# Reset model transformation
 		self.opengl_widget.Reset()
