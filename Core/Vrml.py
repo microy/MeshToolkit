@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                  Vrml.py
 #                             -------------------
-#    update               : 2013-11-22
+#    update               : 2013-11-25
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,7 +24,9 @@
 #
 #
 #-
+
 from numpy import array
+
 from .Mesh import Mesh
 
 
@@ -49,7 +51,7 @@ def ReadVrml( filename ) :
 	normals = []
 	colors = []
 	texcoords = []
-        material = ''
+	material = ''
 	nlbrack = 0
 	nrbrack = 0
 	level = 0

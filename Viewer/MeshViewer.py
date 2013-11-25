@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-24
+#    update               : 2013-11-25
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,7 +24,6 @@
 #
 #-
 #
-from Shader import LoadShader
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
@@ -33,6 +32,8 @@ OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from math import tan, pi
 from numpy import array, identity, dot, float32, uint32
+
+from .Shader import LoadShader
 
 
 #--

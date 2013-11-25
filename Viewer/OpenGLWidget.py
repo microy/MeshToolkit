@@ -90,6 +90,9 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def initializeGL( self ) :
 
+		# Print OpenGL driver informations
+		self.PrintInfo()
+
 		# Default background color
 		glClearColor( 1, 1, 1, 1 )
 
@@ -374,9 +377,9 @@ class OpenGLWidget( QGLWidget ) :
 	def PrintInfo( self ) :
 
 		# Display OpenGL driver informations
-		print '~~~ OpenGL Informations ~~~'
-		print '  Vendor :   ' + glGetString( GL_VENDOR )
-		print '  Renderer : ' + glGetString( GL_RENDERER )
-		print '  Version :  ' + glGetString( GL_VERSION )
-		print '  Shader :   ' + glGetString( GL_SHADING_LANGUAGE_VERSION )
+		print( '~~~ OpenGL Informations ~~~' )
+		print( '  Vendor :   {}'.format(glGetString( GL_VENDOR ).decode('latin-1')) )
+		print( '  Renderer : {}'.format(glGetString( GL_RENDERER ).decode('latin-1')) )
+		print( '  Version :  {}'.format(glGetString( GL_VERSION ).decode('latin-1')) )
+		print( '  Shader :   {}'.format(glGetString( GL_SHADING_LANGUAGE_VERSION ).decode('latin-1')) )
 

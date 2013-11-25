@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2013-11-24
+#    update               : 2013-11-25
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -67,16 +67,19 @@ class Mesh :
 	#
 	def __str__( self ) :
 
-		string = '~~~ Mesh informations ~~~\n' +\
-			'  Filename :         ' + self.name + '\n'\
-			'  Vertices :         ' + `len(self.vertices)` + '\n'\
-			'  Faces :            ' + `len(self.faces)` + '\n'\
-			'  Colors :           ' + `len(self.colors)` + '\n'\
-			'  Faces normals :    ' + `len(self.face_normals)` + '\n'\
-			'  Vertex normals :   ' + `len(self.vertex_normals)` + '\n'\
-			'  Textures :         ' + `len(self.textures)` + '\n'\
-			'  Texture filename : ' + self.texture_name
-	        return string
+		string = '''~~~ Mesh informations ~~~\n
+			  Filename :         {}
+			  Vertices :         {}
+			  Faces :            {}
+			  Colors :           {}
+			  Faces normals :    {}
+			  Vertex normals :   {}
+			  Textures :         {}
+			  Texture filename : {}'''.format(
+				self.name, len(self.vertices), len(self.faces), len(self.colors),
+				len(self.face_normals), len(self.vertex_normals), len(self.textures),
+				self.texture_name )
+		return string
 
 
 	#--
@@ -121,8 +124,8 @@ class Mesh :
 	def UpdateNeighbors( self ) :
 
 		# Initialization
-		self.neighbor_vertices = [ [] for i in xrange(len(self.vertices)) ]
-		self.neighbor_faces = [ [] for i in xrange(len(self.vertices)) ]
+		self.neighbor_vertices = [ [] for i in range(len(self.vertices)) ]
+		self.neighbor_faces = [ [] for i in range(len(self.vertices)) ]
 
 		# Create a list of neighbor vertices and faces for every vertex of the mesh
 		for i in range( len(self.faces) ) :
@@ -295,8 +298,8 @@ def CheckMesh( mesh ) :
 	if not log_message : return
 
 	# Print log message in case of errors
-	print '~~~ Mesh checking informations ~~~\n'
-	print log_message
+	print( '~~~ Mesh checking informations ~~~' )
+	print( log_message )
 
 
 #--
@@ -321,8 +324,8 @@ def CheckNeighborhood( mesh ) :
 	if not log_message : return
 
 	# Print log message in case of errors
-	print '~~~ Neighborhood checking informations ~~~\n'
-	print log_message
+	print( '~~~ Neighborhood checking informations ~~~' )
+	print( log_message )
 
 
 

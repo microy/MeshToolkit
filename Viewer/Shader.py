@@ -86,14 +86,14 @@ def CreateShader( filename, shader_type ) :
 	shader_source = ''
 
 	# Load shader source files
-	with open( filename, 'r') as shader_file :
-		shader_source = shader_file.read()
+	with open( filename, 'rb') as shader_file :
+		shader_source = shader_file.read().decode('utf-8')
 
 	# Create the shaders
 	shader_id = glCreateShader( shader_type )
 
 	# Load shader source codes
-	glShaderSource( shader_id, shader_source )
+	glShaderSource_compat( shader_id, shader_source )
 
 	# Compile the shaders
 	glCompileShader( shader_id )

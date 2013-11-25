@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Trackball.py
 #                             -------------------
-#    update               : 2013-11-24
+#    update               : 2013-11-25
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -143,7 +143,7 @@ class Trackball :
 		if self.button == 1 :
 
 			# Update the rotation of the trackball
-                        self.TrackballRotation( current_mouse_position )
+			self.TrackballRotation( current_mouse_position )
 
 			# Save the mouse position
 			self.previous_mouse_position = current_mouse_position
@@ -193,7 +193,7 @@ class Trackball :
 		rotation_axis = self.Camera2Model( cross( previous_position, current_position ) )
 
 		# Rotation angle
-	        rotation_angle = 90.0 * sqrt( ((current_position - previous_position)**2).sum() ) * 1.5
+		rotation_angle = 90.0 * sqrt( ((current_position - previous_position)**2).sum() ) * 1.5
 
 		# Update transformation matrix
 		self.transformation = self.RotateMatrix( self.transformation, rotation_angle, rotation_axis )
@@ -239,8 +239,8 @@ class Trackball :
 
 		# Translate the matrix
 		T = copy( matrix )
-                T[3] = matrix[0] * direction[0] + matrix[1] * direction[1] + matrix[2] * direction[2] + matrix[3]
-                return T
+		T[3] = matrix[0] * direction[0] + matrix[1] * direction[1] + matrix[2] * direction[2] + matrix[3]
+		return T
 
 
 	#--

@@ -173,7 +173,7 @@ class QtViewer( QMainWindow ) :
 	def FileOpenAction( self ) :
 
 		# Open file dialog
- 		(filename, selected_filter) = QFileDialog.getOpenFileName( self, 'Open a VRML File', '',
+		(filename, selected_filter) = QFileDialog.getOpenFileName( self, 'Open a VRML File', '',
 			'VRML files (*.vrml *.wrl *.x3d *.x3dv *.iv);;All files (*.*)' )
 
 		# Check filename
@@ -205,7 +205,7 @@ class QtViewer( QMainWindow ) :
 		if not self.mesh : return
 
 		# Open file dialog
- 		(filename, selected_filter) = QFileDialog.getSaveFileName( self, 'Save to a VRML File', '',
+		(filename, selected_filter) = QFileDialog.getSaveFileName( self, 'Save to a VRML File', '',
 			'VRML files (*.vrml *.wrl *.x3d *.x3dv *.iv);;All files (*.*)' )
 
 		# Check filename

@@ -3,7 +3,7 @@
 
 
 from Viewer.QtViewer import QtViewer
-from PyQt4 import QtGui
+from PySide import QtGui
 import sys
 
 
