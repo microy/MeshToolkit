@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                               OpenGLWidget.py
 #                             -------------------
-#    update               : 2013-11-24
+#    update               : 2013-11-25
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,19 +24,21 @@
 #
 #--
 #
-from .ColorBar import ColorBar
-from .MeshViewer import MeshViewer
-from .Shader import LoadShader
-from .Trackball import Trackball
+
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtOpenGL import *
+from PySide import QtGui, QtCore
+from PySide.QtOpenGL import *
 from numpy import identity, float32
+
+from .ColorBar import ColorBar
+from .MeshViewer import MeshViewer
+from .Shader import LoadShader
+from .Trackball import Trackball
 
 
 #--

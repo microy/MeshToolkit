@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-24
+#    update               : 2013-11-25
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,11 +24,13 @@
 #
 #--
 #
+
+from PySide import QtGui, QtCore
+from PySide.QtGui import *
+
+from .OpenGLWidget import OpenGLWidget
 from Core.Mesh import CheckMesh, CheckNeighborhood
 from Core.Vrml import ReadVrml, WriteVrml
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtGui import *
-from .OpenGLWidget import OpenGLWidget
 
 
 #--
@@ -171,7 +173,7 @@ class QtViewer( QMainWindow ) :
 	def FileOpenAction( self ) :
 
 		# Open file dialog
- 		filename = QFileDialog.getOpenFileName( self, 'Open a VRML File', '',
+ 		(filename, selected_filter) = QFileDialog.getOpenFileName( self, 'Open a VRML File', '',
 			'VRML files (*.vrml *.wrl);;X3D files (*.x3d *.x3dv);;OpenInventor files (*.iv);;All files (*.*)' )
 
 		# Check filename
@@ -203,7 +205,7 @@ class QtViewer( QMainWindow ) :
 		if not self.mesh : return
 
 		# Open file dialog
- 		filename = QFileDialog.getSaveFileName( self, 'Save to a VRML File', '',
+ 		(filename, selected_filter) = QFileDialog.getSaveFileName( self, 'Save to a VRML File', '',
 			'VRML files (*.vrml *.wrl);;X3D files (*.x3d *.x3dv);;OpenInventor files (*.iv);;All files (*.*)' )
 
 		# Check filename
