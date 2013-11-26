@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2013-11-25
+#    update               : 2013-11-26
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -66,20 +66,18 @@ class Mesh :
 	#--
 	#
 	def __str__( self ) :
-
-		string = '''~~~ Mesh informations ~~~\n
-			  Filename :         {}
-			  Vertices :         {}
-			  Faces :            {}
-			  Colors :           {}
-			  Faces normals :    {}
-			  Vertex normals :   {}
-			  Textures :         {}
-			  Texture filename : {}'''.format(
-				self.name, len(self.vertices), len(self.faces), len(self.colors),
-				len(self.face_normals), len(self.vertex_normals), len(self.textures),
-				self.texture_name )
-		return string
+		
+		# Return OpenGL driver informations
+		log_message = '~~~ Mesh informations ~~~\n'
+		log_message  += '  Name :             {}\n'.format( self.name )
+		log_message  += '  Vertices :         {}\n'.format( len(self.vertices) )
+		log_message  += '  Faces :            {}\n'.format( len(self.faces) )
+		log_message  += '  Colors :           {}\n'.format( len(self.colors) )
+		log_message  += '  Faces normals :    {}\n'.format( len(self.face_normals) )
+		log_message  += '  Vertex normals :   {}\n'.format( len(self.vertex_normals) )
+		log_message  += '  Textures :         {}\n'.format( len(self.textures) )
+		log_message  += '  Texture filename : {}'.format( self.texture_name )
+		return log_message
 
 
 	#--
@@ -159,14 +157,14 @@ class Mesh :
 	def IsBorderVertex( self, vertex ) :
 
 		# Loop through the neighbor vertices
-		for v in mesh.neighbor_vertices[ vertex ] :
+		for v in self.neighbor_vertices[ vertex ] :
 
 			common_face = 0
 
 			# Loop through the neighbor faces
-			for f1 in mesh.neighbor_faces[ v ] :
+			for f1 in self.neighbor_faces[ v ] :
 
-				for f2 in mesh.neighbor_faces[ vertex ] :
+				for f2 in self.neighbor_faces[ vertex ] :
 
 					# Check if it has a face in common
 					if f1 == f2 : common_face += 1

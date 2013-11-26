@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 ColorBar.py
 #                             -------------------
-#    update               : 2013-11-24
+#    update               : 2013-11-26
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,8 +24,7 @@
 #
 #--
 #
-from Core.Color import Value2Color, Value2ColorAlternate
-from .Shader import LoadShader
+
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
@@ -34,6 +33,8 @@ OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from numpy import zeros, float32
 
+from Core.Color import Value2Color, Value2ColorAlternate
+from .Shader import LoadShader
 
 
 #--
@@ -62,8 +63,8 @@ class ColorBar :
 		for i in range( self.size ) :
 			vertices[i*2]   = [ -0.5, float(i) / (self.size-1) - 0.5, 0 ]
 			vertices[i*2+1] = [ 0.5, float(i) / (self.size-1) - 0.5, 0 ]
-			colors[i*2] = Value2Color( float(i)/float(self.size-1) )
-			colors[i*2+1] = Value2Color( float(i)/float(self.size-1) )
+			colors[i*2] = Value2Color( float(i)/ (self.size-1) )
+			colors[i*2+1] = Value2Color( float(i)/ (self.size-1) )
 
 		# Load the shader
 		self.shader_program_id = LoadShader( 'SimpleColor' )

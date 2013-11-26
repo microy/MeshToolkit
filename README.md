@@ -8,8 +8,8 @@ Implement a triangular mesh processing library in Python for research purpose.
 	- NumPy
 
 - Viewer
-	- OpenGL
-	- Qt
+	- PyOpenGL
+	- PySide
 
 ## Contact :
 

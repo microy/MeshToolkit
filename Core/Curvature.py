@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Curvature.py
 #                             -------------------
-#    update               : 2013-11-23
+#    update               : 2013-11-26
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -37,7 +37,8 @@
 # External dependencies
 #
 #-
-from numpy import dot, zeros, sqrt
+from numpy import dot, zeros
+from math import sqrt
 
 
 
@@ -97,18 +98,10 @@ def GetNormalCurvature( mesh ) :
 #
 def Cotangent( v1, v2 ) :
 
-	# Compute square lengths
 	l1 = dot( v1, v1 )
 	l2 = dot( v2, v2 )
-
-	# Compute scalar product between the vectors
 	dot_prod = dot( v1, v2 )
-
-	# Compute the square of the denominator
-	denom = l1 * l2 - dot_prod * dot_prod;
-
-	# Return cotangent between v1 and v2
-	return dot_prod / sqrt( denom )
+	return dot_prod / sqrt( l1 * l2 - dot_prod * dot_prod )
 
 
 

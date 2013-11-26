@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-25
+#    update               : 2013-11-26
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -54,7 +54,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 	def __init__( self, parent=None ) :
 
 		# Initialise the main window
-		super( QtViewer, self ).__init__( parent) 
+		super( QtViewer, self ).__init__( parent ) 
 
 		# Initialise the UI
 		self.setupUi( self )

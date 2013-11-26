@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Trackball.py
 #                             -------------------
-#    update               : 2013-11-25
+#    update               : 2013-11-26
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -35,8 +35,8 @@
 #
 #--
 #
-from math import cos, sin, pi
-from numpy import array, identity, zeros, float32, dot, cross, sqrt, copy
+from math import cos, sin, pi, sqrt
+from numpy import array, identity, zeros, float32, dot, cross, copy
 
 
 #--

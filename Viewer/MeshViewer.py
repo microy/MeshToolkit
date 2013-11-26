@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-25
+#    update               : 2013-11-26
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,6 +24,7 @@
 #
 #-
 #
+
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
@@ -132,7 +133,6 @@ class MeshViewer :
 
 		# Setup model element number
 		self.element_number = len(faces) * 3
-
 
 
 	#-

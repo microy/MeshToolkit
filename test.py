@@ -48,13 +48,13 @@ if __name__ == "__main__" :
 	print( '  Done.' )
 
 
-#	print '~~~ Compute normal curvature ~~~'
-#	normal_curvature = GetNormalCurvature( mesh )
-#	print '  Done.'
+	print '~~~ Compute normal curvature ~~~'
+	normal_curvature = GetNormalCurvature( mesh )
+	print '  Done.'
 
-#	print '~~~ Color vertices ~~~'
-#	mesh.colors = Array2Color( normal_curvature )
-#	print '  Done.'
+	print '~~~ Color vertices ~~~'
+	mesh.colors = Array2Color( normal_curvature )
+	print '  Done.'
 
 	print( mesh )
 

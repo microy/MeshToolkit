@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                               OpenGLWidget.py
 #                             -------------------
-#    update               : 2013-11-25
+#    update               : 2013-11-26
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -91,7 +91,7 @@ class OpenGLWidget( QGLWidget ) :
 	def initializeGL( self ) :
 
 		# Print OpenGL driver informations
-		self.PrintInfo()
+		print( self.OpenGLInfo() )
 
 		# Default background color
 		glClearColor( 1, 1, 1, 1 )
@@ -234,7 +234,7 @@ class OpenGLWidget( QGLWidget ) :
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 
 		# Display the mesh with wireframe rendering
-		if( self.wireframe_enabled ) :
+		if self.wireframe_enabled :
 
 			# 1st pass : wireframe model
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
@@ -370,16 +370,17 @@ class OpenGLWidget( QGLWidget ) :
 
 	#-
 	#
-	# PrintInfo
+	# OpenGLInfo
 	#
 	#-
 	#
-	def PrintInfo( self ) :
+	def OpenGLInfo( self ) :
 
-		# Display OpenGL driver informations
-		print( '~~~ OpenGL Informations ~~~' )
-		print( '  Vendor :   {}'.format(glGetString( GL_VENDOR ).decode('latin-1')) )
-		print( '  Renderer : {}'.format(glGetString( GL_RENDERER ).decode('latin-1')) )
-		print( '  Version :  {}'.format(glGetString( GL_VERSION ).decode('latin-1')) )
-		print( '  Shader :   {}'.format(glGetString( GL_SHADING_LANGUAGE_VERSION ).decode('latin-1')) )
+		# Return OpenGL driver informations
+		log_message = '~~~ OpenGL Informations ~~~\n'
+		log_message  += '  Vendor :   {}\n'.format( glGetString( GL_VENDOR ).decode('latin-1') )
+		log_message  += '  Renderer : {}\n'.format( glGetString( GL_RENDERER ).decode('latin-1') )
+		log_message  += '  Version :  {}\n'.format( glGetString( GL_VERSION ).decode('latin-1') )
+		log_message  += '  Shader :   {}'.format( glGetString( GL_SHADING_LANGUAGE_VERSION ).decode('latin-1') )
+		return log_message
 
