@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 ColorBar.py
 #                             -------------------
-#    update               : 2013-11-26
+#    update               : 2013-11-27
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -61,10 +61,10 @@ class ColorBar :
 		vertices = zeros( (self.size * 2, 3), dtype=float32 )
 		colors = zeros( (self.size * 2, 3), dtype=float32 )
 		for i in range( self.size ) :
-			vertices[i*2]   = [ -0.5, float(i) / (self.size-1) - 0.5, 0 ]
-			vertices[i*2+1] = [ 0.5, float(i) / (self.size-1) - 0.5, 0 ]
-			colors[i*2] = Value2Color( float(i)/ (self.size-1) )
-			colors[i*2+1] = Value2Color( float(i)/ (self.size-1) )
+			vertices[i*2]   = [ -0.5, i / (self.size - 1.0) - 0.5, 0 ]
+			vertices[i*2+1] = [ 0.5, i / (self.size - 1.0) - 0.5, 0 ]
+			colors[i*2] = Value2Color( i / (self.size - 1.0) )
+			colors[i*2+1] = Value2Color( i / (self.size - 1.0) )
 
 		# Load the shader
 		self.shader_program_id = LoadShader( 'SimpleColor' )
