@@ -187,15 +187,11 @@ class Mesh :
 	#
 	def GetAxisAlignedBoundingBox( self ) :
 
-		# Initialisation
-		min_point = array( [+inf, +inf, +inf] )
-		max_point = array( [-inf, -inf, -inf] )
+		# Find the minimum point
+		min_point = array( [self.vertices[:,0].min(), self.vertices[:,1].min(), self.vertices[:,2].min()] )
 
-		# Loop through mesh vertices
-		for v in self.vertices :
-			for i in range( 3 ) :
-				if v[i] < min_point[i] : min_point[i] = v[i]
-				if v[i] > max_point[i] : max_point[i] = v[i]
+		# Find the maximum point
+		max_point = array( [self.vertices[:,0].max(), self.vertices[:,1].max(), self.vertices[:,2].max()] )
 
 		# Return result
 		return ( min_point, max_point )
@@ -218,9 +214,7 @@ class Mesh :
 		center = 0.5 * (pmin + pmax)
 
 		# Compute radius
-		radius = 0.0
-		for v in self.vertices :
-			radius = max( radius, norm( center - v ) )
+		radius = sqrt(((center - self.vertices)**2).sum(axis=1)).max()
 
 		# Return result
 		return ( center, radius )
