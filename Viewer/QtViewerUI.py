@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Viewer/QtViewerUI.ui'
 #
-# Created: Mon Nov 25 20:12:12 2013
+# Created: Wed Nov 27 11:15:11 2013
 #      by: pyside-uic 0.2.13 running on PySide 1.1.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -71,6 +71,8 @@ class Ui_MainWindow(object):
         self.action_help_about.setObjectName("action_help_about")
         self.action_help_opengl = QtGui.QAction(MainWindow)
         self.action_help_opengl.setObjectName("action_help_opengl")
+        self.action_help_qt = QtGui.QAction(MainWindow)
+        self.action_help_qt.setObjectName("action_help_qt")
         self.menu_file.addAction(self.action_file_open)
         self.menu_file.addAction(self.action_file_save)
         self.menu_file.addSeparator()
@@ -87,6 +89,7 @@ class Ui_MainWindow(object):
         self.menu_view.addSeparator()
         self.menu_view.addAction(self.action_view_reset)
         self.menu_help.addAction(self.action_help_about)
+        self.menu_help.addAction(self.action_help_qt)
         self.menu_help.addAction(self.action_help_opengl)
         self.menubar.addAction(self.menu_file.menuAction())
         self.menubar.addAction(self.menu_view.menuAction())
@@ -104,6 +107,9 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.action_view_colorbar, QtCore.SIGNAL("triggered()"), MainWindow.ViewColorbar)
         QtCore.QObject.connect(self.action_view_wireframe, QtCore.SIGNAL("triggered()"), MainWindow.ViewWireframe)
         QtCore.QObject.connect(self.action_view_reset, QtCore.SIGNAL("triggered()"), MainWindow.ViewReset)
+        QtCore.QObject.connect(self.action_help_about, QtCore.SIGNAL("triggered()"), MainWindow.HelpAbout)
+        QtCore.QObject.connect(self.action_help_qt, QtCore.SIGNAL("triggered()"), MainWindow.HelpAboutQt)
+        QtCore.QObject.connect(self.action_help_opengl, QtCore.SIGNAL("triggered()"), MainWindow.HelpAboutOpenGL)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -144,11 +150,13 @@ class Ui_MainWindow(object):
         self.action_view_reset.setText(QtGui.QApplication.translate("MainWindow", "&Reset", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_reset.setToolTip(QtGui.QApplication.translate("MainWindow", "Reset the current view", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_reset.setShortcut(QtGui.QApplication.translate("MainWindow", "R", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_help_about.setText(QtGui.QApplication.translate("MainWindow", "&About QtViewer", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_help_about.setText(QtGui.QApplication.translate("MainWindow", "&About QtViewer...", None, QtGui.QApplication.UnicodeUTF8))
         self.action_help_about.setToolTip(QtGui.QApplication.translate("MainWindow", "About this application", None, QtGui.QApplication.UnicodeUTF8))
         self.action_help_about.setShortcut(QtGui.QApplication.translate("MainWindow", "F1", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_help_opengl.setText(QtGui.QApplication.translate("MainWindow", "About &OpenGL", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_help_opengl.setText(QtGui.QApplication.translate("MainWindow", "About &OpenGL...", None, QtGui.QApplication.UnicodeUTF8))
         self.action_help_opengl.setToolTip(QtGui.QApplication.translate("MainWindow", "OpenGL informations", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_help_opengl.setShortcut(QtGui.QApplication.translate("MainWindow", "F2", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_help_opengl.setShortcut(QtGui.QApplication.translate("MainWindow", "F3", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_help_qt.setText(QtGui.QApplication.translate("MainWindow", "About &Qt...", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_help_qt.setShortcut(QtGui.QApplication.translate("MainWindow", "F2", None, QtGui.QApplication.UnicodeUTF8))
 
 from OpenGLWidget import OpenGLWidget

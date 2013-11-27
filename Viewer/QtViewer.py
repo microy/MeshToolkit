@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-26
+#    update               : 2013-11-27
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -25,12 +25,13 @@
 #--
 #
 
+import platform
+import PySide
 from PySide import QtGui, QtCore
-from PySide.QtGui import *
+from PySide.QtGui import QMainWindow, QFileDialog, QMessageBox
 
 from Core.Mesh import CheckMesh, CheckNeighborhood
 from Core.Vrml import ReadVrml, WriteVrml
-
 from QtViewerUI import Ui_MainWindow
 
 
@@ -222,8 +223,46 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.Reset()
 
 
+	#-
+	#
+	# HelpAbout
+	#
+	#-
+	#
+	def HelpAbout( self ) :
+
+		QMessageBox.about( self, 'About QtViewer',
+		'''<b>About QtViewer</b>
+        <p>Copyright (c) 2013 Michael Roy.</p>
+        <p>All rights reserved in accordance with GPL v2 or later.</p>
+        <p><i>Python {} - PySide version {} - Qt version {} on {}</i></p>'''.format(
+        platform.python_version(), PySide.__version__, PySide.QtCore.__version__,
+        platform.system()))
 
 
-
-
+	#-
+	#
+	# HelpAboutQt
+	#
+	#-
+	#
+	def HelpAboutQt( self ) :
+		
+		QMessageBox.aboutQt( self, 'About Qt' )
+		
+		
+	#-
+	#
+	# HelpAboutOpenGL
+	#
+	#-
+	#
+	def HelpAboutOpenGL( self ) :
+		
+		( gl_vendor, gl_renderer, gl_version, gl_shader ) = self.opengl_widget.OpenGLInfo()
+		
+		QMessageBox.about( self, 'About OpenGL', '''<p><b>Vendor :</b> {}</p>
+			<p><b>Renderer :</b> {}</p>
+			<p><b>Version :</b> {}</p>
+			<p><b>Shader :</b> {}</p>'''.format( gl_vendor, gl_renderer, gl_version, gl_shader ) )
 

@@ -68,6 +68,7 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="action_help_about"/>
+    <addaction name="action_help_qt"/>
     <addaction name="action_help_opengl"/>
    </widget>
    <addaction name="menu_file"/>
@@ -222,7 +223,7 @@
   </action>
   <action name="action_help_about">
    <property name="text">
-    <string>&amp;About QtViewer</string>
+    <string>&amp;About QtViewer...</string>
    </property>
    <property name="toolTip">
     <string>About this application</string>
@@ -233,10 +234,18 @@
   </action>
   <action name="action_help_opengl">
    <property name="text">
-    <string>About &amp;OpenGL</string>
+    <string>About &amp;OpenGL...</string>
    </property>
    <property name="toolTip">
     <string>OpenGL informations</string>
+   </property>
+   <property name="shortcut">
+    <string>F3</string>
+   </property>
+  </action>
+  <action name="action_help_qt">
+   <property name="text">
+    <string>About &amp;Qt...</string>
    </property>
    <property name="shortcut">
     <string>F2</string>
@@ -429,6 +438,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>action_help_about</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>HelpAbout()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_help_qt</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>HelpAboutQt()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_help_opengl</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>HelpAboutOpenGL()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>FileOpen()</slot>
@@ -441,5 +498,8 @@
   <slot>ViewColorbar()</slot>
   <slot>ViewWireframe()</slot>
   <slot>ViewReset()</slot>
+  <slot>HelpAbout()</slot>
+  <slot>HelpAboutQt()</slot>
+  <slot>HelpAboutOpenGL()</slot>
  </slots>
 </ui>

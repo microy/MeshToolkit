@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                               OpenGLWidget.py
 #                             -------------------
-#    update               : 2013-11-26
+#    update               : 2013-11-27
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -31,8 +31,9 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_LOGGING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
-from PySide import QtGui, QtCore
-from PySide.QtOpenGL import *
+import PySide
+from PySide import QtGui, QtCore, QtOpenGL
+from PySide.QtOpenGL import QGLWidget, QGLFormat
 from numpy import identity, float32
 
 from .ColorBar import ColorBar
@@ -62,7 +63,7 @@ class OpenGLWidget( QGLWidget ) :
 
 		
 		# Initialise QtGLWidget with multisampling enabled and OpenGL 3 core only
-		QGLWidget.__init__( self, QGLFormat( QGL.SampleBuffers | QGL.NoDeprecatedFunctions ), parent )
+		QGLWidget.__init__( self, QGLFormat( QtOpenGL.QGL.SampleBuffers | QtOpenGL.QGL.NoDeprecatedFunctions ), parent )
 
 		# Track mouse events
 		self.setMouseTracking( True )
@@ -89,9 +90,6 @@ class OpenGLWidget( QGLWidget ) :
 	#-
 	#
 	def initializeGL( self ) :
-
-		# Print OpenGL driver informations
-		print( self.OpenGLInfo() )
 
 		# Default background color
 		glClearColor( 1, 1, 1, 1 )
@@ -377,10 +375,9 @@ class OpenGLWidget( QGLWidget ) :
 	def OpenGLInfo( self ) :
 
 		# Return OpenGL driver informations
-		log_message = '~~~ OpenGL Informations ~~~\n'
-		log_message  += '  Vendor :   {}\n'.format( glGetString( GL_VENDOR ).decode('latin-1') )
-		log_message  += '  Renderer : {}\n'.format( glGetString( GL_RENDERER ).decode('latin-1') )
-		log_message  += '  Version :  {}\n'.format( glGetString( GL_VERSION ).decode('latin-1') )
-		log_message  += '  Shader :   {}'.format( glGetString( GL_SHADING_LANGUAGE_VERSION ).decode('latin-1') )
-		return log_message
+		gl_vendor = glGetString( GL_VENDOR ).decode('latin-1')
+		gl_renderer = glGetString( GL_RENDERER ).decode('latin-1')
+		gl_version = glGetString( GL_VERSION ).decode('latin-1')
+		gl_shader = glGetString( GL_SHADING_LANGUAGE_VERSION ).decode('latin-1')
+		return ( gl_vendor, gl_renderer, gl_version, gl_shader )
 
