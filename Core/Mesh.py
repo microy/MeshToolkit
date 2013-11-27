@@ -24,8 +24,7 @@
 #
 #-
 #
-from numpy import array, cross, dot, sqrt, zeros, inf
-from numpy.linalg import norm
+from numpy import array, cross, dot, sqrt, zeros
 
 
 #--
