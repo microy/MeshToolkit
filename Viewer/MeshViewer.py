@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-26
+#    update               : 2013-11-27
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -117,7 +117,7 @@ class MeshViewer :
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 
 		# Color buffer object
-		if len(colors) == 0 : self.color_enabled = False
+		if not len(colors) : self.color_enabled = False
 		else :
 			self.color_enabled = True
 			self.color_buffer_id = glGenBuffers( 1 )
