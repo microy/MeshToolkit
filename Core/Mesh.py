@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2013-11-26
+#    update               : 2013-11-27
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -67,7 +67,7 @@ class Mesh :
 	#
 	def __str__( self ) :
 		
-		# Return OpenGL driver informations
+		# Return mesh informations
 		log_message = '~~~ Mesh informations ~~~\n'
 		log_message  += '  Name :             {}\n'.format( self.name )
 		log_message  += '  Vertices :         {}\n'.format( len(self.vertices) )
