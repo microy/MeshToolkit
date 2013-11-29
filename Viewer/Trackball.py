@@ -145,9 +145,6 @@ class Trackball :
 			# Update the rotation of the trackball
 			self.TrackballRotation( current_mouse_position )
 
-			# Save the mouse position
-			self.previous_mouse_position = current_mouse_position
-
 			# Require a display update
 			return True
 
@@ -197,6 +194,9 @@ class Trackball :
 
 		# Update transformation matrix
 		self.transformation = self.RotateMatrix( self.transformation, rotation_angle, rotation_axis )
+
+		# Save the mouse position
+		self.previous_mouse_position = current_mouse_position
 
 
 	#-
