@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-27
+#    update               : 2013-11-29
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -73,7 +73,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 	def FileOpen( self ) :
 
 		# Open file dialog
-		(filename, selected_filter) = QFileDialog.getOpenFileName( self, 'Open a VRML File', '',
+		(filename, selected_filter) = QFileDialog.getOpenFileName( self, 'Open a VRML file...', '',
 			'VRML files (*.vrml *.wrl *.x3d *.x3dv *.iv);;All files (*.*)' )
 
 		# Check filename
@@ -105,7 +105,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		if not self.mesh : return
 
 		# Open file dialog
-		(filename, selected_filter) = QFileDialog.getSaveFileName( self, 'Save to a VRML File', '',
+		(filename, selected_filter) = QFileDialog.getSaveFileName( self, 'Save to a VRML file...', '',
 			'VRML files (*.vrml *.wrl *.x3d *.x3dv *.iv);;All files (*.*)' )
 
 		# Check filename
@@ -232,7 +232,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 	def HelpAbout( self ) :
 
 		QMessageBox.about( self, 'About QtViewer',
-		'''<b>About QtViewer</b>
+		'''<b>PyMesh QtViewer</b>
         <p>Copyright (c) 2013 Michael Roy.</p>
         <p>All rights reserved in accordance with GPL v2 or later.</p>
         <p><i>Python {} - PySide version {} - Qt version {} on {}</i></p>'''.format(
