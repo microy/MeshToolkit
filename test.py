@@ -11,7 +11,11 @@ from Core.Color import Array2Color
 from Core.Vrml import ReadVrml, WriteVrml
 
 
-
+def test( mesh ) :
+	for v in range(len(mesh.vertices)) :
+		if mesh.IsBorderVertex( v ) : pass
+		
+		
 
 if __name__ == "__main__" :
 
@@ -45,17 +49,16 @@ if __name__ == "__main__" :
 	print( '  Done.' )
 
 #	print( '~~~ Neighbor ~~~' )
-#	print(timeit.timeit("mesh.UpdateNeighbors()", setup="from __main__ import mesh", number=10))
-#	print(timeit.timeit("mesh.UpdateNeighbors2()", setup="from __main__ import mesh", number=10))
+#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=10))
 #	print( '  Done.' )
 
-#	print '~~~ Compute normal curvature ~~~'
-#	normal_curvature = GetNormalCurvature( mesh )
-#	print '  Done.'
+	print '~~~ Compute normal curvature ~~~'
+	normal_curvature = GetNormalCurvature( mesh )
+	print '  Done.'
 
-#	print '~~~ Color vertices ~~~'
-#	mesh.colors = Array2Color( normal_curvature )
-#	print '  Done.'
+	print '~~~ Color vertices ~~~'
+	mesh.colors = Array2Color( normal_curvature )
+	print '  Done.'
 
 #	print( mesh )
 

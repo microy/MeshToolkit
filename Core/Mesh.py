@@ -24,7 +24,7 @@
 #
 #-
 #
-from numpy import array, cross, dot, sqrt, zeros, unique
+from numpy import array, cross, dot, sqrt, zeros
 
 
 #--
@@ -121,11 +121,11 @@ class Mesh :
 	def UpdateNeighbors( self ) :
 
 		# Initialization
-		self.neighbor_vertices = [ [] for i in range(len(self.vertices)) ]
-		self.neighbor_faces = [ [] for i in range(len(self.vertices)) ]
+		self.neighbor_vertices = [ [] for i in range(len( self.vertices )) ]
+		self.neighbor_faces = [ [] for i in range(len( self.vertices )) ]
 
 		# Create a list of neighbor vertices and faces for every vertex of the mesh
-		for i in range( len(self.faces) ) :
+		for i in range(len( self.faces )) :
 
 			# Add faces bound to each vertex
 			self.neighbor_faces[ self.faces[i,0] ].append( i )
@@ -141,8 +141,8 @@ class Mesh :
 			self.neighbor_vertices[ self.faces[i,2] ].append( self.faces[i,1] )
 
 		# Remove duplicates
-		self.neighbor_vertices =  [ unique( i ) for i in self.neighbor_vertices ] 
-		self.neighbor_faces =  [ unique( i ) for i in self.neighbor_faces ] 
+		self.neighbor_vertices =  [ set( i ) for i in self.neighbor_vertices ] 
+		self.neighbor_faces =  [ set( i ) for i in self.neighbor_faces ] 
 
 
 	#--
@@ -158,16 +158,14 @@ class Mesh :
 		# Loop through the neighbor vertices
 		for v in self.neighbor_vertices[ vertex ] :
 
+			# Initialise the number of faces in common with the initial vertex
 			common_face = 0
 
 			# Loop through the neighbor faces of the neighbor vertex
-			for f1 in self.neighbor_faces[ v ] :
+			for f in self.neighbor_faces[ v ] :
 
-				# Loop through the neighbor faces of the initial vertex
-				for f2 in self.neighbor_faces[ vertex ] :
-
-					# Check if it has a face in common
-					if f1 == f2 : common_face += 1
+					# Check if it has a face in common with the initial vertex
+					if f in self.neighbor_faces[ vertex ] : common_face += 1
 
 			# If there is only 1 common face with this neighbor,
 			# it is a vertex on the border
