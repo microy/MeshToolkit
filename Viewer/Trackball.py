@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Trackball.py
 #                             -------------------
-#    update               : 2013-11-26
+#    update               : 2013-11-29
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,7 +24,7 @@
 #       - Nate Robins' Programs
 #         http://www.xmission.com/~nate
 #
-#	- NeHe Productions - ArcBall Rotation Tutorial
+#       - NeHe Productions - ArcBall Rotation Tutorial
 #         http://nehe.gamedev.net
 #
 
