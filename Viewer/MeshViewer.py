@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-27
+#    update               : 2013-11-29
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -117,8 +117,8 @@ class MeshViewer :
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 
 		# Color buffer object
-		if not len(colors) : self.color_enabled = False
-		else :
+		self.color_enabled = False
+		if len( colors ) : 
 			self.color_enabled = True
 			self.color_buffer_id = glGenBuffers( 1 )
 			glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
@@ -179,7 +179,7 @@ class MeshViewer :
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_FALSE, dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
-		if self.color_enabled :	glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
+		if self.color_enabled : glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
 		else : glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 0 )
 
 		# Activate hidden lines in the shader for wireframe rendering

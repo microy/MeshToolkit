@@ -164,8 +164,8 @@ class Mesh :
 			# Loop through the neighbor faces of the neighbor vertex
 			for f in self.neighbor_faces[ v ] :
 
-					# Check if it has a face in common with the initial vertex
-					if f in self.neighbor_faces[ vertex ] : common_face += 1
+				# Check if it has a face in common with the initial vertex
+				if f in self.neighbor_faces[ vertex ] : common_face += 1
 
 			# If there is only 1 common face with this neighbor,
 			# it is a vertex on the border
