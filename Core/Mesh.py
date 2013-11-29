@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2013-11-27
+#    update               : 2013-11-29
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,7 +24,7 @@
 #
 #-
 #
-from numpy import array, cross, dot, sqrt, zeros
+from numpy import array, cross, dot, sqrt, zeros, unique
 
 
 #--
@@ -141,8 +141,8 @@ class Mesh :
 			self.neighbor_vertices[ self.faces[i,2] ].append( self.faces[i,1] )
 
 		# Remove duplicates
-		self.neighbor_vertices = [ array( list( set( i ) ) ) for i in self.neighbor_vertices ]
-		self.neighbor_faces = [ array( list( set( i ) ) ) for i in self.neighbor_faces ]
+		self.neighbor_vertices =  [ unique( i ) for i in self.neighbor_vertices ] 
+		self.neighbor_faces =  [ unique( i ) for i in self.neighbor_faces ] 
 
 
 	#--
@@ -160,9 +160,10 @@ class Mesh :
 
 			common_face = 0
 
-			# Loop through the neighbor faces
+			# Loop through the neighbor faces of the neighbor vertex
 			for f1 in self.neighbor_faces[ v ] :
 
+				# Loop through the neighbor faces of the initial vertex
 				for f2 in self.neighbor_faces[ vertex ] :
 
 					# Check if it has a face in common

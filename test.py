@@ -13,9 +13,6 @@ from Core.Vrml import ReadVrml, WriteVrml
 
 
 
-
-
-
 if __name__ == "__main__" :
 
 	print(sys.version)
@@ -47,16 +44,20 @@ if __name__ == "__main__" :
 	CheckNeighborhood( mesh )
 	print( '  Done.' )
 
+#	print( '~~~ Neighbor ~~~' )
+#	print(timeit.timeit("mesh.UpdateNeighbors()", setup="from __main__ import mesh", number=10))
+#	print(timeit.timeit("mesh.UpdateNeighbors2()", setup="from __main__ import mesh", number=10))
+#	print( '  Done.' )
 
-	print '~~~ Compute normal curvature ~~~'
-	normal_curvature = GetNormalCurvature( mesh )
-	print '  Done.'
+#	print '~~~ Compute normal curvature ~~~'
+#	normal_curvature = GetNormalCurvature( mesh )
+#	print '  Done.'
 
-	print '~~~ Color vertices ~~~'
-	mesh.colors = Array2Color( normal_curvature )
-	print '  Done.'
+#	print '~~~ Color vertices ~~~'
+#	mesh.colors = Array2Color( normal_curvature )
+#	print '  Done.'
 
-	print( mesh )
+#	print( mesh )
 
 	if len(sys.argv) == 3 :
 
