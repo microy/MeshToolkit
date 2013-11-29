@@ -4,16 +4,19 @@
 
 import sys
 import timeit
+import numpy
 
 from Core.Mesh import Mesh, CheckMesh, CheckNeighborhood
 from Core.Curvature import GetNormalCurvature
 from Core.Color import Array2Color
 from Core.Vrml import ReadVrml, WriteVrml
 
+normal_curvature = []
 
 def test( mesh ) :
 	for v in range(len(mesh.vertices)) :
 		if mesh.IsBorderVertex( v ) : pass
+#	normal_curvature = GetNormalCurvature( mesh )
 		
 		
 
@@ -48,17 +51,21 @@ if __name__ == "__main__" :
 	CheckNeighborhood( mesh )
 	print( '  Done.' )
 
-#	print( '~~~ Neighbor ~~~' )
-#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=10))
-#	print( '  Done.' )
+	print( '~~~ Neighbor ~~~' )
+	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=100))
+	print( '  Done.' )
 
-	print '~~~ Compute normal curvature ~~~'
-	normal_curvature = GetNormalCurvature( mesh )
-	print '  Done.'
+#	print '~~~ Compute normal curvature ~~~'
+#	normal_curvature = GetNormalCurvature( mesh )
+#	mesh.colors = Array2Color( normal_curvature )
+#	print '  Done.'
 
-	print '~~~ Color vertices ~~~'
-	mesh.colors = Array2Color( normal_curvature )
-	print '  Done.'
+#	print '~~~ Color vertices ~~~'
+#	b = numpy.zeros( (len(mesh.vertices),3) )
+#	for v in range(len(mesh.vertices)) :
+#		if mesh.IsBorderVertex( v ) : b[v] = [1,0,0]
+#	mesh.colors = Array2Color( b )
+#	print '  Done.'
 
 #	print( mesh )
 

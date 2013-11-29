@@ -158,18 +158,8 @@ class Mesh :
 		# Loop through the neighbor vertices
 		for v in self.neighbor_vertices[ vertex ] :
 
-			# Initialise the number of faces in common with the initial vertex
-			common_face = 0
-
-			# Loop through the neighbor faces of the neighbor vertex
-			for f in self.neighbor_faces[ v ] :
-
-				# Check if it has a face in common with the initial vertex
-				if f in self.neighbor_faces[ vertex ] : common_face += 1
-
-			# If there is only 1 common face with this neighbor,
-			# it is a vertex on the border
-			if common_face < 2 : return True
+			# Check the number of faces in common between the initial vertex and the neighbor
+			if len(self.neighbor_faces[v] & self.neighbor_faces[vertex]) < 2 : return True
 
 		# Otherwise, it is not on the border
 		return False
