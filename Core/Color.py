@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Color.py
 #                             -------------------
-#    update               : 2013-11-24
+#    update               : 2013-11-30
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -23,9 +23,8 @@
 # External dependencies
 #
 #-
-from numpy import zeros, sqrt
-
-
+#
+from numpy import array, copy, zeros, sqrt
 
 
 #--
@@ -69,32 +68,41 @@ def Value2ColorAlternate( value ) :
 
 #--
 #
-# Array2Color
+# Array2Colors
 #
 #--
 #
-# Convert an array to a pseudo-color
+# Convert an array of values to pseudo-colors
 #
-def Array2Color( values ) :
-
-	# Compute value vector lengths
-	value_lengths = sqrt( (values ** 2).sum( axis=1 ) )
+def Array2Colors( values ) :
 
 	# Compute minimum value
-	min_value = value_lengths.min()
+	min_value = values.min()
 
 	# Compute the range of the values
-	value_range = value_lengths.max() - min_value
+	value_range = values.max() - min_value
 
-	# Normalize the value lengths
-	value_lengths -= min_value
-	value_lengths /= value_range
+	# Normalize the values
+	norm_values = (values - min_value) / value_range
 
 	# Convert each value to a pseudo-color
-	colors = zeros( (len(values), 3) )
-	for i in range( len(values) ) :
-		colors[i] = Value2Color( value_lengths[i] )
+	colors = [ Value2Color( i ) for i in norm_values ]
 
 	# Return result
-	return colors
+	return array( colors )
+
+
+#--
+#
+# VectorArray2Colors
+#
+#--
+#
+# Convert an array of vectors to pseudo-colors
+#
+def VectorArray2Colors( values ) :
+
+	# Compute value vector lengths and convert them to colors
+	return Array2Color( sqrt((values**2).sum(axis=1)) )
+
 
