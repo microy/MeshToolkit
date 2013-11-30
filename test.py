@@ -7,8 +7,8 @@ import timeit
 import numpy
 
 from Core.Mesh import Mesh, CheckMesh, CheckNeighborhood
-from Core.Curvature import GetNormalCurvature
-from Core.Color import Array2Color
+from Core.Curvature import GetNormalCurvature, GetGaussianCurvature
+from Core.Color import Array2Colors, VectorArray2Colors
 from Core.Vrml import ReadVrml, WriteVrml
 
 normal_curvature = []
@@ -52,12 +52,12 @@ if __name__ == "__main__" :
 	print( '  Done.' )
 
 #	print( '~~~ Neighbor ~~~' )
-#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=2))
+#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=1))
 #	print( '  Done.' )
 
-	print '~~~ Compute normal curvature ~~~'
-	normal_curvature = GetNormalCurvature( mesh )
-	mesh.colors = Array2Color( normal_curvature )
+	print '~~~ Compute curvature ~~~'
+	curvature = GetNormalCurvature( mesh )
+	mesh.colors = VectorArray2Colors( curvature )
 	print '  Done.'
 
 #	print '~~~ Color vertices ~~~'

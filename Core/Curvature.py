@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Curvature.py
 #                             -------------------
-#    update               : 2013-11-29
+#    update               : 2013-11-30
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -35,7 +35,7 @@
 #
 #-
 #
-from numpy import dot, zeros
+from numpy import dot, cross, zeros
 from math import pi, sqrt, atan2
 
 
@@ -51,7 +51,7 @@ from math import pi, sqrt, atan2
 def GetNormalCurvature( mesh ) :
 
 	# Initialise normal curvature array
-	normal_curvature = zeros( mesh.vertices.shape, dtype=mesh.vertices.dtype )
+	normal_curvature = zeros( mesh.vertices.shape )
 
 	# Loop through the vertices
 	for v1 in range(len( mesh.vertices ) ) :
@@ -68,11 +68,9 @@ def GetNormalCurvature( mesh ) :
 			# Find third vertices along the edge
 			for v3 in mesh.neighbor_vertices[v1] & mesh.neighbor_vertices[v2] :
 				
-				# Compute the cotangent opposite to the edge
+				# Compute the cotangent of the angle opposite to the edge
 				# and add it to the ponderation coefficient
-				u = mesh.vertices[v1] - mesh.vertices[v3]
-				v = mesh.vertices[v2] - mesh.vertices[v3]
-				coef += Cotangent( u, v )
+				coef += Cotangent( mesh.vertices[v3], mesh.vertices[v1], mesh.vertices[v2] )
 
 			# Add the edge value to the normal curvature of this vertex
 			normal_curvature[v1] += (coef * (mesh.vertices[v1] - mesh.vertices[v2]))
@@ -92,7 +90,7 @@ def GetNormalCurvature( mesh ) :
 def GetGaussianCurvature( mesh ) :
 
 	# Resize gaussian curvature array
-	gaussian_curvature = zeros( mesh.vertices.shape, dtype=mesh.vertices.dtype )
+	gaussian_curvature = zeros(len( mesh.vertices ))
 
 	# Loop through the vertices
 	for i in range(len( mesh.vertices ) ) :
@@ -108,20 +106,22 @@ def GetGaussianCurvature( mesh ) :
 
 			if mesh.faces[f, 0] == i :
 				
-#				area += VoronoiRegionArea( Vertex(i), Vertex(*it1, 1), Vertex(*it1, 2) )
-#				angle_sum += AngleFromCotan( Vertex(i), Vertex(*it1, 1), Vertex(*it1, 2) )
+				area += VoronoiRegionArea( mesh.vertices[i], mesh.vertices[mesh.faces[f,1]], mesh.vertices[mesh.faces[f,2]] )
+				angle_sum += AngleFromCotan( mesh.vertices[i], mesh.vertices[mesh.faces[f,1]], mesh.vertices[mesh.faces[f,2]] )
 				
 			elif mesh.faces[f, 1] == i  :
 				
-#				area += VoronoiRegionArea( Vertex(i), Vertex(*it1, 2), Vertex(*it1, 0) )
-#				angle_sum += AngleFromCotan( Vertex(i), Vertex(*it1, 2), Vertex(*it1, 0) )
+				area += VoronoiRegionArea( mesh.vertices[i], mesh.vertices[mesh.faces[f,2]], mesh.vertices[mesh.faces[f,0]] )
+				angle_sum += AngleFromCotan( mesh.vertices[i], mesh.vertices[mesh.faces[f,2]], mesh.vertices[mesh.faces[f,0]] )
 
 			else :
 				
-#				area += VoronoiRegionArea( Vertex(i), Vertex(*it1, 0), Vertex(*it1, 1) )
-#				angle_sum += AngleFromCotan( Vertex(i), Vertex(*it1, 0), Vertex(*it1, 1) )
+				area += VoronoiRegionArea( mesh.vertices[i], mesh.vertices[mesh.faces[f,0]], mesh.vertices[mesh.faces[f,1]] )
+				angle_sum += AngleFromCotan( mesh.vertices[i], mesh.vertices[mesh.faces[f,0]], mesh.vertices[mesh.faces[f,1]] )
 
 		gaussian_curvature[i] = ( 2.0 * pi - angle_sum ) / area
+		
+	return gaussian_curvature
 
 
 #--
@@ -130,43 +130,48 @@ def GetGaussianCurvature( mesh ) :
 #
 #--
 #
-# Cotangent between two vector in nD
+# Cotangent between two vectors formed by three points
 #
-def Cotangent( u, v ) :
+def Cotangent( vo, va, vb ) :
 
+	u = va - vo
+	v = vb - vo
 	lu = dot( u, u )
 	lv = dot( v, v )
 	dot_uv = dot( u, v )
 	return dot_uv / sqrt( lu * lv - dot_uv * dot_uv )
 
 
-def CotangentT( vo, va, vb ) :
+#--
+#
+# ObtuseAngle
+#
+#--
+#
+# Tell if an angle formed by three points is obtuse
+#
+def ObtuseAngle( vo, va, vb ) :
 
-	return Cotangent( va-vo, vb-vo )
-
-
-# Obtuse angle
-def ObtuseAngle( u, v ) :
-
+	u = va - vo
+	v = vb - vo
 	return dot( u, v ) < 0.0
 
 
-def ObtuseAngleT( vo, va, vb ) :
+#--
+#
+# AngleFromCotan
+#
+#--
+#
+# 
+#
+def AngleFromCotan( vo, va, vb ) :
 
-	return ObtuseAngle( va-vo, vb-vo )
-
-
-# Angle From Cotan
-def AngleFromCotan( u, v ) :
-	
-	udotv = dot( u , v )
+	u = va - vo
+	v = vb - vo
+	udotv = dot( u, v )
 	denom = (u**2).sum()*(v**2).sum() - udotv*udotv;
 	return abs( atan2( sqrt(denom), udotv ) )
-	
-
-def AngleFromCotanT( vo, va, vb ) :
-
-	return AngleFromCotan( va-vo, vb-vo )
 
 
 #--
@@ -180,15 +185,15 @@ def AngleFromCotanT( vo, va, vb ) :
 def VoronoiRegionArea( vo, va, vb ) :
 
 	# Compute triangle area
-	face_area = sqrt((cross((va-vo),(vb-vo))**2).sum(axis=1)) * 0.5;
+	face_area = sqrt((cross((va-vo),(vb-vo))**2).sum()) * 0.5;
 
 	# Degenerated triangle
 	if face_area == 0.0 : return 0.0
 
-	# Obtuse triangle case (Voronoi inappropriate)
-	if ObtuseAngleT(vo, va, vb) : return face_area * 0.5
-	if ObtuseAngleT(va, vb, vo) or ObtuseAngleT(vb, vo, va) : return face_area * 0.25
+	# Obtuse triangle cases (Voronoi inappropriate)
+	if ObtuseAngle(vo, va, vb) : return face_area * 0.5
+	if ObtuseAngle(va, vb, vo) or ObtuseAngle(vb, vo, va) : return face_area * 0.25
 
 	# Non-obtuse triangle case (Voronoi area)
-	return (CotangentT(va, vo, vb)*((vo-vb)**2).sum(axis=1) + CotangentT(vb, vo, va)*((vo-va)**2).sum(axis=1)) * 0.125
+	return (Cotangent(va, vo, vb) * ((vo - vb)**2).sum() + Cotangent(vb, vo, va) * ((vo - va)**2).sum()) * 0.125
 
