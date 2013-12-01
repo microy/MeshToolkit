@@ -53,7 +53,7 @@ if __name__ == "__main__" :
 	print( '  Done.' )
 
 	print( '~~~ Invert face orientation ~~~' )
-	mesh = InvertFaceOrientation( mesh )
+	InvertFaceOrientation( mesh )
 	print( '  Done.' )
 
 #	print( '~~~ Neighbor ~~~' )

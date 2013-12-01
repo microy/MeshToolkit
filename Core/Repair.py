@@ -130,8 +130,6 @@ def CheckNeighborhood( mesh ) :
 	print( log_message )
 
 
-
-
 #--
 #
 # RemoveIsolatedVertices
@@ -139,6 +137,7 @@ def CheckNeighborhood( mesh ) :
 #--
 #
 # Remove isolated vertices in the mesh
+# TODO : colors and texture coordinates
 #
 def RemoveIsolatedVertices( mesh ) :
 
@@ -163,8 +162,9 @@ def RemoveIsolatedVertices( mesh ) :
 	# Create a new face array
 	new_faces = lut[mesh.faces].reshape( len(mesh.faces), 3 )
 	
-	# Return the new mesh
-	return Mesh( name='{} clean'.format(mesh.name), vertices=array(new_vertices), faces=new_faces )
+	# Update the mesh
+	mesh.vertices = array( new_vertices )
+	mesh.faces = new_faces
 
 
 #--
@@ -173,21 +173,13 @@ def RemoveIsolatedVertices( mesh ) :
 #
 #--
 #
-# 
+# Invert orientation of every face in a given mesh
 #
 def InvertFaceOrientation( mesh ) :
 
-	new_faces = mesh.faces
-
-	# 
-	for face in new_faces :
+	# Swap two vertices in each face
+	for face in mesh.faces :
 		face[0], face[1] = face[1], face[0]
 
-	# Return the new mesh
-	return Mesh( name='{} clean'.format(mesh.name), vertices=mesh.vertices, faces=new_faces )
-
-
-
-
-
-
+	# Recompute face and vertex normals
+	mesh.UpdateNormals()
