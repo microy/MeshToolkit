@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Color.py
 #                             -------------------
-#    update               : 2013-11-30
+#    update               : 2013-12-01
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -103,6 +103,6 @@ def Array2Colors( values ) :
 def VectorArray2Colors( values ) :
 
 	# Compute value vector lengths and convert them to colors
-	return Array2Color( sqrt((values**2).sum(axis=1)) )
+	return Array2Colors( sqrt((values**2).sum(axis=1)) )
 
 
