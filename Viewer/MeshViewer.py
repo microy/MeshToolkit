@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-11-29
+#    update               : 2013-12-01
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -143,9 +143,6 @@ class MeshViewer :
 	#
 	def SetShader( self, shader ) :
 
-		# Need to initialise ?
-		if not self.element_number : return
-
 		# Setup the shader program
 		if shader == 'SmoothShading' : self.shader_program_id = self.smooth_shader_id
 		elif shader == 'FlatShading' : self.shader_program_id = self.flat_shader_id
@@ -179,13 +176,11 @@ class MeshViewer :
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_FALSE, dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
-		if self.color_enabled : glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 1 )
-		else : glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), 0 )
-
+		glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), self.color_enabled )
+		
 		# Activate hidden lines in the shader for wireframe rendering
-		if hidden_lines : glUniform1i( glGetUniformLocation( self.shader_program_id, "hidden_lines" ), 1 )
-		else : glUniform1i( glGetUniformLocation( self.shader_program_id, "hidden_lines" ), 0 )
-
+		glUniform1i( glGetUniformLocation( self.shader_program_id, "hidden_lines" ), hidden_lines )
+		
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
@@ -220,7 +215,7 @@ class MeshViewer :
 	#
 	def SetProjectionMatrix( self, width, height ) :
 
-		fovy, aspect, near, far = 45.0, float(width)/float(height), 0.1, 100.0
+		fovy, aspect, near, far = 45.0, float(width)/height, 0.1, 100.0
 		f = tan( pi * fovy / 360.0 )
 		# Compute the perspective matrix
 		self.projection_matrix = identity( 4, dtype=float32 )
