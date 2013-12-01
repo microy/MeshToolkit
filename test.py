@@ -6,7 +6,8 @@ import sys
 import timeit
 import numpy
 
-from Core.Mesh import Mesh, CheckMesh, CheckNeighborhood
+from Core.Mesh import Mesh
+from Core.Repair import CheckMesh, CheckNeighborhood, InvertFaceOrientation
 from Core.Curvature import GetNormalCurvature, GetGaussianCurvature
 from Core.Color import Array2Colors, VectorArray2Colors
 from Core.Vrml import ReadVrml, WriteVrml
@@ -29,7 +30,7 @@ if __name__ == "__main__" :
 	if len(sys.argv) < 2 : filename = 'cube.wrl'
 	else : filename = sys.argv[1]
 
-	print( '~~~ Read file ~~~' )
+	print( '~~~ Read file ' + filename + ' ~~~' )
 	mesh = ReadVrml( filename )
 	print( '  Done.' )
 
@@ -51,14 +52,18 @@ if __name__ == "__main__" :
 	CheckNeighborhood( mesh )
 	print( '  Done.' )
 
+	print( '~~~ Invert face orientation ~~~' )
+	mesh = InvertFaceOrientation( mesh )
+	print( '  Done.' )
+
 #	print( '~~~ Neighbor ~~~' )
 #	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=1))
 #	print( '  Done.' )
 
-	print '~~~ Compute curvature ~~~'
-	curvature = GetNormalCurvature( mesh )
-	mesh.colors = VectorArray2Colors( curvature )
-	print '  Done.'
+#	print '~~~ Compute curvature ~~~'
+#	curvature = GetGaussianCurvature( mesh )
+#	mesh.colors = Array2Colors( curvature )
+#	print '  Done.'
 
 #	print '~~~ Color vertices ~~~'
 #	b = numpy.zeros( (len(mesh.vertices),3) )

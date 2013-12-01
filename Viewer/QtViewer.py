@@ -30,7 +30,7 @@ import PySide
 from PySide import QtGui, QtCore
 from PySide.QtGui import QMainWindow, QFileDialog, QMessageBox
 
-from Core.Mesh import CheckMesh, CheckNeighborhood
+from Core.Repair import CheckMesh, CheckNeighborhood
 from Core.Vrml import ReadVrml, WriteVrml
 from QtViewerUI import Ui_MainWindow
 
