@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Trackball.py
 #                             -------------------
-#    update               : 2013-11-29
+#    update               : 2013-12-02
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -35,7 +35,7 @@
 #
 #--
 #
-from math import cos, sin, pi, sqrt
+from math import cos, sin, pi, sqrt, radians
 from numpy import array, identity, zeros, float32, dot, cross, copy
 
 
@@ -252,7 +252,7 @@ class Trackball :
 	def RotateMatrix( self, matrix, angle, axis ) :
 
 		# Rotate the matrix according to the given angle and axis
-		angle = pi * angle / 180.0
+		angle = radians( angle )
 		c, s = cos( angle ), sin( angle )
 		n = sqrt( (axis**2).sum() )
 		if n == 0 : n = 1.0

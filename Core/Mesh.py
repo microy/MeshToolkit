@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2013-12-01
+#    update               : 2013-12-02
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -24,7 +24,7 @@
 #
 #-
 #
-from numpy import array, cross, sqrt, zeros
+from numpy import array, cross, sqrt, zeros, amin, amax
 
 
 #--
@@ -175,14 +175,8 @@ class Mesh :
 	#
 	def GetAxisAlignedBoundingBox( self ) :
 
-		# Find the minimum point
-		min_point = array( [self.vertices[:,0].min(), self.vertices[:,1].min(), self.vertices[:,2].min()] )
-
-		# Find the maximum point
-		max_point = array( [self.vertices[:,0].max(), self.vertices[:,1].max(), self.vertices[:,2].max()] )
-
-		# Return result
-		return ( min_point, max_point )
+		# Return the minimum point and the maximum point for each axis
+		return ( amin( self.vertices, axis = 0 ), amax( self.vertices, axis = 0 ) )
 
 
 	#--
@@ -202,7 +196,7 @@ class Mesh :
 		center = 0.5 * (pmin + pmax)
 
 		# Compute radius
-		radius = sqrt(((center - self.vertices)**2).sum(axis=1)).max()
+		radius = sqrt(((center - self.vertices) ** 2).sum(axis = 1)).max()
 
 		# Return result
 		return ( center, radius )
