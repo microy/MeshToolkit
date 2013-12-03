@@ -7,7 +7,7 @@ import timeit
 import numpy
 
 from Core.Mesh import Mesh
-from Core.Repair import CheckMesh, CheckNeighborhood, InvertFaceOrientation, RemoveIsolatedVertices
+from Core.Repair import CheckMesh, CheckNeighborhood, RemoveIsolatedVertices
 from Core.Curvature import GetNormalCurvature, GetGaussianCurvature
 from Core.Color import Array2Colors, VectorArray2Colors
 from Core.Vrml import ReadVrml, WriteVrml
@@ -35,7 +35,7 @@ if __name__ == "__main__" :
 	print( '  Done.' )
 
 	print( mesh )
-
+	
 	print( '~~~ Compute normals ~~~' )
 	mesh.UpdateNormals()
 	print( '  Done.' )
@@ -50,10 +50,6 @@ if __name__ == "__main__" :
 
 	print( '~~~ Check neighborhood ~~~' )
 	print( CheckNeighborhood( mesh ) )
-	print( '  Done.' )
-
-	print( '~~~ Invert face orientation ~~~' )
-	RemoveIsolatedVertices( mesh )
 	print( '  Done.' )
 
 #	print( '~~~ Neighbor ~~~' )
@@ -73,14 +69,6 @@ if __name__ == "__main__" :
 #	print '  Done.'
 
 	print( mesh )
-
-	print( '~~~ Check mesh ~~~' )
-	print( CheckMesh( mesh ) )
-	print( '  Done.' )
-
-	print( '~~~ Check neighborhood ~~~' )
-	print( CheckNeighborhood( mesh ) )
-	print( '  Done.' )
 
 	if len(sys.argv) == 3 :
 
