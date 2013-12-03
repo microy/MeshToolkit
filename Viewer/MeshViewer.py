@@ -135,6 +135,9 @@ class MeshViewer :
 		# Setup model element number
 		self.element_number = len(faces) * 3
 
+		# Reset the trackball
+		self.trackball.Reset()
+
 
 	#-
 	#
@@ -252,8 +255,4 @@ class MeshViewer :
 
 		# Initialise the model parameters
 		self.element_number = 0
-
-		# Reset the trackball
-		self.trackball.Reset()
-
 
