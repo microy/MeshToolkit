@@ -1,3 +1,7 @@
 *.py[co]
 *~
+*.vrml
 *.wrl
+*.iv
+*.x3d
+*.x3dv
