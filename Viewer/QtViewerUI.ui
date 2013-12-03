@@ -57,9 +57,12 @@
     <addaction name="action_view_flat"/>
     <addaction name="action_view_smooth"/>
     <addaction name="separator"/>
-    <addaction name="action_view_colorbar"/>
-    <addaction name="action_view_antialiasing"/>
+    <addaction name="action_view_solid"/>
     <addaction name="action_view_wireframe"/>
+    <addaction name="action_view_hiddenlines"/>
+    <addaction name="separator"/>
+    <addaction name="action_view_antialiasing"/>
+    <addaction name="action_view_colorbar"/>
     <addaction name="separator"/>
     <addaction name="action_view_reset"/>
    </widget>
@@ -176,7 +179,7 @@
     <string>Enable wireframe rendering</string>
    </property>
    <property name="shortcut">
-    <string>D</string>
+    <string>2</string>
    </property>
   </action>
   <action name="action_view_antialiasing">
@@ -249,6 +252,37 @@
    </property>
    <property name="shortcut">
     <string>F2</string>
+   </property>
+  </action>
+  <action name="action_view_hiddenlines">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Hidden lines</string>
+   </property>
+   <property name="toolTip">
+    <string>Enable wireframe rendering with hidden lines removal</string>
+   </property>
+   <property name="shortcut">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="action_view_solid">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>S&amp;olid</string>
+   </property>
+   <property name="toolTip">
+    <string>Enable solid rendering</string>
+   </property>
+   <property name="shortcut">
+    <string>1</string>
    </property>
   </action>
  </widget>
@@ -486,6 +520,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>action_view_solid</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>ViewSolid()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_view_hiddenlines</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>ViewHiddenlines()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>FileOpen()</slot>
@@ -501,5 +567,7 @@
   <slot>HelpAbout()</slot>
   <slot>HelpAboutQt()</slot>
   <slot>HelpAboutOpenGL()</slot>
+  <slot>ViewSolid()</slot>
+  <slot>ViewHiddenlines()</slot>
  </slots>
 </ui>

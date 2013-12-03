@@ -174,15 +174,47 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 	#-
 	#
+	# ViewSolid
+	#
+	#-
+	#
+	def ViewSolid( self ) :
+
+		# Enable / Disable solid rendering
+		self.action_view_solid.setChecked( True )
+		self.action_view_wireframe.setChecked( False )
+		self.action_view_hiddenlines.setChecked( False )
+		self.opengl_widget.SetWireframe( 0 )
+
+
+	#-
+	#
 	# ViewWireframe
 	#
 	#-
 	#
 	def ViewWireframe( self ) :
 
-		# Enable / Disable wireframe
-		self.action_view_wireframe.setChecked( self.action_view_wireframe.isChecked() )
-		self.opengl_widget.SetWireframe( self.action_view_wireframe.isChecked() )
+		# Enable / Disable wireframe rendering
+		self.action_view_solid.setChecked( False )
+		self.action_view_wireframe.setChecked( True )
+		self.action_view_hiddenlines.setChecked( False )
+		self.opengl_widget.SetWireframe( 1 )
+
+
+	#-
+	#
+	# ViewHiddenlines
+	#
+	#-
+	#
+	def ViewHiddenlines( self ) :
+
+		# Enable / Disable hideen lines rendering
+		self.action_view_solid.setChecked( False )
+		self.action_view_wireframe.setChecked( False )
+		self.action_view_hiddenlines.setChecked( True )
+		self.opengl_widget.SetWireframe( 2 )
 
 
 	#-

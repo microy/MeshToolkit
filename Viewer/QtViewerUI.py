@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Viewer/QtViewerUI.ui'
 #
-# Created: Wed Nov 27 11:15:11 2013
+# Created: Tue Dec  3 17:22:37 2013
 #      by: pyside-uic 0.2.13 running on PySide 1.1.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -73,6 +73,13 @@ class Ui_MainWindow(object):
         self.action_help_opengl.setObjectName("action_help_opengl")
         self.action_help_qt = QtGui.QAction(MainWindow)
         self.action_help_qt.setObjectName("action_help_qt")
+        self.action_view_hiddenlines = QtGui.QAction(MainWindow)
+        self.action_view_hiddenlines.setCheckable(True)
+        self.action_view_hiddenlines.setObjectName("action_view_hiddenlines")
+        self.action_view_solid = QtGui.QAction(MainWindow)
+        self.action_view_solid.setCheckable(True)
+        self.action_view_solid.setChecked(True)
+        self.action_view_solid.setObjectName("action_view_solid")
         self.menu_file.addAction(self.action_file_open)
         self.menu_file.addAction(self.action_file_save)
         self.menu_file.addSeparator()
@@ -83,9 +90,12 @@ class Ui_MainWindow(object):
         self.menu_view.addAction(self.action_view_flat)
         self.menu_view.addAction(self.action_view_smooth)
         self.menu_view.addSeparator()
-        self.menu_view.addAction(self.action_view_colorbar)
-        self.menu_view.addAction(self.action_view_antialiasing)
+        self.menu_view.addAction(self.action_view_solid)
         self.menu_view.addAction(self.action_view_wireframe)
+        self.menu_view.addAction(self.action_view_hiddenlines)
+        self.menu_view.addSeparator()
+        self.menu_view.addAction(self.action_view_antialiasing)
+        self.menu_view.addAction(self.action_view_colorbar)
         self.menu_view.addSeparator()
         self.menu_view.addAction(self.action_view_reset)
         self.menu_help.addAction(self.action_help_about)
@@ -110,6 +120,8 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.action_help_about, QtCore.SIGNAL("triggered()"), MainWindow.HelpAbout)
         QtCore.QObject.connect(self.action_help_qt, QtCore.SIGNAL("triggered()"), MainWindow.HelpAboutQt)
         QtCore.QObject.connect(self.action_help_opengl, QtCore.SIGNAL("triggered()"), MainWindow.HelpAboutOpenGL)
+        QtCore.QObject.connect(self.action_view_solid, QtCore.SIGNAL("triggered()"), MainWindow.ViewSolid)
+        QtCore.QObject.connect(self.action_view_hiddenlines, QtCore.SIGNAL("triggered()"), MainWindow.ViewHiddenlines)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -140,7 +152,7 @@ class Ui_MainWindow(object):
         self.action_view_smooth.setShortcut(QtGui.QApplication.translate("MainWindow", "G", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_wireframe.setText(QtGui.QApplication.translate("MainWindow", "&Wireframe", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_wireframe.setToolTip(QtGui.QApplication.translate("MainWindow", "Enable wireframe rendering", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_view_wireframe.setShortcut(QtGui.QApplication.translate("MainWindow", "D", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_view_wireframe.setShortcut(QtGui.QApplication.translate("MainWindow", "2", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_antialiasing.setText(QtGui.QApplication.translate("MainWindow", "&Antialiasing", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_antialiasing.setToolTip(QtGui.QApplication.translate("MainWindow", "Enable antialiasing", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_antialiasing.setShortcut(QtGui.QApplication.translate("MainWindow", "A", None, QtGui.QApplication.UnicodeUTF8))
@@ -158,5 +170,11 @@ class Ui_MainWindow(object):
         self.action_help_opengl.setShortcut(QtGui.QApplication.translate("MainWindow", "F3", None, QtGui.QApplication.UnicodeUTF8))
         self.action_help_qt.setText(QtGui.QApplication.translate("MainWindow", "About &Qt...", None, QtGui.QApplication.UnicodeUTF8))
         self.action_help_qt.setShortcut(QtGui.QApplication.translate("MainWindow", "F2", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_view_hiddenlines.setText(QtGui.QApplication.translate("MainWindow", "&Hidden lines", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_view_hiddenlines.setToolTip(QtGui.QApplication.translate("MainWindow", "Enable wireframe rendering with hidden lines removal", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_view_hiddenlines.setShortcut(QtGui.QApplication.translate("MainWindow", "3", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_view_solid.setText(QtGui.QApplication.translate("MainWindow", "S&olid", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_view_solid.setToolTip(QtGui.QApplication.translate("MainWindow", "Enable solid rendering", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_view_solid.setShortcut(QtGui.QApplication.translate("MainWindow", "1", None, QtGui.QApplication.UnicodeUTF8))
 
 from OpenGLWidget import OpenGLWidget

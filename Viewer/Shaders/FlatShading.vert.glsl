@@ -7,7 +7,7 @@ layout (location = 2) in vec3 Color;
 uniform mat4 MVP_Matrix;
 uniform mat3 Normal_Matrix;
 uniform int color_enabled = 0;
-uniform int hidden_lines = 0;
+uniform int wireframe_mode = 0;
 
 flat out vec4 FragColor;
 
@@ -18,7 +18,10 @@ void main( void ) {
 
 	float Dot = max( 0.0, dot(Norm, LightDir) ); 
 
-	if( hidden_lines == 1 ) {
+	if( wireframe_mode == 1 ) {
+		FragColor.xyz = vec3( 0.7, 0.2, 0.2 );
+	}	
+	else if( wireframe_mode == 2 ) {
 		FragColor.xyz = vec3( 1.0, 1.0, 1.0 );
 	}	
 	else if( color_enabled == 0 ) {

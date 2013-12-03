@@ -75,7 +75,7 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Initialise viewing parameters
 		self.colorbar_enabled = False
-		self.wireframe_enabled = False
+		self.wireframe_mode = 0
 
 
 	#-
@@ -205,10 +205,10 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	#-
 	#
-	def SetWireframe( self, enabled ) :
+	def SetWireframe( self, wireframe_mode ) :
 
 		# Enable / Disable color bar
-		self.wireframe_enabled = enabled
+		self.wireframe_mode = wireframe_mode
 
 		# Update the display
 		self.update()
@@ -225,8 +225,28 @@ class OpenGLWidget( QGLWidget ) :
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 
+		# Display the mesh with solid rendering
+		if self.wireframe_mode == 0 :
+
+			# Display the mesh
+			self.mesh_viewer.Display()
+
 		# Display the mesh with wireframe rendering
-		if self.wireframe_enabled :
+		elif self.wireframe_mode == 1 :
+
+			# 1st pass : wireframe model
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
+			self.mesh_viewer.Display( self.wireframe_mode )
+
+			# 2nd pass : solid model
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
+			glEnable( GL_POLYGON_OFFSET_FILL )
+			glPolygonOffset( 1.0, 1.0 )
+			self.mesh_viewer.Display()
+			glDisable( GL_POLYGON_OFFSET_FILL )
+
+		# Display the mesh with hidden line removal rendering
+		elif self.wireframe_mode == 2 :
 
 			# 1st pass : wireframe model
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
@@ -236,11 +256,8 @@ class OpenGLWidget( QGLWidget ) :
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
 			glEnable( GL_POLYGON_OFFSET_FILL )
 			glPolygonOffset( 1.0, 1.0 )
-			self.mesh_viewer.Display( True )
+			self.mesh_viewer.Display( self.wireframe_mode )
 			glDisable( GL_POLYGON_OFFSET_FILL )
-
-		# Display the mesh
-		else : self.mesh_viewer.Display()
 
 		# Display the color bar
 		self.DrawColorBar()
