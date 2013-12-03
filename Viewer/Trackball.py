@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                Trackball.py
 #                             -------------------
-#    update               : 2013-12-02
+#    update               : 2013-12-03
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -69,6 +69,18 @@ class Trackball :
 		self.previous_mouse_position = [ 0, 0 ]
 
 		# Tranformation matrix
+		self.transformation = identity( 4, dtype=float32 )
+
+
+	#-
+	#
+	# Reset
+	#
+	#-
+	#
+	def Reset( self ) :
+
+		# Reset the tranformation matrix
 		self.transformation = identity( 4, dtype=float32 )
 
 
