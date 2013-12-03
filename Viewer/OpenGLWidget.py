@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                               OpenGLWidget.py
 #                             -------------------
-#    update               : 2013-11-27
+#    update               : 2013-12-03
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -33,13 +33,11 @@ OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 import PySide
 from PySide import QtGui, QtCore, QtOpenGL
-from PySide.QtOpenGL import QGLWidget, QGLFormat
+from PySide.QtOpenGL import QGLWidget, QGLFormat, QGL
 from numpy import identity, float32
 
 from .ColorBar import ColorBar
 from .MeshViewer import MeshViewer
-from .Shader import LoadShader
-from .Trackball import Trackball
 
 
 #--
@@ -62,8 +60,8 @@ class OpenGLWidget( QGLWidget ) :
 	def __init__( self, parent=None ) :
 
 		
-		# Initialise QtGLWidget with multisampling enabled and OpenGL 3 core only
-		QGLWidget.__init__( self, QGLFormat( QtOpenGL.QGL.SampleBuffers | QtOpenGL.QGL.NoDeprecatedFunctions ), parent )
+		# Initialise QGLWidget with multisampling enabled and OpenGL 3 core only
+		QGLWidget.__init__( self, QGLFormat( QGL.SampleBuffers | QGL.NoDeprecatedFunctions ), parent )
 
 		# Track mouse events
 		self.setMouseTracking( True )
@@ -78,9 +76,6 @@ class OpenGLWidget( QGLWidget ) :
 		# Initialise viewing parameters
 		self.colorbar_enabled = False
 		self.wireframe_enabled = False
-
-		# Trackball initialisation
-		self.trackball = Trackball( self.width(), self.height() )
 
 
 	#-
@@ -125,8 +120,8 @@ class OpenGLWidget( QGLWidget ) :
 		# Send the mesh to the OpenGL viewer
 		self.mesh_viewer.LoadMesh( mesh )
 
-		# Reset current transformations
-		self.Reset()
+		# Update the display
+		self.update()
 
 
 	#-
@@ -142,6 +137,21 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Update the display
 		self.update()
+
+	#-
+	#
+	# Reset
+	#
+	#-
+	#
+	def Reset( self ) :
+
+		# Reset the trackball
+		self.mesh_viewer.trackball.Reset()
+
+		# Update the display
+		self.update()
+
 
 	#-
 	#
@@ -199,22 +209,6 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Enable / Disable color bar
 		self.wireframe_enabled = enabled
-
-		# Update the display
-		self.update()
-
-
-	#-
-	#
-	# Reset
-	#
-	#-
-	#
-	def Reset( self ) :
-
-		# Reset transformation matrices
-		self.trackball.transformation = identity( 4, dtype=float32 )
-		self.mesh_viewer.trackball_transform = identity( 4, dtype=float32 )
 
 		# Update the display
 		self.update()
@@ -290,9 +284,6 @@ class OpenGLWidget( QGLWidget ) :
 		# Recompute the perspective matrix of the mesh viewer
 		self.mesh_viewer.Resize( width, height )
 
-		# Resize the trackball
-		self.trackball.Resize( width, height )
-
 
 	#-
 	#
@@ -312,7 +303,7 @@ class OpenGLWidget( QGLWidget ) :
 		else : return
 
 		# Update the trackball
-		self.trackball.MousePress( [ mouseEvent.x(), mouseEvent.y() ], button )
+		self.mesh_viewer.trackball.MousePress( [ mouseEvent.x(), mouseEvent.y() ], button )
 
 
 	#-
@@ -324,7 +315,7 @@ class OpenGLWidget( QGLWidget ) :
 	def mouseReleaseEvent( self, mouseEvent ) :
 
 		# Update the trackball
-		self.trackball.MouseRelease()
+		self.mesh_viewer.trackball.MouseRelease()
 
 
 	#-
@@ -336,10 +327,7 @@ class OpenGLWidget( QGLWidget ) :
 	def mouseMoveEvent( self, mouseEvent ) :
 
 		# Update the trackball
-		if self.trackball.Motion( [ mouseEvent.x(), mouseEvent.y() ] ) :
-
-			# Update the transformation matrix of the mesh viewer
-			self.mesh_viewer.trackball_transform = self.trackball.transformation
+		if self.mesh_viewer.trackball.Motion( [ mouseEvent.x(), mouseEvent.y() ] ) :
 
 			# Refresh display
 			self.update()
@@ -357,10 +345,7 @@ class OpenGLWidget( QGLWidget ) :
 		delta = event.delta()
 
 		# Update the trackball
-		self.trackball.WheelEvent( delta and delta // abs(delta) )
-
-		# Update the transformation matrix of the mesh viewer
-		self.mesh_viewer.trackball_transform = self.trackball.transformation
+		self.mesh_viewer.trackball.WheelEvent( delta and delta // abs(delta) )
 
 		# Refresh display
 		self.update()

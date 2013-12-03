@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                MeshViewer.py
 #                             -------------------
-#    update               : 2013-12-01
+#    update               : 2013-12-03
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -35,6 +35,7 @@ from math import tan, pi
 from numpy import array, identity, dot, float32, uint32
 
 from .Shader import LoadShader
+from .Trackball import Trackball
 
 
 #--
@@ -59,10 +60,10 @@ class MeshViewer :
 		# Initialise the model parameters
 		self.element_number = 0
 
-		# Initialise the trackball transformation matrix
-		self.trackball_transform = identity( 4, dtype=float32 )
+		# Initialise the trackball
+		self.trackball = Trackball( width, height )
 
-		# Initialise the Projection transformation matrix
+		# Initialise the projection transformation matrix
 		self.SetProjectionMatrix( width, height )
 
 		# Load the shaders
@@ -169,10 +170,10 @@ class MeshViewer :
 		modelview_matrix[3,2] = -30.0
 
 		# Apply trackball transformation
-		modelview_matrix = dot( self.trackball_transform, modelview_matrix )
+		modelview_matrix = dot( self.trackball.transformation, modelview_matrix )
 
 		# Send the transformation matrices to the shader
-		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_FALSE, array( self.trackball_transform[ :3, :3 ] ) )
+		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_FALSE, array( self.trackball.transformation[ :3, :3 ] ) )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_FALSE, dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
@@ -202,6 +203,9 @@ class MeshViewer :
 	#-
 	#
 	def Resize( self, width, height ) :
+
+		# Resize the trackball
+		self.trackball.Resize( width, height )
 
 		# Compute perspective projection matrix
 		self.SetProjectionMatrix( width, height )
@@ -249,5 +253,7 @@ class MeshViewer :
 		# Initialise the model parameters
 		self.element_number = 0
 
+		# Reset the trackball
+		self.trackball.Reset()
 
 
