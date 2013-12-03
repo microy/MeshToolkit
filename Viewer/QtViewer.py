@@ -3,7 +3,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2013-11-29
+#    update               : 2013-12-03
 #    copyright            : (C) 2013 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -86,9 +86,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		if len(self.mesh.vertex_normals) != len(self.mesh.vertices) :
 			self.mesh.UpdateNormals()
 
-		# Record neighborhood informations
-		self.mesh.UpdateNeighbors()
-
 		# Send the mesh to the OpenGL viewer
 		self.opengl_widget.LoadMesh( self.mesh )
 
@@ -125,6 +122,9 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 		# Nothing to check
 		if not self.mesh : return
+
+		# Record neighborhood informations
+		self.mesh.UpdateNeighbors()
 
 		# Check different parameters of the mesh
 		CheckMesh( self.mesh )
