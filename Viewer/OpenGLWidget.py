@@ -26,10 +26,11 @@ from OpenGL.GL import *
 import PySide
 from PySide import QtGui, QtCore, QtOpenGL
 from PySide.QtOpenGL import QGLWidget, QGLFormat, QGL
-from numpy import identity, float32
-
+from math import tan, pi
+from numpy import array, identity, dot, float32, uint32
 from .ColorBar import ColorBar
-from .MeshViewer import MeshViewer
+from .Shader import LoadShader
+from .Trackball import Trackball
 
 
 #--
@@ -62,12 +63,13 @@ class OpenGLWidget( QGLWidget ) :
 		self.previous_mouse_position = [ 0, 0 ]
 
 		# Initialise OpenGL viewers
-		self.mesh_viewer = None
 		self.colorbar = None
 
 		# Initialise viewing parameters
 		self.colorbar_enabled = False
 		self.wireframe_mode = 0
+		self.element_number = 0
+		self.color_enabled = False
 
 
 	#-
@@ -94,8 +96,16 @@ class OpenGLWidget( QGLWidget ) :
 		# Enable multisampling (antialiasing)
 		glEnable( GL_MULTISAMPLE )
 
-		# Mesh viewer initialisation
-		self.mesh_viewer = MeshViewer( self.width(), self.height() )
+		# Initialise the trackball
+		self.trackball = Trackball( self.width(), self.height() )
+
+		# Initialise the projection transformation matrix
+		self.SetProjectionMatrix( self.width(), self.height() )
+
+		# Load the shaders
+		self.smooth_shader_id = LoadShader( 'SmoothShading' )
+		self.flat_shader_id = LoadShader( 'FlatShading' )
+		self.shader_program_id = self.smooth_shader_id
 
 		# Color bar viewer initialisation
 		self.colorbar = ColorBar()
@@ -109,8 +119,63 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def LoadMesh( self, mesh ) :
 
-		# Send the mesh to the OpenGL viewer
-		self.mesh_viewer.LoadMesh( mesh )
+		# Close previous mesh
+		self.Close()
+
+		# Cast input data (required for OpenGL)
+		vertices = array( mesh.vertices, dtype=float32 )
+		faces = array( mesh.faces, dtype=uint32 )
+		normals = array( mesh.vertex_normals, dtype=float32 )
+		colors = array( mesh.colors, dtype=float32 )
+
+		# Normalize the model
+		(center, radius) = mesh.GetBoundingSphere()
+		vertices -= center
+		vertices *= 10.0 / radius
+
+		# Vertex array object
+		self.vertex_array_id = glGenVertexArrays( 1 )
+		glBindVertexArray( self.vertex_array_id )
+
+		# Face buffer object
+		self.face_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, faces.nbytes, faces, GL_STATIC_DRAW )
+
+		# Vertex buffer object
+		self.vertex_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
+		glBufferData( GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW )
+		glEnableVertexAttribArray( 0 )
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
+
+		# Normal buffer object
+		self.normal_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ARRAY_BUFFER, self.normal_buffer_id )
+		glBufferData( GL_ARRAY_BUFFER, normals.nbytes, normals, GL_STATIC_DRAW )
+		glEnableVertexAttribArray( 1 )
+		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
+
+		# Color buffer object
+		self.color_enabled = False
+		if len( colors ) : 
+			self.color_enabled = True
+			self.color_buffer_id = glGenBuffers( 1 )
+			glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
+			glBufferData( GL_ARRAY_BUFFER, colors.nbytes, colors, GL_STATIC_DRAW )
+			glEnableVertexAttribArray( 2 )
+			glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
+
+		# Release the buffers
+		glBindBuffer( GL_ARRAY_BUFFER, 0 )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
+		glBindVertexArray( 0 )
+
+		# Setup model element number
+		self.element_number = len(faces) * 3
+
+		# Reset the trackball
+		self.trackball.Reset()
 
 		# Update the display
 		self.update()
@@ -124,8 +189,20 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def Close( self ) :
 
-		# Close the current mesh
-		self.mesh_viewer.Close()
+		# Need to initialise ?
+		if not self.element_number : return
+
+		# Delete buffer objects
+		glDeleteBuffers( 1, array([ self.face_buffer_id ]) )
+		glDeleteBuffers( 1, array([ self.vertex_buffer_id ]) )
+		glDeleteBuffers( 1, array([ self.normal_buffer_id ]) )
+		if self.color_enabled :	glDeleteBuffers( 1, array([ self.color_buffer_id ]) )
+
+		# Delete vertex array
+		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
+
+		# Initialise the model parameters
+		self.element_number = 0
 
 		# Update the display
 		self.update()
@@ -139,7 +216,7 @@ class OpenGLWidget( QGLWidget ) :
 	def Reset( self ) :
 
 		# Reset the trackball
-		self.mesh_viewer.trackball.Reset()
+		self.trackball.Reset()
 
 		# Update the display
 		self.update()
@@ -153,8 +230,9 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def SetShader( self, shader ) :
 
-		# Load a shader for the model
-		self.mesh_viewer.SetShader( shader )
+		# Setup the shader program
+		if shader == 'SmoothShading' : self.shader_program_id = self.smooth_shader_id
+		elif shader == 'FlatShading' : self.shader_program_id = self.flat_shader_id
 
 		# Update the display
 		self.update()
@@ -221,20 +299,20 @@ class OpenGLWidget( QGLWidget ) :
 		if self.wireframe_mode == 0 :
 
 			# Display the mesh
-			self.mesh_viewer.Display()
+			self.Display()
 
 		# Display the mesh with wireframe rendering
 		elif self.wireframe_mode == 1 :
 
 			# 1st pass : wireframe model
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
-			self.mesh_viewer.Display( self.wireframe_mode )
+			self.Display( self.wireframe_mode )
 
 			# 2nd pass : solid model
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
 			glEnable( GL_POLYGON_OFFSET_FILL )
 			glPolygonOffset( 1.0, 1.0 )
-			self.mesh_viewer.Display()
+			self.Display()
 			glDisable( GL_POLYGON_OFFSET_FILL )
 
 		# Display the mesh with hidden line removal rendering
@@ -242,13 +320,13 @@ class OpenGLWidget( QGLWidget ) :
 
 			# 1st pass : wireframe model
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
-			self.mesh_viewer.Display()
+			self.Display()
 
 			# 2nd pass : hidden line removal
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
 			glEnable( GL_POLYGON_OFFSET_FILL )
 			glPolygonOffset( 1.0, 1.0 )
-			self.mesh_viewer.Display( self.wireframe_mode )
+			self.Display( self.wireframe_mode )
 			glDisable( GL_POLYGON_OFFSET_FILL )
 
 		# Display the color bar
@@ -256,6 +334,54 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Swap buffers
 		self.swapBuffers()
+
+
+	#-
+	#
+	# Display
+	#
+	#-
+	#
+	def Display( self, wireframe_mode = 0 ) :
+
+		# Is there a mesh to display ?
+		if not self.element_number : return
+
+		# Use the shader program
+		glUseProgram( self.shader_program_id )
+
+		# Initialise Model-View transformation matrix
+		modelview_matrix = identity( 4, dtype=float32 )
+
+		# Position the scene (camera)
+		modelview_matrix[3,2] = -30.0
+
+		# Apply trackball transformation
+		modelview_matrix = dot( self.trackball.transformation, modelview_matrix )
+
+		# Send the transformation matrices to the shader
+		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_FALSE, array( self.trackball.transformation[ :3, :3 ] ) )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_FALSE, dot( modelview_matrix, self.projection_matrix ) )
+
+		# Activate color in the shader if necessary
+		glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), self.color_enabled )
+		
+		# Activate hidden lines in the shader for wireframe rendering
+		glUniform1i( glGetUniformLocation( self.shader_program_id, "wireframe_mode" ), wireframe_mode )
+		
+		# Vertex array object
+		glBindVertexArray( self.vertex_array_id )
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
+
+		# Draw the mesh
+		glDrawElements( GL_TRIANGLES, self.element_number, GL_UNSIGNED_INT, None )
+
+		# Release the vertex array object
+		glBindVertexArray( 0 )
+
+		# Release the shader program
+		glUseProgram( 0 )
+
 
 
 	#-
@@ -290,8 +416,11 @@ class OpenGLWidget( QGLWidget ) :
 		# Resize the viewport
 		glViewport( 0, 0, width, height )
 
-		# Recompute the perspective matrix of the mesh viewer
-		self.mesh_viewer.Resize( width, height )
+		# Resize the trackball
+		self.trackball.Resize( width, height )
+
+		# Compute perspective projection matrix
+		self.SetProjectionMatrix( width, height )
 
 
 	#-
@@ -312,7 +441,7 @@ class OpenGLWidget( QGLWidget ) :
 		else : return
 
 		# Update the trackball
-		self.mesh_viewer.trackball.MousePress( [ mouseEvent.x(), mouseEvent.y() ], button )
+		self.trackball.MousePress( [ mouseEvent.x(), mouseEvent.y() ], button )
 
 
 	#-
@@ -324,7 +453,7 @@ class OpenGLWidget( QGLWidget ) :
 	def mouseReleaseEvent( self, mouseEvent ) :
 
 		# Update the trackball
-		self.mesh_viewer.trackball.MouseRelease()
+		self.trackball.MouseRelease()
 
 
 	#-
@@ -336,7 +465,7 @@ class OpenGLWidget( QGLWidget ) :
 	def mouseMoveEvent( self, mouseEvent ) :
 
 		# Update the trackball
-		if self.mesh_viewer.trackball.Motion( [ mouseEvent.x(), mouseEvent.y() ] ) :
+		if self.trackball.Motion( [ mouseEvent.x(), mouseEvent.y() ] ) :
 
 			# Refresh display
 			self.update()
@@ -354,7 +483,7 @@ class OpenGLWidget( QGLWidget ) :
 		delta = event.delta()
 
 		# Update the trackball
-		self.mesh_viewer.trackball.WheelEvent( delta and delta // abs(delta) )
+		self.trackball.WheelEvent( delta and delta // abs(delta) )
 
 		# Refresh display
 		self.update()
@@ -374,4 +503,23 @@ class OpenGLWidget( QGLWidget ) :
 		gl_version = glGetString( GL_VERSION ).decode('latin-1')
 		gl_shader = glGetString( GL_SHADING_LANGUAGE_VERSION ).decode('latin-1')
 		return ( gl_vendor, gl_renderer, gl_version, gl_shader )
+
+
+	#--
+	#
+	# SetProjectionMatrix
+	#
+	#--
+	#
+	def SetProjectionMatrix( self, width, height ) :
+
+		fovy, aspect, near, far = 45.0, float(width)/height, 0.1, 100.0
+		f = tan( pi * fovy / 360.0 )
+		# Compute the perspective matrix
+		self.projection_matrix = identity( 4, dtype=float32 )
+		self.projection_matrix[0,0] = 1.0 / (f * aspect)
+		self.projection_matrix[1,1] = 1.0 / f
+		self.projection_matrix[2,2] = - (far + near) / (far - near)
+		self.projection_matrix[2,3] = - 1.0
+		self.projection_matrix[3,2] = - 2.0 * near * far / (far - near)
 
