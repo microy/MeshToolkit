@@ -1,20 +1,12 @@
 # -*- coding:utf-8 -*- 
 
+
 # ***************************************************************************
 #                                  Vrml.py
 #                             -------------------
-#    update               : 2013-11-25
-#    copyright            : (C) 2013 by Michaël Roy
+#    update               : 2014-04-14
+#    copyright            : (C) 2013-2014 by Michaël Roy
 #    email                : microygh@gmail.com
-# ***************************************************************************
-
-# ***************************************************************************
-# *                                                                         *
-# *   This program is free software; you can redistribute it and/or modify  *
-# *   it under the terms of the GNU General Public License as published by  *
-# *   the Free Software Foundation; either version 2 of the License, or     *
-# *   (at your option) any later version.                                   *
-# *                                                                         *
 # ***************************************************************************
 
 
@@ -24,15 +16,9 @@
 #
 #
 #-
-
+#
 from numpy import array
-
 from .Mesh import Mesh
-
-
-
-
-
 
 
 #--
@@ -278,8 +264,6 @@ def ReadVrml( filename ) :
 	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
 		vertex_normals=array(normals), colors=array(colors),
 		textures=array(texcoords), texture_name=material )
-
-
 
 
 
