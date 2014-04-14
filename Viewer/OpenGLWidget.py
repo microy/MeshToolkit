@@ -27,9 +27,8 @@ import PySide
 from PySide import QtGui, QtCore, QtOpenGL
 from PySide.QtOpenGL import QGLWidget, QGLFormat, QGL
 from math import tan, pi
-from numpy import array, identity, dot, float32, uint32
-from .ColorBar import ColorBar
-from .Shader import LoadShader
+from numpy import array, identity, dot, float32, uint32, zeros
+from Core.Color import Value2Color, Value2ColorAlternate
 from .Trackball import Trackball
 
 
@@ -108,7 +107,7 @@ class OpenGLWidget( QGLWidget ) :
 		self.shader_program_id = self.smooth_shader_id
 
 		# Color bar viewer initialisation
-		self.colorbar = ColorBar()
+		self.InitColorBar()
 
 
 	#-
@@ -330,7 +329,28 @@ class OpenGLWidget( QGLWidget ) :
 			glDisable( GL_POLYGON_OFFSET_FILL )
 
 		# Display the color bar
-		self.DrawColorBar()
+		if self.colorbar_enabled :
+
+			# Resize the viewport
+			glViewport( self.width()-50, self.height()/2-300, 50, 600 )
+
+			# Use the shader program
+			glUseProgram( self.colorbar_shader )
+
+			# Vertex array object
+			glBindVertexArray( self.colorbar_vertexarray )
+
+			# Draw the mesh
+			glDrawArrays( GL_TRIANGLE_STRIP, 0, 44 )
+
+			# Release the vertex array object
+			glBindVertexArray( 0 )
+
+			# Release the shader program
+			glUseProgram( 0 )
+
+			# Restore the viewport
+			glViewport( 0, 0, self.width(), self.height() )
 
 		# Swap buffers
 		self.swapBuffers()
@@ -381,28 +401,6 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Release the shader program
 		glUseProgram( 0 )
-
-
-
-	#-
-	#
-	# DrawColorBar
-	#
-	#-
-	#
-	def DrawColorBar( self ) :
-
-		# Color bar enabled ?
-		if not self.colorbar_enabled : return
-
-		# Resize the viewport
-		glViewport( self.width()-50, self.height()/2-300, 50, 600 )
-
-		# Display the color bar
-		self.colorbar.Display()
-
-		# Restore the viewport
-		glViewport( 0, 0, self.width(), self.height() )
 
 
 	#-
@@ -522,4 +520,128 @@ class OpenGLWidget( QGLWidget ) :
 		self.projection_matrix[2,2] = - (far + near) / (far - near)
 		self.projection_matrix[2,3] = - 1.0
 		self.projection_matrix[3,2] = - 2.0 * near * far / (far - near)
+		
+		
+	#-
+	#
+	# Initialisation of a color bar
+	#
+	#-
+	#
+	def InitColorBar( self ) :
+
+		# Generate vertices and colors
+		size = 22
+		vertices = zeros( (size * 2, 3), dtype=float32 )
+		colors = zeros( (size * 2, 3), dtype=float32 )
+		for i in range( size ) :
+			vertices[i*2]   = [ -0.5, i / (size - 1.0) - 0.5, 0 ]
+			vertices[i*2+1] = [ 0.5, i / (size - 1.0) - 0.5, 0 ]
+			colors[i*2] = Value2Color( i / (size - 1.0) )
+			colors[i*2+1] = Value2Color( i / (size - 1.0) )
+
+		# Load the shader
+		self.colorbar_shader = LoadShader( 'SimpleColor' )
+
+		# Use the shader program
+		glUseProgram( self.colorbar_shader )
+
+		# Vertex array object
+		self.colorbar_vertexarray = glGenVertexArrays( 1 )
+		glBindVertexArray( self.colorbar_vertexarray )
+
+		# Vertex buffer object
+		vertex_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer_id )
+		glBufferData( GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW )
+		glEnableVertexAttribArray( 0 )
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
+
+		# Color buffer object
+		color_buffer_id = glGenBuffers( 1 )
+		glBindBuffer( GL_ARRAY_BUFFER, color_buffer_id )
+		glBufferData( GL_ARRAY_BUFFER, colors.nbytes, colors, GL_STATIC_DRAW )
+		glEnableVertexAttribArray( 1 )
+		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
+
+		# Release the buffers
+		glBindBuffer( GL_ARRAY_BUFFER, 0 )
+		glBindVertexArray( 0 )
+
+		# Release the shader program
+		glUseProgram( 0 )
+
+
+
+#-
+#
+#  LoadShader
+#
+#-
+#
+def LoadShader( name, geometry_enabled=False ) :
+
+	# Create the shaders
+	vertex_shader = CreateShader( 'Viewer/Shaders/'+name+'.vert.glsl', GL_VERTEX_SHADER )
+	fragment_shader = CreateShader( 'Viewer/Shaders/'+name+'.frag.glsl', GL_FRAGMENT_SHADER )
+	if geometry_enabled : geometry_shader = CreateShader( 'Viewer/Shaders/'+name+'.geom.glsl', GL_GEOMETRY_SHADER )
+
+	# Create the program
+	program_id = glCreateProgram()
+
+	# Attach the shaders to the program
+	glAttachShader( program_id, vertex_shader )
+	glAttachShader( program_id, fragment_shader )
+	if geometry_enabled : glAttachShader( program_id, geometry_shader )
+
+	# Link the program
+	glLinkProgram( program_id )
+
+	# Check the program
+	if not glGetProgramiv( program_id, GL_LINK_STATUS ) :
+		raise RuntimeError( 'Shader program linking failed.\n' + glGetProgramInfoLog( program_id ) )
+
+	# Detach the shaders from the program
+	glDetachShader( program_id, vertex_shader )
+	glDetachShader( program_id, fragment_shader )
+	if geometry_enabled : glDetachShader( program_id, geometry_shader )
+
+	# Delete the shaders
+	glDeleteShader( vertex_shader )
+	glDeleteShader( fragment_shader )
+	if geometry_enabled : glDeleteShader( geometry_shader )
+
+	# Return shader program ID
+	return program_id
+
+
+#-
+#
+#  CreateShader
+#
+#-
+#
+def CreateShader( filename, shader_type ) :
+
+	# Load shader source files
+	with open( filename, 'r') as shader_file :
+		shader_source = shader_file.read()
+
+	# Create the shaders
+	shader_id = glCreateShader( shader_type )
+
+	# Load shader source codes
+	glShaderSource( shader_id, shader_source )
+
+	# Compile the shaders
+	glCompileShader( shader_id )
+
+	# Check the shaders
+	if not glGetShaderiv( shader_id, GL_COMPILE_STATUS ) :
+		raise RuntimeError( 'Shader compilation failed.\n' + glGetShaderInfoLog( shader_id ) )
+
+	# Return the shader ID
+	return shader_id
+
+
 
