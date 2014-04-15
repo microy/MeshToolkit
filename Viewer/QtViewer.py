@@ -4,7 +4,7 @@
 # ***************************************************************************
 #                                 QtViewer.py
 #                             -------------------
-#    update               : 2014-04-14
+#    update               : 2014-04-15
 #    copyright            : (C) 2013-2014 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -16,12 +16,10 @@
 #
 #--
 #
-
 import platform
 import PySide
 from PySide import QtGui, QtCore
 from PySide.QtGui import QMainWindow, QFileDialog, QMessageBox
-
 from Core.Repair import CheckMesh, CheckNeighborhood
 from Core.Vrml import ReadVrml, WriteVrml
 from QtViewerUI import Ui_MainWindow
@@ -176,7 +174,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.action_view_solid.setChecked( True )
 		self.action_view_wireframe.setChecked( False )
 		self.action_view_hiddenlines.setChecked( False )
-		self.opengl_widget.SetWireframe( 0 )
+		self.opengl_widget.wireframe_mode = 0
+		self.opengl_widget.update()
 
 
 	#-
@@ -191,7 +190,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.action_view_solid.setChecked( False )
 		self.action_view_wireframe.setChecked( True )
 		self.action_view_hiddenlines.setChecked( False )
-		self.opengl_widget.SetWireframe( 1 )
+		self.opengl_widget.wireframe_mode = 1
+		self.opengl_widget.update()
 
 
 	#-
@@ -206,7 +206,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.action_view_solid.setChecked( False )
 		self.action_view_wireframe.setChecked( False )
 		self.action_view_hiddenlines.setChecked( True )
-		self.opengl_widget.SetWireframe( 2 )
+		self.opengl_widget.wireframe_mode = 2
+		self.opengl_widget.update()
 
 
 	#-
@@ -232,7 +233,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 		# Enable / Disable color bar display
 		self.action_view_colorbar.setChecked( self.action_view_colorbar.isChecked() )
-		self.opengl_widget.SetColorBar( self.action_view_colorbar.isChecked() )
+		self.opengl_widget.colorbar_enabled = self.action_view_colorbar.isChecked()
+		self.opengl_widget.update()
 
 
 	#-
@@ -244,7 +246,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 	def ViewReset( self ) :
 
 		# Reset model transformation
-		self.opengl_widget.Reset()
+		self.opengl_widget.trackball.Reset()
+		self.opengl_widget.update()
 
 
 	#-
@@ -257,9 +260,9 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 		QMessageBox.about( self, 'About QtViewer',
 		'''<b>PyMesh QtViewer</b>
-        <p>Copyright (c) 2013 Michael Roy.</p>
-        <p>All rights reserved in accordance with GPL v2 or later.</p>
-        <p><i>Python {} - PySide version {} - Qt version {} on {}</i></p>'''.format(
+        <p>Copyright (c) 2013-2014 Michael Roy.</p>
+        <p>All rights reserved in accordance with MIT License.</p>
+        <i><p>Python {}</p><p>PySide version {}</p><p>Qt version {} on {}</p></i>'''.format(
         platform.python_version(), PySide.__version__, PySide.QtCore.__version__,
         platform.system()))
 

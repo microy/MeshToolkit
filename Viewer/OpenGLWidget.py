@@ -4,7 +4,7 @@
 # ***************************************************************************
 #                               OpenGLWidget.py
 #                             -------------------
-#    update               : 2014-04-14
+#    update               : 2014-04-15
 #    copyright            : (C) 2013-2014 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -61,14 +61,11 @@ class OpenGLWidget( QGLWidget ) :
 		# Initialise mouse position
 		self.previous_mouse_position = [ 0, 0 ]
 
-		# Initialise OpenGL viewers
-		self.colorbar = None
-
 		# Initialise viewing parameters
-		self.colorbar_enabled = False
 		self.wireframe_mode = 0
 		self.element_number = 0
 		self.color_enabled = False
+		self.colorbar_enabled = False
 
 
 	#-
@@ -156,7 +153,6 @@ class OpenGLWidget( QGLWidget ) :
 		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
 
 		# Color buffer object
-		self.color_enabled = False
 		if len( colors ) : 
 			self.color_enabled = True
 			self.color_buffer_id = glGenBuffers( 1 )
@@ -202,20 +198,7 @@ class OpenGLWidget( QGLWidget ) :
 
 		# Initialise the model parameters
 		self.element_number = 0
-
-		# Update the display
-		self.update()
-
-	#-
-	#
-	# Reset
-	#
-	#-
-	#
-	def Reset( self ) :
-
-		# Reset the trackball
-		self.trackball.Reset()
+		self.color_enabled = False
 
 		# Update the display
 		self.update()
@@ -255,36 +238,6 @@ class OpenGLWidget( QGLWidget ) :
 
 	#-
 	#
-	# SetColorBar
-	#
-	#-
-	#
-	def SetColorBar( self, enabled ) :
-
-		# Enable / Disable color bar
-		self.colorbar_enabled = enabled
-
-		# Update the display
-		self.update()
-
-
-	#-
-	#
-	# SetWireframe
-	#
-	#-
-	#
-	def SetWireframe( self, wireframe_mode ) :
-
-		# Enable / Disable color bar
-		self.wireframe_mode = wireframe_mode
-
-		# Update the display
-		self.update()
-
-
-	#-
-	#
 	# paintGL
 	#
 	#-
@@ -298,20 +251,20 @@ class OpenGLWidget( QGLWidget ) :
 		if self.wireframe_mode == 0 :
 
 			# Display the mesh
-			self.Display()
+			self.DisplayMesh()
 
 		# Display the mesh with wireframe rendering
 		elif self.wireframe_mode == 1 :
 
 			# 1st pass : wireframe model
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
-			self.Display( self.wireframe_mode )
+			self.DisplayMesh( self.wireframe_mode )
 
 			# 2nd pass : solid model
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
 			glEnable( GL_POLYGON_OFFSET_FILL )
 			glPolygonOffset( 1.0, 1.0 )
-			self.Display()
+			self.DisplayMesh()
 			glDisable( GL_POLYGON_OFFSET_FILL )
 
 		# Display the mesh with hidden line removal rendering
@@ -319,13 +272,13 @@ class OpenGLWidget( QGLWidget ) :
 
 			# 1st pass : wireframe model
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
-			self.Display()
+			self.DisplayMesh()
 
 			# 2nd pass : hidden line removal
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
 			glEnable( GL_POLYGON_OFFSET_FILL )
 			glPolygonOffset( 1.0, 1.0 )
-			self.Display( self.wireframe_mode )
+			self.DisplayMesh( self.wireframe_mode )
 			glDisable( GL_POLYGON_OFFSET_FILL )
 
 		# Display the color bar
@@ -362,7 +315,7 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	#-
 	#
-	def Display( self, wireframe_mode = 0 ) :
+	def DisplayMesh( self, wireframe_mode = 0 ) :
 
 		# Is there a mesh to display ?
 		if not self.element_number : return
@@ -572,7 +525,6 @@ class OpenGLWidget( QGLWidget ) :
 		glUseProgram( 0 )
 
 
-
 #-
 #
 #  LoadShader
@@ -642,6 +594,3 @@ def CreateShader( filename, shader_type ) :
 
 	# Return the shader ID
 	return shader_id
-
-
-
