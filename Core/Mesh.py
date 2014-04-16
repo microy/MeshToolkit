@@ -4,7 +4,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2014-04-16
+#    update               : 2014-04-17
 #    copyright            : (C) 2013-2014 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -16,7 +16,7 @@
 #
 #-
 #
-from numpy import amin, amax, array, cross, sqrt, zeros
+from numpy import amin, amax, array, cross, sort, sqrt, zeros
 
 
 #--
@@ -147,15 +147,24 @@ class Mesh :
 
 		# Initialization
 		self.edges = {}
+		
+	#	sorted_faces = sort( self.faces )
 
 		# Create a dictionary of the mesh edges
-		for f in self.faces :
-	#		edge = tuple(sorted([f[0], f[1]]))
-	#		if edge not in self.edges : self.edges[edge] = []
-	#		self.edges[edge].append( i )
-			self.edges[ tuple(sorted([f[0], f[1]])) ] = True
-			self.edges[ tuple(sorted([f[1], f[2]])) ] = True
-			self.edges[ tuple(sorted([f[2], f[0]])) ] = True
+		for i, f in enumerate( self.faces ) :
+	#		self.edges[ tuple(sorted([f[0], f[1]])) ] = True
+	#		self.edges[ tuple(sorted([f[1], f[2]])) ] = True
+	#		self.edges[ tuple(sorted([f[2], f[0]])) ] = True
+			fs = sort( f )
+			e1 = tuple( (fs[0], fs[1]) )
+			e2 = tuple( (fs[0], fs[2]) )
+			e3 = tuple( (fs[1], fs[2]) )
+			if e1 not in self.edges : self.edges[e1] = []
+			self.edges[e1].append( i )
+			if e2 not in self.edges : self.edges[e2] = []
+			self.edges[e2].append( i )
+			if e3 not in self.edges : self.edges[e3] = []
+			self.edges[e3].append( i )
 
 
 	#--
