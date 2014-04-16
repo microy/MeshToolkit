@@ -52,6 +52,10 @@ if __name__ == "__main__" :
 	print( CheckNeighborhood( mesh ) )
 	print( '  Done.' )
 
+	print( '~~~ Register edges ~~~' )
+	mesh.UpdateEdges()
+	print( '  Done.' )
+
 #	print( '~~~ Neighbor ~~~' )
 #	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=1))
 #	print( '  Done.' )

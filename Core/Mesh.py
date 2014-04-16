@@ -4,7 +4,7 @@
 # ***************************************************************************
 #                                   Mesh.py
 #                             -------------------
-#    update               : 2014-04-14
+#    update               : 2014-04-16
 #    copyright            : (C) 2013-2014 by Michaël Roy
 #    email                : microygh@gmail.com
 # ***************************************************************************
@@ -16,7 +16,7 @@
 #
 #-
 #
-from numpy import array, cross, sqrt, zeros, amin, amax
+from numpy import amin, amax, array, cross, sqrt, zeros
 
 
 #--
@@ -46,8 +46,6 @@ class Mesh :
 		self.textures = textures
 		self.face_normals = face_normals
 		self.vertex_normals = vertex_normals
-		self.neighbor_vertices = []
-		self.neighbor_faces = []
 
 
 	#--
@@ -135,6 +133,29 @@ class Mesh :
 		# Remove duplicates
 		self.neighbor_vertices =  [ set( i ) for i in self.neighbor_vertices ] 
 		self.neighbor_faces =  [ set( i ) for i in self.neighbor_faces ] 
+
+
+	#--
+	#
+	# UpdateEdges
+	#
+	#--
+	#
+	# Collect the mesh edges
+	#
+	def UpdateEdges( self ) :
+
+		# Initialization
+		self.edges = {}
+
+		# Create a dictionary of the mesh edges
+		for f in self.faces :
+	#		edge = tuple(sorted([f[0], f[1]]))
+	#		if edge not in self.edges : self.edges[edge] = []
+	#		self.edges[edge].append( i )
+			self.edges[ tuple(sorted([f[0], f[1]])) ] = True
+			self.edges[ tuple(sorted([f[1], f[2]])) ] = True
+			self.edges[ tuple(sorted([f[2], f[0]])) ] = True
 
 
 	#--
