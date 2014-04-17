@@ -8,11 +8,11 @@
 #--
 
 
-#-
+#--
 #
 # External dependencies
 #
-#-
+#--
 #
 from .Mesh import Mesh
 from numpy import array, isfinite, zeros

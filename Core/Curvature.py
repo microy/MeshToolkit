@@ -8,22 +8,20 @@
 #--
 
 
-#--
 #
 # Based on :
 #
-# Discrete Differential-Geometry Operators for Triangulated 2-Manifolds
-# Mark Meyer, Mathieu Desbrun, Peter Schröder, Alan H. Barr
-# VisMath '02, Berlin (Germany)
+#   Discrete Differential-Geometry Operators for Triangulated 2-Manifolds
+#     Mark Meyer, Mathieu Desbrun, Peter Schröder, Alan H. Barr
+#     VisMath '02, Berlin (Germany)
 #
+
+
 #--
-
-
-#-
 #
 # External dependencies
 #
-#-
+#--
 #
 from numpy import dot, cross, zeros
 from math import pi, sqrt, atan2

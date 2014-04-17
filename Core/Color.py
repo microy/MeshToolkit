@@ -8,11 +8,11 @@
 #--
 
 
-#-
+#--
 #
 # External dependencies
 #
-#-
+#--
 #
 from numpy import array, copy, zeros, sqrt
 

@@ -14,7 +14,6 @@
 #
 #--
 #
-
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
