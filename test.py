@@ -55,7 +55,8 @@ if __name__ == "__main__" :
 	print( '~~~ Register edges ~~~' )
 	mesh.UpdateEdges()
 	print( '  Done.' )
-	print len( mesh.edges.keys() )
+#	print len( mesh.edges.keys() )
+#	print mesh.edges
 
 #	print( '~~~ Neighbor ~~~' )
 #	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=1))
