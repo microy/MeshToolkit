@@ -1,20 +1,18 @@
 # -*- coding:utf-8 -*- 
 
 
-# ***************************************************************************
-#                                   Mesh.py
-#                             -------------------
-#    update               : 2014-04-17
-#    copyright            : (C) 2013-2014 by Michaël Roy
-#    email                : microygh@gmail.com
-# ***************************************************************************
+#--
+#
+# Copyright (C) 2013-2014 Michaël Roy
+#
+#--
 
 
-#-
+#--
 #
 # External dependencies
 #
-#-
+#--
 #
 from numpy import amin, amax, array, cross, sort, sqrt, zeros
 
@@ -152,19 +150,13 @@ class Mesh :
 		edges = sort( self.faces )[:,[[0,1],[0,2],[1,2]]]
 
 		# Create a dictionary of the mesh edges
-		for i, e in enumerate( edges ) :
-
-			edge = tuple( e[0] )
-			if edge not in self.edges : self.edges[edge] = []
-			self.edges[edge].append( i )
-
-			edge = tuple( e[1] )
-			if edge not in self.edges : self.edges[edge] = []
-			self.edges[edge].append( i )
-
-			edge = tuple( e[2] )
-			if edge not in self.edges : self.edges[edge] = []
-			self.edges[edge].append( i )
+		for i, ef in enumerate( edges ) :
+			for e in ef :
+				edge = tuple( e )
+				if edge not in self.edges :
+					self.edges[edge] = {};
+					self.edges[edge]['face'] = []
+				self.edges[edge]['face'].append( i )
 
 
 	#--
