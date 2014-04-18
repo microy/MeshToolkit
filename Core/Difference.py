@@ -27,7 +27,7 @@ class Difference :
 	#
 	#--
 	#
-	def __init__( self, mesh=None ) :
+	def __init__( self, mesh ) :
 		
 		# Base mesh
 		self.mesh = mesh

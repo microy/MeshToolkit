@@ -237,6 +237,11 @@ class OpenGLWidget( QGLWidget ) :
 		# Clear all pixels and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 
+		# Nothing to display
+		if not self.element_number :
+			self.swapBuffers()
+			return
+
 		# Display the mesh with solid rendering
 		if self.wireframe_mode == 0 :
 
@@ -307,9 +312,6 @@ class OpenGLWidget( QGLWidget ) :
 	#
 	def DisplayMesh( self, wireframe_mode = 0 ) :
 
-		# Is there a mesh to display ?
-		if not self.element_number : return
-
 		# Use the shader program
 		glUseProgram( self.shader_program_id )
 
@@ -323,8 +325,10 @@ class OpenGLWidget( QGLWidget ) :
 		modelview_matrix = dot( self.trackball.transformation, modelview_matrix )
 
 		# Send the transformation matrices to the shader
-		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ), 1, GL_FALSE, array( self.trackball.transformation[ :3, :3 ] ) )
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ), 1, GL_FALSE, dot( modelview_matrix, self.projection_matrix ) )
+		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ),
+			1, GL_FALSE, array( self.trackball.transformation[ :3, :3 ] ) )
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ),
+			1, GL_FALSE, dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
 		glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), self.color_enabled )

@@ -69,10 +69,7 @@ def Array2Colors( values ) :
 	norm_values = (values - min_value) / value_range
 
 	# Convert each value to a pseudo-color
-	colors = [ Value2Color( i ) for i in norm_values ]
-
-	# Return result
-	return array( colors )
+	return array( [ Value2Color( i ) for i in norm_values ] )
 
 
 #--

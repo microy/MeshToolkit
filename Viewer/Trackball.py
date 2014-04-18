@@ -39,7 +39,7 @@ class Trackball :
 	#
 	#-
 	#
-	def __init__( self, width=1024, height=768 ) :
+	def __init__( self, width, height ) :
 
 		# Window size
 		self.width = width
@@ -73,7 +73,7 @@ class Trackball :
 	#
 	#-
 	#
-	def Resize( self, width=1024, height=768 ) :
+	def Resize( self, width, height ) :
 
 		# Change window size
 		self.width = width
