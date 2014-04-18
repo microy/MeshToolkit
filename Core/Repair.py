@@ -3,13 +3,6 @@
 
 #--
 #
-# Copyright (C) 2013-2014 Michaël Roy
-#
-#--
-
-
-#--
-#
 # External dependencies
 #
 #--

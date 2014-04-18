@@ -1,13 +1,6 @@
 # -*- coding:utf-8 -*- 
 
 
-#--
-#
-# Copyright (C) 2013-2014 Michaël Roy
-#
-#--
-
-
 #
 # Based on :
 #
