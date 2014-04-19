@@ -1,31 +1,20 @@
 # -*- coding:utf-8 -*- 
 
 
-#--
 #
 # External dependencies
-#
-#--
 #
 from numpy import amin, amax, array, cross, sort, sqrt, zeros
 
 
-#--
 #
-# Mesh
-#
-#--
-#
-# Defines a class representing a triangular mesh
+# Define a class representing a triangular mesh
 #
 class Mesh :
 
 
-	#--
 	#
 	# Initialisation
-	#
-	#--
 	#
 	def __init__( self, name='', vertices=[], faces=[], colors=[], texture_name='', textures=[], face_normals=[], vertex_normals=[] ) :
 
@@ -39,34 +28,25 @@ class Mesh :
 		self.vertex_normals = vertex_normals
 
 
-	#--
 	#
-	# Display
-	#
-	#--
+	# Print object informations
 	#
 	def __str__( self ) :
 		
-		# Return mesh informations
 		log_message = '~~~ Mesh informations ~~~\n'
-		log_message  += '  Name :             {}\n'.format( self.name )
-		log_message  += '  Vertices :         {}\n'.format( len(self.vertices) )
-		log_message  += '  Faces :            {}\n'.format( len(self.faces) )
-		log_message  += '  Colors :           {}\n'.format( len(self.colors) )
-		log_message  += '  Faces normals :    {}\n'.format( len(self.face_normals) )
-		log_message  += '  Vertex normals :   {}\n'.format( len(self.vertex_normals) )
-		log_message  += '  Textures :         {}\n'.format( len(self.textures) )
-		log_message  += '  Texture filename : {}'.format( self.texture_name )
+		log_message  += '  Name :               {}\n'.format( self.name )
+		log_message  += '  Vertices :           {}\n'.format( len(self.vertices) )
+		log_message  += '  Faces :              {}\n'.format( len(self.faces) )
+		log_message  += '  Colors :             {}\n'.format( len(self.colors) )
+		log_message  += '  Faces normals :      {}\n'.format( len(self.face_normals) )
+		log_message  += '  Vertex normals :     {}\n'.format( len(self.vertex_normals) )
+		log_message  += '  Textures :           {}\n'.format( len(self.textures) )
+		log_message  += '  Texture filename :   {}'.format( self.texture_name )
 		return log_message
 
 
-	#--
 	#
-	# UpdateNormals
-	#
-	#--
-	#
-	# Compute vertex normal vectors of a given mesh
+	# Compute normal vectors of the faces and vertices
 	#
 	def UpdateNormals( self ) :
 
@@ -74,7 +54,7 @@ class Mesh :
 		tris = self.vertices[ self.faces ]
 
 		# Calculate the normal for all the triangles
-		self.face_normals = cross( tris[::,1 ] - tris[::,0]  , tris[::,2 ] - tris[::,0] )
+		self.face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
 
 		# Normalise the face normals
 		self.face_normals /= sqrt( (self.face_normals ** 2).sum( axis=1 ) ).reshape( len(self.face_normals), 1 )
@@ -91,11 +71,6 @@ class Mesh :
 		self.vertex_normals /= sqrt( (self.vertex_normals ** 2).sum( axis=1 ) ).reshape( len(self.vertex_normals), 1 )
 
 
-	#--
-	#
-	# UpdateNeighbors
-	#
-	#--
 	#
 	# Collect vertex neighborhoods of a given mesh
 	#
@@ -105,32 +80,27 @@ class Mesh :
 		self.neighbor_vertices = [ [] for i in range(len( self.vertices )) ]
 		self.neighbor_faces = [ [] for i in range(len( self.vertices )) ]
 
-		# Create a list of neighbor vertices and faces for every vertex of the mesh
-		for i in range(len( self.faces )) :
+		# Loop through the faces
+		for i, (a, b ,c) in enumerate( self.faces ) :
 
 			# Add faces bound to each vertex
-			self.neighbor_faces[ self.faces[i,0] ].append( i )
-			self.neighbor_faces[ self.faces[i,1] ].append( i )
-			self.neighbor_faces[ self.faces[i,2] ].append( i )
+			self.neighbor_faces[ a ].append( i )
+			self.neighbor_faces[ b ].append( i )
+			self.neighbor_faces[ c ].append( i )
 
 			# Add vertices link by a face
-			self.neighbor_vertices[ self.faces[i,0] ].append( self.faces[i,1] )
-			self.neighbor_vertices[ self.faces[i,0] ].append( self.faces[i,2] )
-			self.neighbor_vertices[ self.faces[i,1] ].append( self.faces[i,0] )
-			self.neighbor_vertices[ self.faces[i,1] ].append( self.faces[i,2] )
-			self.neighbor_vertices[ self.faces[i,2] ].append( self.faces[i,0] )
-			self.neighbor_vertices[ self.faces[i,2] ].append( self.faces[i,1] )
+			self.neighbor_vertices[ a ].append( b )
+			self.neighbor_vertices[ a ].append( c )
+			self.neighbor_vertices[ b ].append( a )
+			self.neighbor_vertices[ b ].append( c )
+			self.neighbor_vertices[ c ].append( a )
+			self.neighbor_vertices[ c ].append( b )
 
 		# Remove duplicates
 		self.neighbor_vertices =  [ set( i ) for i in self.neighbor_vertices ] 
 		self.neighbor_faces =  [ set( i ) for i in self.neighbor_faces ] 
 
 
-	#--
-	#
-	# UpdateEdges
-	#
-	#--
 	#
 	# Collect the mesh edges
 	#
@@ -152,13 +122,8 @@ class Mesh :
 				self.edges[edge]['face'].append( i )
 
 
-	#--
 	#
-	# IsBorderVertex
-	#
-	#--
-	#
-	# Return true if the vertex is on a border edge
+	# Tell if a vertex is on a border
 	#
 	def IsBorderVertex( self, vertex ) :
 
@@ -172,13 +137,8 @@ class Mesh :
 		return False
 
 
-	#--
 	#
-	# GetAxisAlignedBoundingBox
-	#
-	#--
-	#
-	# Compute the axis-aligned bounding box of a given mesh
+	# Compute the axis-aligned bounding box
 	#
 	def GetAxisAlignedBoundingBox( self ) :
 
@@ -186,13 +146,8 @@ class Mesh :
 		return ( amin( self.vertices, axis = 0 ), amax( self.vertices, axis = 0 ) )
 
 
-	#--
 	#
-	# GetBoundingSphere
-	#
-	#--
-	#
-	# Compute the bounding sphere of a given mesh
+	# Compute the bounding sphere
 	#
 	def GetBoundingSphere( self ) :
 

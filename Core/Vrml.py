@@ -1,23 +1,15 @@
 # -*- coding:utf-8 -*- 
 
 
-#--
 #
 # External dependencies
-#
-#--
 #
 from numpy import array
 from .Mesh import Mesh
 
 
-#--
 #
-# ReadVrml
-#
-#--
-#
-# Import mesh from a file in Inventor / VRML / X3D format
+# Import a mesh from a Inventor / VRML / X3D file
 #
 def ReadVrml( filename ) :
 
@@ -256,14 +248,8 @@ def ReadVrml( filename ) :
 		textures=array(texcoords), texture_name=material )
 
 
-
-#--
 #
-# WriteVrml
-#
-#--
-#
-# Export mesh to a VRML V2.0 file
+# Export a mesh to a VRML V2.0 file
 #
 def WriteVrml( mesh, filename ) :
 

@@ -1,11 +1,8 @@
 # -*- coding:utf-8 -*- 
 
 
-#--
 #
 # External dependencies
-#
-#--
 #
 import platform
 import PySide
@@ -16,22 +13,14 @@ from Core.Vrml import ReadVrml, WriteVrml
 from QtViewerUI import Ui_MainWindow
 
 
-#--
-#
-# QtViewer
-#
-#--
 #
 # Create a mesh viewer with Qt
 #
 class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 
-	#-
 	#
 	# Initialisation
-	#
-	#-
 	#
 	def __init__( self, parent=None ) :
 
@@ -45,11 +34,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.mesh = None
 
 
-	#-
 	#
 	# FileOpen
-	#
-	#-
 	#
 	def FileOpen( self ) :
 
@@ -71,11 +57,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.LoadMesh( self.mesh )
 
 
-	#-
 	#
 	# FileSave
-	#
-	#-
 	#
 	def FileSave( self ) :
 
@@ -93,11 +76,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		WriteVrml( self.mesh, unicode(filename) )
 
 
-	#-
 	#
 	# FileCheck
-	#
-	#-
 	#
 	def FileCheck( self ) :
 
@@ -112,11 +92,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		CheckNeighborhood( self.mesh )
 
 
-	#-
 	#
 	# FileClose
-	#
-	#-
 	#
 	def FileClose( self ) :
 
@@ -125,11 +102,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.mesh = None
 
 
-	#-
 	#
 	# ViewFlat
-	#
-	#-
 	#
 	def ViewFlat( self ) :
 
@@ -139,11 +113,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.SetShader( 'FlatShading' )
 
 
-	#-
 	#
 	# ViewSmooth
-	#
-	#-
 	#
 	def ViewSmooth( self ) :
 
@@ -153,11 +124,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.SetShader( 'SmoothShading' )
 
 
-	#-
 	#
 	# ViewSolid
-	#
-	#-
 	#
 	def ViewSolid( self ) :
 
@@ -169,11 +137,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 
-	#-
 	#
 	# ViewWireframe
-	#
-	#-
 	#
 	def ViewWireframe( self ) :
 
@@ -185,11 +150,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 
-	#-
 	#
 	# ViewHiddenlines
-	#
-	#-
 	#
 	def ViewHiddenlines( self ) :
 
@@ -201,11 +163,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 
-	#-
 	#
 	# ViewAntialiasing
-	#
-	#-
 	#
 	def ViewAntialiasing( self ) :
 
@@ -214,11 +173,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.SetAntialiasing( self.action_view_antialiasing.isChecked() )
 
 
-	#-
 	#
 	# ViewColorbar
-	#
-	#-
 	#
 	def ViewColorbar( self ) :
 
@@ -228,11 +184,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 
-	#-
 	#
 	# ViewReset
-	#
-	#-
 	#
 	def ViewReset( self ) :
 
@@ -241,11 +194,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 
-	#-
 	#
 	# HelpAbout
-	#
-	#-
 	#
 	def HelpAbout( self ) :
 
@@ -258,22 +208,16 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
         platform.system()))
 
 
-	#-
 	#
 	# HelpAboutQt
-	#
-	#-
 	#
 	def HelpAboutQt( self ) :
 		
 		QMessageBox.aboutQt( self, 'About Qt' )
 		
 		
-	#-
 	#
 	# HelpAboutOpenGL
-	#
-	#-
 	#
 	def HelpAboutOpenGL( self ) :
 		

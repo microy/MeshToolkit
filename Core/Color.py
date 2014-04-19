@@ -1,20 +1,12 @@
 # -*- coding:utf-8 -*- 
 
 
-#--
 #
 # External dependencies
-#
-#--
 #
 from numpy import array, copy, zeros, sqrt
 
 
-#--
-#
-# Value2Color
-#
-#--
 #
 # Convert a value in range [ 0.0, 1.0 ] to a pseudo-color
 #
@@ -28,12 +20,6 @@ def Value2Color( value ) :
 	return [ 1.0, 0.0, 0.0 ]
 
 
-
-#--
-#
-# Value2ColorAlternate
-#
-#--
 #
 # Convert a value in range [ 0.0, 1.0 ] to a pseudo-color
 #
@@ -48,12 +34,6 @@ def Value2ColorAlternate( value ) :
 	return [ 1.0, 0.0, 0.0 ]
 
 
-
-#--
-#
-# Array2Colors
-#
-#--
 #
 # Convert an array of values to pseudo-colors
 #
@@ -72,11 +52,6 @@ def Array2Colors( values ) :
 	return array( [ Value2Color( i ) for i in norm_values ] )
 
 
-#--
-#
-# VectorArray2Colors
-#
-#--
 #
 # Convert an array of vectors to pseudo-colors
 #

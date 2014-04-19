@@ -1,11 +1,8 @@
 # -*- coding:utf-8 -*- 
 
 
-#--
 #
 # External dependencies
-#
-#--
 #
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
@@ -22,25 +19,16 @@ from Core.Color import Value2Color, Value2ColorAlternate
 from .Trackball import Trackball
 
 
-#--
-#
-# OpenGLWidget
-#
-#--
 #
 # Create an OpenGL frame with Qt
 #
 class OpenGLWidget( QGLWidget ) :
 
 
-	#-
 	#
 	# Initialisation
 	#
-	#-
-	#
 	def __init__( self, parent=None ) :
-
 		
 		# Initialise QGLWidget with multisampling enabled and OpenGL 3 core only
 		QGLWidget.__init__( self, QGLFormat( QGL.SampleBuffers | QGL.NoDeprecatedFunctions ), parent )
@@ -58,11 +46,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.colorbar_enabled = False
 
 
-	#-
 	#
 	# initializeGL
-	#
-	#-
 	#
 	def initializeGL( self ) :
 
@@ -97,11 +82,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.InitColorBar()
 
 
-	#-
 	#
 	# LoadMesh
-	#
-	#-
 	#
 	def LoadMesh( self, mesh ) :
 
@@ -166,11 +148,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.update()
 
 
-	#-
 	#
 	# Close
-	#
-	#-
 	#
 	def Close( self ) :
 
@@ -194,11 +173,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.update()
 
 
-	#-
 	#
 	# SetShader
-	#
-	#-
 	#
 	def SetShader( self, shader ) :
 
@@ -210,11 +186,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.update()
 
 
-	#-
 	#
 	# SetAntialiasing
-	#
-	#-
 	#
 	def SetAntialiasing( self, enabled ) :
 
@@ -226,11 +199,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.update()
 
 
-	#-
 	#
 	# paintGL
-	#
-	#-
 	#
 	def paintGL( self ) :
 
@@ -304,11 +274,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.swapBuffers()
 
 
-	#-
 	#
 	# Display
-	#
-	#-
 	#
 	def DisplayMesh( self, wireframe_mode = 0 ) :
 
@@ -350,11 +317,8 @@ class OpenGLWidget( QGLWidget ) :
 		glUseProgram( 0 )
 
 
-	#-
 	#
 	# resizeGL
-	#
-	#-
 	#
 	def resizeGL( self, width, height ) :
 
@@ -368,11 +332,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.SetProjectionMatrix( width, height )
 
 
-	#-
 	#
 	# mousePressEvent
-	#
-	#-
 	#
 	def mousePressEvent( self, mouseEvent ) :
 
@@ -389,11 +350,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.trackball.MousePress( [ mouseEvent.x(), mouseEvent.y() ], button )
 
 
-	#-
 	#
 	# mouseReleaseEvent
-	#
-	#-
 	#
 	def mouseReleaseEvent( self, mouseEvent ) :
 
@@ -401,11 +359,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.trackball.MouseRelease()
 
 
-	#-
 	#
 	# mouseMoveEvent
-	#
-	#-
 	#
 	def mouseMoveEvent( self, mouseEvent ) :
 
@@ -416,11 +371,8 @@ class OpenGLWidget( QGLWidget ) :
 			self.update()
 
 
-	#-
 	#
 	# wheelEvent
-	#
-	#-
 	#
 	def wheelEvent( self, event ) :
 
@@ -434,11 +386,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.update()
 
 
-	#-
 	#
 	# OpenGLInfo
-	#
-	#-
 	#
 	def OpenGLInfo( self ) :
 
@@ -450,11 +399,8 @@ class OpenGLWidget( QGLWidget ) :
 		return ( gl_vendor, gl_renderer, gl_version, gl_shader )
 
 
-	#--
 	#
 	# SetProjectionMatrix
-	#
-	#--
 	#
 	def SetProjectionMatrix( self, width, height ) :
 
@@ -469,11 +415,8 @@ class OpenGLWidget( QGLWidget ) :
 		self.projection_matrix[3,2] = - 2.0 * near * far / (far - near)
 		
 		
-	#-
 	#
 	# Initialisation of a color bar
-	#
-	#-
 	#
 	def InitColorBar( self ) :
 
@@ -519,11 +462,8 @@ class OpenGLWidget( QGLWidget ) :
 		glUseProgram( 0 )
 
 
-#-
 #
 #  LoadShader
-#
-#-
 #
 def LoadShader( name, geometry_enabled=False ) :
 
@@ -561,11 +501,8 @@ def LoadShader( name, geometry_enabled=False ) :
 	return program_id
 
 
-#-
 #
 #  CreateShader
-#
-#-
 #
 def CreateShader( filename, shader_type ) :
 

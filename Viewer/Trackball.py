@@ -12,32 +12,21 @@
 #
 
 
-#--
 #
 # External dependencies
-#
-#--
 #
 from math import cos, sin, pi, sqrt, radians
 from numpy import array, identity, zeros, float32, dot, cross, copy
 
 
-#--
 #
-# Trackball
-#
-#--
-#
-# Create a trackball for smooth visualization
+# Create a trackball for smooth object manipulation
 #
 class Trackball :
 
 
-	#-
 	#
 	# Initialisation
-	#
-	#-
 	#
 	def __init__( self, width, height ) :
 
@@ -55,11 +44,8 @@ class Trackball :
 		self.transformation = identity( 4, dtype=float32 )
 
 
-	#-
 	#
-	# Reset
-	#
-	#-
+	# Reset the current transformation
 	#
 	def Reset( self ) :
 
@@ -67,11 +53,8 @@ class Trackball :
 		self.transformation = identity( 4, dtype=float32 )
 
 
-	#-
 	#
-	# Resize
-	#
-	#-
+	# Resize the viewing parameters
 	#
 	def Resize( self, width, height ) :
 
@@ -80,11 +63,8 @@ class Trackball :
 		self.height = height
 
 
-	#-
 	#
-	# MousePress
-	#
-	#-
+	# Handle when a mouse button is pressed
 	#
 	def MousePress( self, mouse_position, button ) :
 
@@ -95,11 +75,8 @@ class Trackball :
 		self.button = button
 
 
-	#-
 	#
-	# MouseRelease
-	#
-	#-
+	# Handle when a mouse button is released
 	#
 	def MouseRelease( self ) :
 
@@ -107,11 +84,8 @@ class Trackball :
 		self.button = 0
 
 
-	#-
 	#
-	# WheelEvent
-	#
-	#-
+	# Handle when the mouse wheel is used
 	#
 	def WheelEvent( self, delta ) :
 
@@ -126,11 +100,8 @@ class Trackball :
 		self.transformation = self.TranslateMatrix( self.transformation, translation )
 
 
-	#-
 	#
-	# Motion
-	#
-	#-
+	# Handle when the mouse is moved
 	#
 	def Motion( self, current_mouse_position ) :
 
@@ -167,11 +138,6 @@ class Trackball :
 		return False
 
 	
-	#-
-	#
-	# TrackballRotation
-	#
-	#-
 	#
 	# Update the rotation of the trackball
 	#
@@ -194,15 +160,11 @@ class Trackball :
 		self.previous_mouse_position = current_mouse_position
 
 
-	#-
 	#
-	# TrackballMapping
-	#
-	#-
+	# Map the mouse position onto a unit sphere
 	#
 	def TrackballMapping( self, mouse_position ) :
 
-		# Map the mouse position onto a unit sphere
 		v = zeros( 3 )
 		v[0] = ( 2.0 * mouse_position[0] - self.width ) / self.width
 		v[1] = ( self.height - 2.0 * mouse_position[1] ) / self.height
@@ -212,11 +174,8 @@ class Trackball :
 		return v / sqrt(( v**2 ).sum())
 
 
-	#--
 	#
-	# Camera2Model
-	#
-	#--
+	# Transform a vector from the camera space to the object space
 	#
 	def Camera2Model( self, vector ) :
 
@@ -224,11 +183,8 @@ class Trackball :
 		return dot( self.transformation[:3,:3], vector )
 
 
-	#--
 	#
-	# TranslateMatrix
-	#
-	#--
+	# Translate a matrix with a direction vector
 	#
 	def TranslateMatrix( self, matrix, direction ) :
 
@@ -238,11 +194,8 @@ class Trackball :
 		return T
 
 
-	#--
 	#
-	# RotateMatrix
-	#
-	#--
+	# Rotate a matrix according to a given angle and axis
 	#
 	def RotateMatrix( self, matrix, angle, axis ) :
 
@@ -259,5 +212,3 @@ class Trackball :
 			    [ cx*z - y*s, cy*z + x*s,   cz*z + c, 0],
 			    [          0,          0,          0, 1] ], dtype=float32 ).T
 		return dot( R, matrix )
-
-

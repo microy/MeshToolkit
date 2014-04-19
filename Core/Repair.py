@@ -1,21 +1,13 @@
 # -*- coding:utf-8 -*- 
 
 
-#--
 #
 # External dependencies
-#
-#--
 #
 from .Mesh import Mesh
 from numpy import array, isfinite, zeros
 
 
-#--
-#
-# CheckMesh
-#
-#--
 #
 # Check several parameters of a given mesh
 #
@@ -80,13 +72,8 @@ def CheckMesh( mesh ) :
 	return log_message
 
 
-#--
 #
-# CheckNeighborhood
-#
-#--
-#
-# Check neighborhood parameters
+# Check neighborhood parameters of a given mesh
 #
 def CheckNeighborhood( mesh ) :
 
@@ -101,13 +88,8 @@ def CheckNeighborhood( mesh ) :
 	return log_message
 
 
-#--
 #
-# RemoveIsolatedVertices
-#
-#--
-#
-# Remove isolated vertices in the mesh
+# Remove isolated vertices in a given mesh
 # TODO : process colors and texture coordinates
 #
 def RemoveIsolatedVertices( mesh ) :
@@ -138,13 +120,8 @@ def RemoveIsolatedVertices( mesh ) :
 	mesh.UpdateNeighbors()
 
 
-#--
 #
-# InvertFacesOrientation
-#
-#--
-#
-# Invert orientation of every face in a given mesh
+# Invert the orientation of every face in a given mesh
 #
 def InvertFacesOrientation( mesh ) :
 
