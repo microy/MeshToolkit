@@ -44,28 +44,29 @@ if __name__ == "__main__" :
 	mesh.UpdateNeighbors()
 	print( '  Done.' )
 
-	print( '~~~ Check mesh ~~~' )
-	print( CheckMesh( mesh ) )
-	print( '  Done.' )
+#	print( '~~~ Check mesh ~~~' )
+#	print( CheckMesh( mesh ) )
+#	print( '  Done.' )
 
-	print( '~~~ Check neighborhood ~~~' )
-	print( CheckNeighborhood( mesh ) )
-	print( '  Done.' )
+#	print( '~~~ Check neighborhood ~~~' )
+#	print( CheckNeighborhood( mesh ) )
+#	print( '  Done.' )
 
-	print( '~~~ Register edges ~~~' )
-	mesh.UpdateEdges()
-	print( '  Done.' )
+#	print( '~~~ Register edges ~~~' )
+#	mesh.UpdateEdges()
+#	print( '  Done.' )
 #	print len( mesh.edges.keys() )
 #	print mesh.edges
 
-#	print( '~~~ Neighbor ~~~' )
-#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=1))
+#	print( '~~~ Curvature time ~~~' )
+#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=10))
 #	print( '  Done.' )
 
-#	print '~~~ Compute curvature ~~~'
+	print '~~~ Compute curvature ~~~'
+	curvature = GetNormalCurvature( mesh )
 #	curvature = GetGaussianCurvature( mesh )
-#	mesh.colors = Array2Colors( curvature )
-#	print '  Done.'
+	mesh.colors = VectorArray2Colors( curvature )
+	print '  Done.'
 
 #	print '~~~ Color vertices ~~~'
 #	b = numpy.zeros( (len(mesh.vertices),3) )

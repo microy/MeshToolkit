@@ -10,61 +10,94 @@
 #
 
 
-#--
 #
 # External dependencies
-#
-#--
 #
 from numpy import dot, cross, zeros
 from math import pi, sqrt, atan2
 
 
-#--
 #
-# GetNormalCurvature
-#
-#--
-#
-# Compute the normal curvature vectors of the mesh
-# for every vertex
+# Compute the normal curvature vectors of a given mesh
 #
 def GetNormalCurvature( mesh ) :
 
-	# Initialise normal curvature array
+	# Initialisation
 	normal_curvature = zeros( mesh.vertices.shape )
+	mixed_area = zeros( (len(mesh.vertices),1) )
+	
+	# Loop through the faces
+	for a, b, c in mesh.faces :
 
-	# Loop through the vertices
-	for v1 in range(len( mesh.vertices ) ) :
+		# Get the vertices
+		va, vb, vc = mesh.vertices[[a, b, c]]
 
-		# Check border
-		if mesh.IsBorderVertex( v1 ) : continue
+		# Compute cotangent of each angle
+		cota = Cotangent( vb-va, vc-va )
+		cotb = Cotangent( va-vb, vc-vb )
+		cotc = Cotangent( va-vc, vb-vc )
 
-		# Get the 1-ring neighborhood
-		for v2 in mesh.neighbor_vertices[v1] :
+		# Add vectors to vertex normal curvature
+		normal_curvature[a] += (va-vc) * cotb + (va-vb) * cotc
+		normal_curvature[b] += (vb-vc) * cota + (vb-va) * cotc
+		normal_curvature[c] += (vc-va) * cotb + (vc-vb) * cota
+		
+		#
+		# Compute "mixed" area
+		#
 
-			# Initialise the ponderation coefficient
-			coef = 0.0
+		# Compute triangle area
+		face_area = sqrt((cross((vb-va),(vc-va))**2).sum()) / 2.0
+
+		# Obtuse triangle cases (Voronoi inappropriate)
+		if dot( vb-va, vc-va ) <  0 :
 			
-			# Find third vertices along the edge
-			for v3 in mesh.neighbor_vertices[v1] & mesh.neighbor_vertices[v2] :
-				
-				# Compute the cotangent of the angle opposite to the edge
-				# and add it to the ponderation coefficient
-				coef += Cotangent( mesh.vertices[v3], mesh.vertices[v1], mesh.vertices[v2] )
+			mixed_area[a] += face_area / 2.0
+			mixed_area[b] += face_area / 4.0
+			mixed_area[c] += face_area / 4.0
+			
+		elif dot( va-vb, vc-vb ) <  0 :
+			
+			mixed_area[a] += face_area / 4.0
+			mixed_area[b] += face_area / 2.0
+			mixed_area[c] += face_area / 4.0
+			
+		elif dot( va-vc, vb-vc ) <  0 :
+			
+			mixed_area[a] += face_area / 4.0
+			mixed_area[b] += face_area / 4.0
+			mixed_area[c] += face_area / 2.0
+			
+		# Non-obtuse triangle case (Voronoi area)
+		else :
+		
+			u = ( (va - vb) ** 2 ).sum()
+			v = ( (va - vc) ** 2 ).sum()
+			w = ( (vb - vc) ** 2 ).sum()
+			mixed_area[a] += ( u * cotc + v * cotb ) / 8.0
+			mixed_area[b] += ( u * cotc + w * cota ) / 8.0
+			mixed_area[c] += ( v * cotb + w * cota ) / 8.0
 
-			# Add the edge value to the normal curvature of this vertex
-			normal_curvature[v1] += (coef * (mesh.vertices[v1] - mesh.vertices[v2]))
-
+	# Weight the normal curvature vectors by the mixed area
+	normal_curvature /= 2.0 * mixed_area
+	
+	# Remove border vertices
+	for i in range(len( mesh.vertices ) ) :
+		if mesh.IsBorderVertex( i ) : normal_curvature[i] = 0.0
+		
 	# Return the normal curvature vector array
 	return normal_curvature
 
 
-#--
+
 #
-# ComputeGaussianNormal
+# Cotangent between two vectors
 #
-#--
+def Cotangent( u, v ) :
+
+	return dot( u, v ) / sqrt( dot(u, u) * dot(v, v) - dot(u, v) ** 2 )
+
+
 #
 # Compute vertex gaussian curvature
 #
@@ -104,77 +137,12 @@ def GetGaussianCurvature( mesh ) :
 		
 	return gaussian_curvature
 
-
-#--
-#
-# Cotangent
-#
-#--
-#
-# Cotangent between two vectors formed by three points
-#
-def Cotangent( vo, va, vb ) :
-
-	u = va - vo
-	v = vb - vo
-	lu = dot( u, u )
-	lv = dot( v, v )
-	dot_uv = dot( u, v )
-	return dot_uv / sqrt( lu * lv - dot_uv * dot_uv )
-
-
-#--
-#
-# ObtuseAngle
-#
-#--
-#
-# Tell if an angle formed by three points is obtuse
-#
-def ObtuseAngle( vo, va, vb ) :
-
-	u = va - vo
-	v = vb - vo
-	return dot( u, v ) < 0.0
-
-
-#--
-#
-# AngleFromCotan
-#
-#--
 #
 # 
 #
-def AngleFromCotan( vo, va, vb ) :
+def AngleFromCotan( u, v ) :
 
-	u = va - vo
-	v = vb - vo
 	udotv = dot( u, v )
 	denom = (u**2).sum()*(v**2).sum() - udotv*udotv;
 	return abs( atan2( sqrt(denom), udotv ) )
-
-
-#--
-#
-# VoronoiRegionArea
-#
-#--
-#
-# Compute the Voronoi region area of a triangle
-#
-def VoronoiRegionArea( vo, va, vb ) :
-
-	# Compute triangle area
-	face_area = sqrt((cross((va-vo),(vb-vo))**2).sum()) * 0.5;
-
-	# Degenerated triangle
-	if face_area == 0.0 : return 0.0
-
-	# Obtuse triangle cases (Voronoi inappropriate)
-	if ObtuseAngle(vo, va, vb) : return face_area * 0.5
-	if ObtuseAngle(va, vb, vo) or ObtuseAngle(vb, vo, va) : return face_area * 0.25
-
-	# Non-obtuse triangle case (Voronoi area)
-	return (Cotangent(va, vo, vb) * ((vo - vb)**2).sum() + Cotangent(vb, vo, va) * ((vo - va)**2).sum()) * 0.125
 
