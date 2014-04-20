@@ -97,6 +97,16 @@ def RemoveIsolatedVertices( mesh ) :
 	# Register isolated vertices
 	isolated_vertices = (array([len(neighbor) for neighbor in mesh.neighbor_faces]) == 0)
 
+	#
+	# Pouet
+	#
+	border_vertices = zeros( len(self.vertices) )
+	border_vertices[ self.faces[:,0] ] += 1
+	border_vertices[ self.faces[:,1] ] += 1
+	border_vertices[ self.faces[:,2] ] += 1
+	if any( border_vertices == 0 ) : print "Isolated vertices"
+
+
 	# Do nothing if there is no isolated vertex
 	if not isolated_vertices.any() : return
 
@@ -126,7 +136,7 @@ def RemoveIsolatedVertices( mesh ) :
 def InvertFacesOrientation( mesh ) :
 
 	# Swap two vertices in each face
-	for face in mesh.faces : face[0], face[1] = face[1], face[0]
+	mesh.faces[ :, [0, 1, 2] ] = mesh.faces[ :, [1, 0, 2] ]
 
 	# Recompute face and vertex normals
 	mesh.UpdateNormals()
