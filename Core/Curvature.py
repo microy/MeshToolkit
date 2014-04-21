@@ -64,11 +64,14 @@ def GetNormalCurvature2( mesh ) :
 	# Create an indexed view of the triangles
 	tris = mesh.vertices[ mesh.faces ]
 
-	# Compute cotangent of each angle
-	cota = Cotangent2( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ).reshape(-1, 1)
-	cotb = Cotangent2( tris[::,0] - tris[::,1], tris[::,2] - tris[::,1] ).reshape(-1, 1)
-	cotc = Cotangent2( tris[::,0] - tris[::,2], tris[::,1] - tris[::,2] ).reshape(-1, 1)
-
+	# Compute angle cotangent of each face
+	cotangent = array( [ Cotangent2( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ),
+				Cotangent2( tris[::,0] - tris[::,1], tris[::,2] - tris[::,1] ),
+				Cotangent2( tris[::,0] - tris[::,2], tris[::,1] - tris[::,2] ) ] ).T
+	
+	# Compute triangle area
+	face_area = sqrt( (cross( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ) ** 2).sum(axis=1) ) / 2.0
+	
 	# Loop through the faces
 	for i, (a, b, c) in enumerate(mesh.faces) :
 
@@ -76,23 +79,9 @@ def GetNormalCurvature2( mesh ) :
 		va, vb, vc = mesh.vertices[[a, b, c]]
 		
 		# Add vectors to vertex normal curvature
-		normal_curvature[a] += (va-vc) * cotb[i] + (va-vb) * cotc[i]
-		normal_curvature[b] += (vb-vc) * cota[i] + (vb-va) * cotc[i]
-		normal_curvature[c] += (vc-va) * cotb[i] + (vc-vb) * cota[i]
-		
-	#~ # Compute angle cotangent of each face
-	#~ cotangent = GetFaceCotangent( mesh )
-	#~ 
-	#~ # Loop through the faces
-	#~ for i, (a, b, c) in enumerate(mesh.faces) :
-#~ 
-		#~ # Get the vertices
-		#~ va, vb, vc = mesh.vertices[[a, b, c]]
-		#~ 
-		#~ # Add vectors to vertex normal curvature
-		#~ normal_curvature[a] += (va-vc) * cotangent[i,1] + (va-vb) * cotangent[i,2]
-		#~ normal_curvature[b] += (vb-vc) * cotangent[i,0] + (vb-va) * cotangent[i,2]
-		#~ normal_curvature[c] += (vc-va) * cotangent[i,1] + (vc-vb) * cotangent[i,0]
+		normal_curvature[a] += (va-vc) * cotangent[i,1] + (va-vb) * cotangent[i,2]
+		normal_curvature[b] += (vb-vc) * cotangent[i,0] + (vb-va) * cotangent[i,2]
+		normal_curvature[c] += (vc-va) * cotangent[i,1] + (vc-vb) * cotangent[i,0]
 
 	# Remove border vertices
 	for i in range(len( mesh.vertices ) ) :
@@ -100,20 +89,6 @@ def GetNormalCurvature2( mesh ) :
 
 	# Return the normal curvature vector array
 	return normal_curvature
-
-
-#
-# Compute angle cotangents inside each face
-#
-def GetFaceCotangent( mesh ) :
-
-	# Create an indexed view of the triangles
-	tris = mesh.vertices[ mesh.faces ]
-
-	return array( [ Cotangent2( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ),
-				Cotangent2( tris[::,0] - tris[::,1], tris[::,2] - tris[::,1] ),
-				Cotangent2( tris[::,0] - tris[::,2], tris[::,1] - tris[::,2] ) ] ).reshape( -1, 3 )
-
 
 
 #
@@ -186,11 +161,11 @@ def Cotangent( u, v ) :
 	return dot( u, v ) / sqrt( dot(u, u) * dot(v, v) - dot(u, v) ** 2 )
 
 #
-# Cotangent between two vectors
+# Cotangent between two vector array
 #
 def Cotangent2( u, v ) :
 
-	return sum( u * v, axis=1 ) / sqrt( sum( u * u, axis=1 ) * sum( v * v, axis=1 ) - sum( u * v, axis=1 ) ** 2 )
+	return ( u * v ).sum(axis=1) / sqrt( ( u**2 ).sum(axis=1) * ( v**2 ).sum(axis=1) - ( u * v ).sum(axis=1) ** 2 )
 
 
 
