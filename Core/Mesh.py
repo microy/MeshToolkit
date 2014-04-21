@@ -63,10 +63,8 @@ class Mesh :
 		self.vertex_normals = zeros( self.vertices.shape )
 
 		# Add the face normals to the vertex normals
-		for i, (a, b, c) in enumerate( self.faces ) :
-			self.vertex_normals[a] += self.face_normals[i]
-			self.vertex_normals[b] += self.face_normals[i]
-			self.vertex_normals[c] += self.face_normals[i]
+		for i, f in enumerate( self.faces ) :
+			self.vertex_normals[ f ] += self.face_normals[ i ]
 		
 		#~ for i in range(self.vertex_normals.shape[-1]) :
 			#~ self.vertex_normals[:, i] += bincount( self.faces[:, 0], self.face_normals[:, i], minlength=len(self.vertex_normals) )
