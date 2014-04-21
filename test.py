@@ -7,8 +7,8 @@ import timeit
 import numpy
 
 from Core.Mesh import Mesh
-from Core.Repair import CheckMesh, CheckNeighborhood, RemoveIsolatedVertices
-from Core.Curvature import GetNormalCurvature, GetGaussianCurvature
+from Core.Repair import CheckMesh, CheckNeighborhood, RemoveIsolatedVertices, InvertFacesOrientation
+from Core.Curvature import GetNormalCurvature, GetNormalCurvature2, GetGaussianCurvature
 from Core.Color import Array2Colors, VectorArray2Colors
 from Core.Vrml import ReadVrml, WriteVrml
 
@@ -17,8 +17,9 @@ normal_curvature = []
 def test( mesh ) :
 #	for v in range(len(mesh.vertices)) :
 #		if mesh.IsBorderVertex( v ) : pass
-	normal_curvature = GetNormalCurvature( mesh )
-		
+	normal_curvature = GetNormalCurvature2( mesh )
+#	InvertFacesOrientation( mesh )
+#	mesh.UpdateNormals()
 		
 
 if __name__ == "__main__" :
@@ -58,14 +59,16 @@ if __name__ == "__main__" :
 #	print len( mesh.edges.keys() )
 #	print mesh.edges
 
-#	print( '~~~ Curvature time ~~~' )
-#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=10))
-#	print( '  Done.' )
+	#~ print( '~~~ Time ~~~' )
+	#~ print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=10))
+	#~ print( '  Done.' )
 
 	print '~~~ Compute curvature ~~~'
 	curvature = GetNormalCurvature( mesh )
+	curvature2 = GetNormalCurvature2( mesh )
+	print( curvature == curvature2 ).all()
 #	curvature = GetGaussianCurvature( mesh )
-	mesh.colors = VectorArray2Colors( curvature )
+	mesh.colors = VectorArray2Colors( curvature2 )
 	print '  Done.'
 
 #	print '~~~ Color vertices ~~~'
