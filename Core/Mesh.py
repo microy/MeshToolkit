@@ -4,7 +4,7 @@
 #
 # External dependencies
 #
-from numpy import amin, amax, array, cross, sort, sqrt, zeros
+from numpy import amin, amax, array, bincount, cross, sort, sqrt, zeros
 
 
 #
@@ -59,14 +59,25 @@ class Mesh :
 		# Normalise the face normals
 		self.face_normals /= sqrt( (self.face_normals ** 2).sum( axis=1 ) ).reshape( len(self.face_normals), 1 )
 
-		# Intialise the vertex normals
-		self.vertex_normals = zeros( self.vertices.shape, dtype=self.vertices.dtype )
+		# Initialise the vertex normals
+		self.vertex_normals = zeros( self.vertices.shape )
 
 		# Add the face normals to the vertex normals
-		self.vertex_normals[ self.faces[:,0] ] += self.face_normals
-		self.vertex_normals[ self.faces[:,1] ] += self.face_normals
-		self.vertex_normals[ self.faces[:,2] ] += self.face_normals
-
+		for i, (a, b, c) in enumerate( self.faces ) :
+			self.vertex_normals[a] += self.face_normals[i]
+			self.vertex_normals[b] += self.face_normals[i]
+			self.vertex_normals[c] += self.face_normals[i]
+		
+		#~ for i in range(self.vertex_normals.shape[-1]) :
+			#~ self.vertex_normals[:, i] += bincount( self.faces[:, 0], self.face_normals[:, i], minlength=len(self.vertex_normals) )
+			#~ self.vertex_normals[:, i] += bincount( self.faces[:, 1], self.face_normals[:, i], minlength=len(self.vertex_normals) )
+			#~ self.vertex_normals[:, i] += bincount( self.faces[:, 2], self.face_normals[:, i], minlength=len(self.vertex_normals) )
+		
+		# Bug :(
+#		self.vertex_normals[ self.faces[:,0] ] += self.face_normals
+#		self.vertex_normals[ self.faces[:,1] ] += self.face_normals
+#		self.vertex_normals[ self.faces[:,2] ] += self.face_normals
+		
 		# Normalise the vertex normals
 		self.vertex_normals /= sqrt( (self.vertex_normals ** 2).sum( axis=1 ) ).reshape( len(self.vertex_normals), 1 )
 
