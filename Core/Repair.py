@@ -89,7 +89,7 @@ def CheckNeighborhood( mesh ) :
 
 
 #
-# Remove isolated vertices in a given mesh
+# Remove the isolated vertices in a given mesh
 # TODO : process colors and texture coordinates
 #
 def RemoveIsolatedVertices( mesh ) :
@@ -131,6 +131,16 @@ def RemoveIsolatedVertices( mesh ) :
 
 
 #
+# Remove the degenerated faces of a given mesh
+#
+def RemoveDegeneratedFaces( mesh ) :
+		
+	tris = mesh.vertices[ mesh.faces ]
+	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+	print (sqrt((face_normals**2).sum(axis=1))>0).all()
+
+
+#
 # Invert the orientation of every face in a given mesh
 #
 def InvertFacesOrientation( mesh ) :
@@ -140,3 +150,4 @@ def InvertFacesOrientation( mesh ) :
 
 	# Recompute face and vertex normals
 	mesh.UpdateNormals()
+	
