@@ -9,21 +9,22 @@ import numpy
 from numpy import bincount, cross, sqrt, zeros
 
 
-from Core.Mesh import Mesh
+from Core.Mesh import Mesh, GetNeighborFaces, GetNeighborVertices, GetBorderVertices
 from Core.Repair import CheckMesh, CheckNeighborhood, RemoveIsolatedVertices, InvertFacesOrientation
 from Core.Curvature import GetNormalCurvature, GetGaussianCurvature
 from Core.Color import Array2Colors, VectorArray2Colors
 from Core.Vrml import ReadVrml, WriteVrml
 
-normal_curvature = []
 
 def test( mesh ) :
 #	for v in range(len(mesh.vertices)) :
 #		if mesh.IsBorderVertex( v ) : pass
-	normal_curvature = GetNormalCurvature( mesh )
+#	normal_curvature = GetNormalCurvature( mesh )
 #	InvertFacesOrientation( mesh )
-#	mesh.UpdateNormals()
-	
+#	mesh.UpdateNeighbors()
+	neighbor_vertices =  GetNeighborVertices( mesh ) 
+	neighbor_faces =  GetNeighborFaces( mesh )
+
 	
 	
 #
@@ -89,10 +90,6 @@ if __name__ == "__main__" :
 	mesh.UpdateNormals()
 	print( '  Done.' )
 
-	print( '~~~ Register neighbors ~~~' )
-	mesh.UpdateNeighbors()
-	print( '  Done.' )
-
 	print( '~~~ Check mesh ~~~' )
 	print( CheckMesh( mesh ) )
 	print( '  Done.' )
@@ -108,7 +105,7 @@ if __name__ == "__main__" :
 #	print mesh.edges
 
 #	print( '~~~ Time ~~~' )
-#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=10))
+#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=100))
 #	print( '  Done.' )
 
 #	print '~~~ Compute curvature ~~~'
@@ -117,14 +114,12 @@ if __name__ == "__main__" :
 #	mesh.colors = VectorArray2Colors( curvature )
 #	print '  Done.'
 
-#	print '~~~ Color vertices ~~~'
-#	b = numpy.zeros( (len(mesh.vertices),3) )
-#	for v in range(len(mesh.vertices)) :
-#		if mesh.IsBorderVertex( v ) : b[v] = [1,0,0]
-#	mesh.colors = Array2Color( b )
+#	print '~~~ Color border vertices ~~~'
+#	border = GetBorderVertices( mesh )
+#	mesh.colors = Array2Colors( border )
 #	print '  Done.'
 
-	TestNormals( mesh )
+#	TestNormals( mesh )
 
 	print( mesh )
 

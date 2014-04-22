@@ -29,7 +29,7 @@ class Mesh :
 
 
 	#
-	# Print object informations
+	# Return mesh informations
 	#
 	def __str__( self ) :
 		
@@ -79,94 +79,114 @@ class Mesh :
 		self.vertex_normals /= sqrt( ( self.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
 
 
-	#
-	# Collect vertex neighborhoods of a given mesh
-	#
-	def UpdateNeighbors( self ) :
+#
+# Collect the neighbor faces
+#
+def GetNeighborFaces( mesh ) :
 
-		# Initialization
-		self.neighbor_vertices = [ [] for i in range(len( self.vertices )) ]
-		self.neighbor_faces = [ [] for i in range(len( self.vertices )) ]
+	# Initialization
+	neighbor_faces = [ [] for i in range(len( mesh.vertices )) ]
 
-		# Loop through the faces
-		for i, (a, b ,c) in enumerate( self.faces ) :
+	# Loop through the faces
+	for i, (a, b ,c) in enumerate( mesh.faces ) :
 
-			# Add faces bound to each vertex
-			self.neighbor_faces[ a ].append( i )
-			self.neighbor_faces[ b ].append( i )
-			self.neighbor_faces[ c ].append( i )
+		# Add faces bound to each vertex
+		neighbor_faces[ a ].append( i )
+		neighbor_faces[ b ].append( i )
+		neighbor_faces[ c ].append( i )
 
-			# Add vertices link by a face
-			self.neighbor_vertices[ a ].append( b )
-			self.neighbor_vertices[ a ].append( c )
-			self.neighbor_vertices[ b ].append( a )
-			self.neighbor_vertices[ b ].append( c )
-			self.neighbor_vertices[ c ].append( a )
-			self.neighbor_vertices[ c ].append( b )
-
-		# Remove duplicates
-		self.neighbor_vertices =  [ set( i ) for i in self.neighbor_vertices ] 
-		self.neighbor_faces =  [ set( i ) for i in self.neighbor_faces ] 
+	# Return the list of neighbors without duplicates
+	return  [ set( i ) for i in neighbor_faces ] 
 
 
-	#
-	# Collect the mesh edges
-	#
-	def UpdateEdges( self ) :
+#
+# Collect the neighborhoods vertices
+#
+def GetNeighborVertices( mesh ) :
 
-		# Initialization
-		self.edges = {}
-		
-		# Create an indexed view of the edges per face
-		edges = sort( self.faces )[:,[[0,1],[0,2],[1,2]]]
+	# Initialization
+	neighbor_vertices = [ [] for i in range(len( mesh.vertices )) ]
 
-		# Create a dictionary of the mesh edges
-		for i, ef in enumerate( edges ) :
-			for e in ef :
-				edge = tuple( e )
-				if edge not in self.edges :
-					self.edges[edge] = {};
-					self.edges[edge]['face'] = []
-				self.edges[edge]['face'].append( i )
+	# Loop through the faces
+	for i, (a, b ,c) in enumerate( mesh.faces ) :
+
+		# Add vertices link by a face
+		neighbor_vertices[ a ].append( b )
+		neighbor_vertices[ a ].append( c )
+		neighbor_vertices[ b ].append( a )
+		neighbor_vertices[ b ].append( c )
+		neighbor_vertices[ c ].append( a )
+		neighbor_vertices[ c ].append( b )
+
+	# Return the list of neighbors without duplicates
+	return [ set( i ) for i in neighbor_vertices ] 
 
 
-	#
-	# Tell if a vertex is on a border
-	#
-	def IsBorderVertex( self, vertex ) :
+#
+# Collect the mesh edges
+#
+def GetEdges( mesh ) :
 
-		# Loop through the neighbor vertices
-		for v in self.neighbor_vertices[ vertex ] :
+	# Initialization
+	edges = {}
+	
+	# Create an indexed view of the edges per face
+	face_edges = sort( self.faces )[:,[[0,1],[0,2],[1,2]]]
 
+	# Create a dictionary of the mesh edges
+	for i, ef in enumerate( face_edges ) :
+		for e in ef :
+			edge = tuple( e )
+			if edge not in self.edges :
+				edges[edge] = {};
+				edges[edge]['face'] = []
+			edges[edge]['face'].append( i )
+
+	return edges
+
+
+#
+# Tell which vertex is on a border
+#
+def GetBorderVertices( mesh ) :
+	
+	neighbor_vertices =  GetNeighborVertices( mesh ) 
+	neighbor_faces =  GetNeighborFaces( mesh )
+	border_vertices = zeros( len(mesh.vertices), dtype=bool )
+	
+	# Loop through the neighbor vertices
+	for va, vn in enumerate( neighbor_vertices ) :
+		for vb in vn :
+			
 			# Check the number of faces in common between the initial vertex and the neighbor
-			if len(self.neighbor_faces[v] & self.neighbor_faces[vertex]) < 2 : return True
+			if len( neighbor_faces[va] & neighbor_faces[vb] ) < 2 :
+				border_vertices[ va ] = True
+				break
 
-		# Otherwise, it is not on the border
-		return False
+	return border_vertices
+
+#
+# Compute the axis-aligned bounding box
+#
+def GetAxisAlignedBoundingBox( mesh ) :
+
+	# Return the minimum point and the maximum point for each axis
+	return ( amin( mesh.vertices, axis = 0 ), amax( mesh.vertices, axis = 0 ) )
 
 
-	#
-	# Compute the axis-aligned bounding box
-	#
-	def GetAxisAlignedBoundingBox( self ) :
+#
+# Compute the bounding sphere
+#
+def GetBoundingSphere( mesh ) :
 
-		# Return the minimum point and the maximum point for each axis
-		return ( amin( self.vertices, axis = 0 ), amax( self.vertices, axis = 0 ) )
+	# Compute axis-aligned bounding box
+	( pmin, pmax ) = GetAxisAlignedBoundingBox( mesh )
 
+	# Compute center
+	center = 0.5 * (pmin + pmax)
 
-	#
-	# Compute the bounding sphere
-	#
-	def GetBoundingSphere( self ) :
+	# Compute radius
+	radius = sqrt(((center - mesh.vertices) ** 2).sum(axis = 1)).max()
 
-		# Compute axis-aligned bounding box
-		( pmin, pmax ) = self.GetAxisAlignedBoundingBox()
-
-		# Compute center
-		center = 0.5 * (pmin + pmax)
-
-		# Compute radius
-		radius = sqrt(((center - self.vertices) ** 2).sum(axis = 1)).max()
-
-		# Return result
-		return ( center, radius )
+	# Return result
+	return ( center, radius )

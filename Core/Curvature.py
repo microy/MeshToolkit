@@ -15,6 +15,7 @@
 #
 from numpy import array, cross, dot, sqrt, zeros
 from math import pi, atan2
+from .Mesh import GetBorderVertices
 
 
 #
@@ -87,8 +88,9 @@ def GetNormalCurvature( mesh ) :
 	normal_curvature /= 2.0 * mixed_area.reshape( -1, 1 )
 
 	# Remove border vertices
-	for i in range(len( mesh.vertices ) ) :
-		if mesh.IsBorderVertex( i ) : normal_curvature[i] = 0.0
+	border = GetBorderVertices( mesh )
+	for v, on_border in enumerate( border ) :
+		if on_border : normal_curvature[ v ] = 0.0
 
 	# Return the normal curvature vector array
 	return normal_curvature
