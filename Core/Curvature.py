@@ -13,7 +13,7 @@
 #
 # External dependencies
 #
-from numpy import array, cross, dot, sqrt, sum, zeros
+from numpy import array, cross, dot, sqrt, zeros
 from math import pi, atan2
 
 
@@ -24,149 +24,82 @@ def GetNormalCurvature( mesh ) :
 
 	# Initialisation
 	normal_curvature = zeros( mesh.vertices.shape )
-#	mixed_area = GetMixedArea( mesh )
-
-	# Loop through the faces
-	for a, b, c in mesh.faces :
-
-		# Get the vertices
-		va, vb, vc = mesh.vertices[[a, b, c]]
-
-		# Compute cotangent of each angle
-		cota = Cotangent( vb-va, vc-va )
-		cotb = Cotangent( va-vb, vc-vb )
-		cotc = Cotangent( va-vc, vb-vc )
-
-		# Add vectors to vertex normal curvature
-		normal_curvature[a] += (va-vc) * cotb + (va-vb) * cotc
-		normal_curvature[b] += (vb-vc) * cota + (vb-va) * cotc
-		normal_curvature[c] += (vc-va) * cotb + (vc-vb) * cota
-
-	# Weight the normal curvature vectors by the mixed area
-#	normal_curvature /= 2.0 * mixed_area.reshape( (len(mesh.vertices),1) )
-	
-	# Remove border vertices
-	for i in range(len( mesh.vertices ) ) :
-		if mesh.IsBorderVertex( i ) : normal_curvature[i] = 0.0
-		
-	# Return the normal curvature vector array
-	return normal_curvature
-
-
-#
-# Compute the normal curvature vectors of a given mesh
-#
-def GetNormalCurvature2( mesh ) :
-
-	# Initialisation
-	normal_curvature = zeros( mesh.vertices.shape )
+	mixed_area = zeros( len(mesh.vertices) )
 
 	# Create an indexed view of the triangles
 	tris = mesh.vertices[ mesh.faces ]
 
-	# Compute angle cotangent of each face
-	cotangent = array( [ Cotangent2( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ),
-				Cotangent2( tris[::,0] - tris[::,1], tris[::,2] - tris[::,1] ),
-				Cotangent2( tris[::,0] - tris[::,2], tris[::,1] - tris[::,2] ) ] ).T
-	
+	# Compute the cotangent of the triangle angles
+	cotangent = array( [ Cotangent( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ),
+				Cotangent( tris[::,0] - tris[::,1], tris[::,2] - tris[::,1] ),
+				Cotangent( tris[::,0] - tris[::,2], tris[::,1] - tris[::,2] ) ] ).T
+
 	# Compute triangle area
 	face_area = sqrt( (cross( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ) ** 2).sum(axis=1) ) / 2.0
 	
-	# Loop through the faces
-	for i, (a, b, c) in enumerate(mesh.faces) :
+	# Tell if there is an obtuse angle in the triangles
+	obtuse_angle = ( array( [  ((tris[::,1]-tris[::,0])*(tris[::,2]-tris[::,0])).sum(axis=1),
+			((tris[::,0]-tris[::,1])*(tris[::,2]-tris[::,1])).sum(axis=1),
+			((tris[::,0]-tris[::,2])*(tris[::,1]-tris[::,2])).sum(axis=1) ] ) < 0 ).T
+			
+	# Compute the mixed area and the normal curvature vector of each vertex
+	for i, f in enumerate( mesh.faces ) :
 
 		# Get the vertices
-		va, vb, vc = mesh.vertices[[a, b, c]]
+		a, b, c = f
+		va, vb, vc = mesh.vertices[ f ]
 		
-		# Add vectors to vertex normal curvature
-		normal_curvature[a] += (va-vc) * cotangent[i,1] + (va-vb) * cotangent[i,2]
-		normal_curvature[b] += (vb-vc) * cotangent[i,0] + (vb-va) * cotangent[i,2]
-		normal_curvature[c] += (vc-va) * cotangent[i,1] + (vc-vb) * cotangent[i,0]
-
-	# Remove border vertices
-	for i in range(len( mesh.vertices ) ) :
-		if mesh.IsBorderVertex( i ) : normal_curvature[i] = 0.0
-
-	# Return the normal curvature vector array
-	return normal_curvature
-
-
-#
-# Compute the mixed area of every vertex of a given mesh
-#
-def GetMixedArea( mesh ) :
-
-	# Initialisation
-	mixed_area = zeros( len(mesh.vertices) )
-
-	# Create an indexed view of the triangles
-	tris = self.vertices[ self.faces ]
-
-	# Compute triangle area
-	face_area = sqrt( (cross( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ) ** 2).sum(axis=1) ) / 2.0
-	
-	# Loop through the faces
-	for a, b, c in mesh.faces :
-
-		# Get the vertices
-		va, vb, vc = mesh.vertices[[a, b, c]]
-
-		# Compute cotangent of each angle
-		cota = Cotangent( vb-va, vc-va )
-		cotb = Cotangent( va-vb, vc-vb )
-		cotc = Cotangent( va-vc, vb-vc )
-
-		# Compute triangle area
-		face_area = sqrt((cross((vb-va),(vc-va))**2).sum()) / 2.0
-
-		# Obtuse triangle cases (Voronoi inappropriate)
-		if dot( vb-va, vc-va ) <  0 :
+		# Mixed area - Obtuse triangle cases (Voronoi inappropriate)
+		if obtuse_angle[i,0] :
 			
-			mixed_area[a] += face_area / 2.0
-			mixed_area[b] += face_area / 4.0
-			mixed_area[c] += face_area / 4.0
+			mixed_area[a] += face_area[i] / 2.0
+			mixed_area[b] += face_area[i] / 4.0
+			mixed_area[c] += face_area[i] / 4.0
 			
-		elif dot( va-vb, vc-vb ) <  0 :
+		elif obtuse_angle[i,1] :
 			
-			mixed_area[a] += face_area / 4.0
-			mixed_area[b] += face_area / 2.0
-			mixed_area[c] += face_area / 4.0
+			mixed_area[a] += face_area[i] / 4.0
+			mixed_area[b] += face_area[i] / 2.0
+			mixed_area[c] += face_area[i] / 4.0
 			
-		elif dot( va-vc, vb-vc ) <  0 :
+		elif obtuse_angle[i,2] :
 			
-			mixed_area[a] += face_area / 4.0
-			mixed_area[b] += face_area / 4.0
-			mixed_area[c] += face_area / 2.0
+			mixed_area[a] += face_area[i] / 4.0
+			mixed_area[b] += face_area[i] / 4.0
+			mixed_area[c] += face_area[i] / 2.0
 			
-		# Non-obtuse triangle case (Voronoi area)
+		# Mixed area - Non-obtuse triangle case (Voronoi area)
 		else :
 		
 			u = ( (va - vb) ** 2 ).sum()
 			v = ( (va - vc) ** 2 ).sum()
 			w = ( (vb - vc) ** 2 ).sum()
-			mixed_area[a] += ( u * cotc + v * cotb ) / 8.0
-			mixed_area[b] += ( u * cotc + w * cota ) / 8.0
-			mixed_area[c] += ( v * cotb + w * cota ) / 8.0
-	
-	# Return the mixed area of every vertex
-	return mixed_area
+			mixed_area[a] += ( u * cotangent[i,2] + v * cotangent[i,1] ) / 8.0
+			mixed_area[b] += ( u * cotangent[i,2] + w * cotangent[i,0] ) / 8.0
+			mixed_area[c] += ( v * cotangent[i,1] + w * cotangent[i,0] ) / 8.0
 
+		# Compute the normal curvature vector of each vertex
+		normal_curvature[a] += (va-vc) * cotangent[i,1] + (va-vb) * cotangent[i,2]
+		normal_curvature[b] += (vb-vc) * cotangent[i,0] + (vb-va) * cotangent[i,2]
+		normal_curvature[c] += (vc-va) * cotangent[i,1] + (vc-vb) * cotangent[i,0]
+
+	# Weight the normal curvature vectors by the mixed area
+	normal_curvature /= 2.0 * mixed_area.reshape( -1, 1 )
+
+	# Remove border vertices
+	for i in range(len( mesh.vertices ) ) :
+		if mesh.IsBorderVertex( i ) : normal_curvature[i] = 0.0
+
+	# Return the normal curvature vector array
+	return normal_curvature
 
 
 #
-# Cotangent between two vectors
+# Cotangent between two vector arrays
 #
 def Cotangent( u, v ) :
 
-	return dot( u, v ) / sqrt( dot(u, u) * dot(v, v) - dot(u, v) ** 2 )
-
-#
-# Cotangent between two vector array
-#
-def Cotangent2( u, v ) :
-
 	return ( u * v ).sum(axis=1) / sqrt( ( u**2 ).sum(axis=1) * ( v**2 ).sum(axis=1) - ( u * v ).sum(axis=1) ** 2 )
-
 
 
 #
@@ -208,8 +141,9 @@ def GetGaussianCurvature( mesh ) :
 		
 	return gaussian_curvature
 
+
 #
-# 
+# AngleFromCotan
 #
 def AngleFromCotan( u, v ) :
 
