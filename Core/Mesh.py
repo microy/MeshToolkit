@@ -57,14 +57,13 @@ class Mesh :
 		self.face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
 
 		# Normalise the face normals
-		self.face_normals /= sqrt( (self.face_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+		self.face_normals /= sqrt( ( self.face_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
 
 		# Initialise the vertex normals
 		self.vertex_normals = zeros( self.vertices.shape )
 
 		# Add the face normals to the vertex normals
-		for i, f in enumerate( self.faces ) :
-			self.vertex_normals[ f ] += self.face_normals[ i ]
+		for i, f in enumerate( self.faces ) : self.vertex_normals[ f ] += self.face_normals[ i ]
 		
 		#~ for i in range(self.vertex_normals.shape[-1]) :
 			#~ self.vertex_normals[:, i] += bincount( self.faces[:, 0], self.face_normals[:, i], minlength=len(self.vertex_normals) )
@@ -77,7 +76,7 @@ class Mesh :
 #		self.vertex_normals[ self.faces[:,2] ] += self.face_normals
 		
 		# Normalise the vertex normals
-		self.vertex_normals /= sqrt( (self.vertex_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+		self.vertex_normals /= sqrt( ( self.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
 
 
 	#

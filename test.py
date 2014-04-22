@@ -24,6 +24,53 @@ def test( mesh ) :
 #	InvertFacesOrientation( mesh )
 #	mesh.UpdateNormals()
 	
+	
+	
+#
+# Normal computation test
+#
+
+def TestNormals( mesh ) :
+	
+	vn1 = GetNormals1( mesh )
+	vn2 = GetNormals2( mesh )
+	vn3 = GetNormals3( mesh )
+	
+	
+def GetNormals1( mesh ) :
+	tris = mesh.vertices[ mesh.faces ]
+	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+	face_normals /= sqrt( (face_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+	vertex_normals = zeros( mesh.vertices.shape )
+	for i, f in enumerate( mesh.faces ) : vertex_normals[ f ] += face_normals[ i ]
+	return vertex_normals / sqrt( (vertex_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+
+def GetNormals2( mesh ) :
+	tris = mesh.vertices[ mesh.faces ]
+	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+	face_normals /= sqrt( (face_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+	vertex_normals = zeros( mesh.vertices.shape )
+	for i in range(vertex_normals.shape[-1]) :
+		vertex_normals[:, i] += bincount( mesh.faces[:, 0], face_normals[:, i], minlength=len(vertex_normals) )
+		vertex_normals[:, i] += bincount( mesh.faces[:, 1], face_normals[:, i], minlength=len(vertex_normals) )
+		vertex_normals[:, i] += bincount( mesh.faces[:, 2], face_normals[:, i], minlength=len(vertex_normals) )
+	return vertex_normals / sqrt( (vertex_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+
+def GetNormals3( mesh ) :
+	tris = mesh.vertices[ mesh.faces ]
+	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+	face_normals /= sqrt( (face_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+	vertex_normals = zeros( mesh.vertices.shape )
+	vertex_normals[ mesh.faces[:,0] ] += face_normals
+	vertex_normals[ mesh.faces[:,1] ] += face_normals
+	vertex_normals[ mesh.faces[:,2] ] += face_normals
+	return vertex_normals / sqrt( (vertex_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+		
+	
+	
+	
+	
+	
 
 if __name__ == "__main__" :
 
@@ -64,11 +111,11 @@ if __name__ == "__main__" :
 #	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=10))
 #	print( '  Done.' )
 
-	print '~~~ Compute curvature ~~~'
-	curvature = GetNormalCurvature( mesh )
+#	print '~~~ Compute curvature ~~~'
+#	curvature = GetNormalCurvature( mesh )
 #	curvature = GetGaussianCurvature( mesh )
-	mesh.colors = VectorArray2Colors( curvature )
-	print '  Done.'
+#	mesh.colors = VectorArray2Colors( curvature )
+#	print '  Done.'
 
 #	print '~~~ Color vertices ~~~'
 #	b = numpy.zeros( (len(mesh.vertices),3) )
@@ -76,6 +123,8 @@ if __name__ == "__main__" :
 #		if mesh.IsBorderVertex( v ) : b[v] = [1,0,0]
 #	mesh.colors = Array2Color( b )
 #	print '  Done.'
+
+	TestNormals( mesh )
 
 	print( mesh )
 
@@ -85,42 +134,3 @@ if __name__ == "__main__" :
 		WriteVrml( mesh, sys.argv[2] )
 		print( '  Done.' )
 		
-	
-	
-#
-# Normal computation test
-#
-	
-def GetNormals1( mesh ) :
-	tris = mesh.vertices[ mesh.faces ]
-	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
-	print (sqrt((face_normals**2).sum(axis=1))>0).all()
-	face_normals /= sqrt( (face_normals ** 2).sum( axis=1 ) ).reshape( len(face_normals), 1 )
-	vertex_normals = zeros( mesh.vertices.shape )
-	for i, f in enumerate( mesh.faces ) :
-		vertex_normals[ f ] += face_normals[ i ]
-	return vertex_normals / sqrt( (vertex_normals ** 2).sum( axis=1 ) ).reshape( len(vertex_normals), 1 )
-
-def GetNormals2( mesh ) :
-	tris = mesh.vertices[ mesh.faces ]
-	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
-	face_normals /= sqrt( (face_normals ** 2).sum( axis=1 ) ).reshape( len(face_normals), 1 )
-	vertex_normals = zeros( mesh.vertices.shape )
-	for i in range(vertex_normals.shape[-1]) :
-		vertex_normals[:, i] += bincount( mesh.faces[:, 0], face_normals[:, i], minlength=len(vertex_normals) )
-		vertex_normals[:, i] += bincount( mesh.faces[:, 1], face_normals[:, i], minlength=len(vertex_normals) )
-		vertex_normals[:, i] += bincount( mesh.faces[:, 2], face_normals[:, i], minlength=len(vertex_normals) )
-	return vertex_normals / sqrt( (vertex_normals ** 2).sum( axis=1 ) ).reshape( len(vertex_normals), 1 )
-
-def GetNormals3( mesh ) :
-	tris = mesh.vertices[ mesh.faces ]
-	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
-	face_normals /= sqrt( (face_normals ** 2).sum( axis=1 ) ).reshape( len(face_normals), 1 )
-	vertex_normals = zeros( mesh.vertices.shape )
-	vertex_normals[ mesh.faces[:,0] ] += face_normals
-	vertex_normals[ mesh.faces[:,1] ] += face_normals
-	vertex_normals[ mesh.faces[:,2] ] += face_normals
-	return vertex_normals / sqrt( (vertex_normals ** 2).sum( axis=1 ) ).reshape( len(vertex_normals), 1 )
-		
-
-
