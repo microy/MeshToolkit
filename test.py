@@ -9,9 +9,9 @@ import numpy
 from numpy import bincount, cross, sqrt, zeros
 
 
-from Core.Mesh import Mesh, GetNeighborFaces, GetNeighborVertices, GetBorderVertices
+from Core.Mesh import Mesh, UpdateNormals, GetNeighborFaces, GetNeighborVertices, GetBorderVertices
 from Core.Repair import CheckMesh, CheckNeighborhood, RemoveIsolatedVertices, InvertFacesOrientation
-from Core.Curvature import GetNormalCurvature, GetGaussianCurvature
+from Core.Curvature import GetNormalCurvature, GetGaussianCurvature, GetNormalCurvature2
 from Core.Color import Array2Colors, VectorArray2Colors
 from Core.Vrml import ReadVrml, WriteVrml
 
@@ -80,44 +80,47 @@ if __name__ == "__main__" :
 	if len(sys.argv) < 2 : filename = 'Models/cube.wrl'
 	else : filename = sys.argv[1]
 
-	print( '~~~ Read file ' + filename + ' ~~~' )
+	print( '~~ Read file ' + filename + ' ~~' )
 	mesh = ReadVrml( filename )
 	print( '  Done.' )
 
 	print( mesh )
 	
-	print( '~~~ Compute normals ~~~' )
-	mesh.UpdateNormals()
+	print( '~~ Compute normals ~~' )
+	UpdateNormals( mesh )
 	print( '  Done.' )
 
-	print( '~~~ Check mesh ~~~' )
-	print( CheckMesh( mesh ) )
+	print( '~~ Check mesh ~~' )
+	log_message = CheckMesh( mesh )
+	if log_message : print( log_message )
 	print( '  Done.' )
 
-#	print( '~~~ Check neighborhood ~~~' )
+#	print( '~~ Check neighborhood ~~' )
 #	print( CheckNeighborhood( mesh ) )
 #	print( '  Done.' )
 
-#	print( '~~~ Register edges ~~~' )
+#	print( '~~ Register edges ~~' )
 #	mesh.UpdateEdges()
 #	print( '  Done.' )
 #	print len( mesh.edges.keys() )
 #	print mesh.edges
 
-#	print( '~~~ Time ~~~' )
+	print( '~~ Time ~~' )
 #	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=100))
-#	print( '  Done.' )
+	print( "Curvature 1 : {}".format( timeit.timeit("GetNormalCurvature(mesh)", setup="from __main__ import mesh, GetNormalCurvature", number=1) ) )
+	print( "Curvature 2 : {}".format( timeit.timeit("GetNormalCurvature2(mesh)", setup="from __main__ import mesh, GetNormalCurvature2", number=1) ) )
+	print( '  Done.' )
 
-#	print '~~~ Compute curvature ~~~'
+#	print( '~~ Compute curvature ~~' )
 #	curvature = GetNormalCurvature( mesh )
 #	curvature = GetGaussianCurvature( mesh )
 #	mesh.colors = VectorArray2Colors( curvature )
-#	print '  Done.'
+#	print( '  Done.' )
 
-#	print '~~~ Color border vertices ~~~'
+#	print( '~~ Color border vertices ~~' )
 #	border = GetBorderVertices( mesh )
 #	mesh.colors = Array2Colors( border )
-#	print '  Done.'
+#	print( '  Done.' )
 
 #	TestNormals( mesh )
 
@@ -125,7 +128,7 @@ if __name__ == "__main__" :
 
 	if len(sys.argv) == 3 :
 
-		print( '~~~ Write file ' + sys.argv[2] + ' ~~~' )
+		print( '~~ Write file ' + sys.argv[2] + ' ~~' )
 		WriteVrml( mesh, sys.argv[2] )
 		print( '  Done.' )
 		
