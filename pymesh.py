@@ -10,25 +10,12 @@ import timeit
 from numpy import bincount, cross, sqrt, zeros, allclose
 from PyMesh.Mesh import Mesh, UpdateNormals, GetNeighborFaces, GetNeighborVertices, GetBorderVertices
 from PyMesh.Tools.Repair import CheckMesh, CheckNeighborhood, RemoveIsolatedVertices, InvertFacesOrientation
-from PyMesh.Tools.Curvature import GetNormalCurvature, GetGaussianCurvature, GetNormalCurvature2
+from PyMesh.Tools.Curvature import GetNormalCurvature, GetGaussianCurvature
 from PyMesh.Tools.Color import Array2Colors, VectorArray2Colors
 from PyMesh.File.Vrml import ReadVrml, WriteVrml
 
 
 
-#
-# Curvature computation test
-#
-
-def TestCurvature( mesh ) :
-	c1 = GetNormalCurvature( mesh )
-	c2 = GetNormalCurvature2( mesh )
-	print( "Curvature 1 : {}".format( timeit.timeit("GetNormalCurvature(mesh)", setup="from __main__ import mesh, GetNormalCurvature", number=1) ) )
-	print( "Curvature 2 : {} {}".format( timeit.timeit("GetNormalCurvature2(mesh)", setup="from __main__ import mesh, GetNormalCurvature2", number=1),
-		allclose( c1, c2 ) ) )
-
-	
-	
 #
 # Normal computation test
 #
@@ -108,20 +95,20 @@ if __name__ == "__main__" :
 #	print len( mesh.edges.keys() )
 #	print mesh.edges
 
-#	print( '~~ Compute curvature ~~' )
-#	curvature = GetNormalCurvature( mesh )
+	print( '~~ Compute curvature ~~' )
+	curvature = GetNormalCurvature( mesh )
 #	curvature = GetGaussianCurvature( mesh )
-#	mesh.colors = VectorArray2Colors( curvature )
-#	print( '  Done.' )
+	mesh.colors = VectorArray2Colors( curvature )
+	print( '  Done.' )
 
 #	print( '~~ Color border vertices ~~' )
 #	border = GetBorderVertices( mesh )
 #	mesh.colors = Array2Colors( border )
 #	print( '  Done.' )
 
-	print( '~~ Test curvature ~~' )
-	TestCurvature( mesh )
-	print( '  Done.' )
+#	print( '~~ Test curvature ~~' )
+#	TestCurvature( mesh )
+#	print( '  Done.' )
 
 #	print( '~~ Test normals ~~' )
 #	TestNormals( mesh )
