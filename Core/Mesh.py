@@ -45,38 +45,38 @@ class Mesh :
 		return log_message
 
 
-	#
-	# Compute normal vectors of the faces and vertices
-	#
-	def UpdateNormals( self ) :
+#
+# Compute normal vectors of the faces and vertices
+#
+def UpdateNormals( mesh ) :
 
-		# Create an indexed view of the triangles
-		tris = self.vertices[ self.faces ]
+	# Create an indexed view of the triangles
+	tris = mesh.vertices[ mesh.faces ]
 
-		# Calculate the normal for all the triangles
-		self.face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+	# Calculate the normal for all the triangles
+	mesh.face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
 
-		# Normalise the face normals
-		self.face_normals /= sqrt( ( self.face_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
+	# Normalise the face normals
+	mesh.face_normals /= sqrt( ( mesh.face_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
 
-		# Initialise the vertex normals
-		self.vertex_normals = zeros( self.vertices.shape )
+	# Initialise the vertex normals
+	mesh.vertex_normals = zeros( mesh.vertices.shape )
 
-		# Add the face normals to the vertex normals
-		for i, f in enumerate( self.faces ) : self.vertex_normals[ f ] += self.face_normals[ i ]
-		
-		#~ for i in range(self.vertex_normals.shape[-1]) :
-			#~ self.vertex_normals[:, i] += bincount( self.faces[:, 0], self.face_normals[:, i], minlength=len(self.vertex_normals) )
-			#~ self.vertex_normals[:, i] += bincount( self.faces[:, 1], self.face_normals[:, i], minlength=len(self.vertex_normals) )
-			#~ self.vertex_normals[:, i] += bincount( self.faces[:, 2], self.face_normals[:, i], minlength=len(self.vertex_normals) )
-		
-		# Bug :(
+	# Add the face normals to the vertex normals
+	for i, f in enumerate( mesh.faces ) : mesh.vertex_normals[ f ] += mesh.face_normals[ i ]
+	
+	#~ for i in range(self.vertex_normals.shape[-1]) :
+		#~ self.vertex_normals[:, i] += bincount( self.faces[:, 0], self.face_normals[:, i], minlength=len(self.vertex_normals) )
+		#~ self.vertex_normals[:, i] += bincount( self.faces[:, 1], self.face_normals[:, i], minlength=len(self.vertex_normals) )
+		#~ self.vertex_normals[:, i] += bincount( self.faces[:, 2], self.face_normals[:, i], minlength=len(self.vertex_normals) )
+	
+	# Bug :(
 #		self.vertex_normals[ self.faces[:,0] ] += self.face_normals
 #		self.vertex_normals[ self.faces[:,1] ] += self.face_normals
 #		self.vertex_normals[ self.faces[:,2] ] += self.face_normals
-		
-		# Normalise the vertex normals
-		self.vertex_normals /= sqrt( ( self.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
+	
+	# Normalise the vertex normals
+	mesh.vertex_normals /= sqrt( ( mesh.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
 
 
 #

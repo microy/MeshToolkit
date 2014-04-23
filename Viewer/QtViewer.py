@@ -8,7 +8,8 @@ import platform
 import PySide
 from PySide import QtGui, QtCore
 from PySide.QtGui import QMainWindow, QFileDialog, QMessageBox
-from Core.Repair import CheckMesh, CheckNeighborhood
+from Core.Mesh import UpdateNormals
+from Core.Repair import CheckMesh
 from Core.Vrml import ReadVrml, WriteVrml
 from QtViewerUI import Ui_MainWindow
 
@@ -51,7 +52,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 		# Compute mesh normals if necessary
 		if len(self.mesh.vertex_normals) != len(self.mesh.vertices) :
-			self.mesh.UpdateNormals()
+			UpdateNormals( self.mesh )
 
 		# Send the mesh to the OpenGL viewer
 		self.opengl_widget.LoadMesh( self.mesh )
@@ -84,12 +85,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		# Nothing to check
 		if not self.mesh : return
 
-		# Record neighborhood informations
-		self.mesh.UpdateNeighbors()
-
 		# Check different parameters of the mesh
 		CheckMesh( self.mesh )
-		CheckNeighborhood( self.mesh )
 
 
 	#

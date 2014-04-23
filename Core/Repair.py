@@ -4,7 +4,7 @@
 #
 # External dependencies
 #
-from .Mesh import Mesh
+from .Mesh import Mesh, UpdateNormals
 from numpy import array, isfinite, zeros
 
 
@@ -97,15 +97,12 @@ def RemoveIsolatedVertices( mesh ) :
 	# Register isolated vertices
 	isolated_vertices = (array([len(neighbor) for neighbor in mesh.neighbor_faces]) == 0)
 
-	#
 	# Pouet
-	#
-	border_vertices = zeros( len(self.vertices) )
-	border_vertices[ self.faces[:,0] ] += 1
-	border_vertices[ self.faces[:,1] ] += 1
-	border_vertices[ self.faces[:,2] ] += 1
-	if any( border_vertices == 0 ) : print "Isolated vertices"
-
+#	isolated_vertices = zeros( len(self.vertices) )
+#	isolated_vertices[ self.faces[:,0] ] += 1
+#	isolated_vertices[ self.faces[:,1] ] += 1
+#	isolated_vertices[ self.faces[:,2] ] += 1
+#	if any( isolated_vertices == 0 ) : print( "Isolated vertices" )
 
 	# Do nothing if there is no isolated vertex
 	if not isolated_vertices.any() : return
@@ -126,8 +123,7 @@ def RemoveIsolatedVertices( mesh ) :
 	# Update the mesh
 	mesh.vertices = array( new_vertices )
 	mesh.faces = new_faces
-	mesh.UpdateNormals()
-	mesh.UpdateNeighbors()
+	UpdateNormals( mesh )
 
 
 #
@@ -149,5 +145,5 @@ def InvertFacesOrientation( mesh ) :
 	mesh.faces[ :, [0, 1, 2] ] = mesh.faces[ :, [1, 0, 2] ]
 
 	# Recompute face and vertex normals
-	mesh.UpdateNormals()
+	UpdateNormals( mesh )
 	
