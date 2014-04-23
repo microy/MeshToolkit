@@ -4,7 +4,7 @@
 #
 # External dependencies
 #
-from .Mesh import Mesh, UpdateNormals
+from PyMesh.Mesh import Mesh, UpdateNormals
 from numpy import array, isfinite, zeros
 
 

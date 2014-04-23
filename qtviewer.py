@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*- 
 
 
-from Viewer.QtViewer import QtViewer
+from PyMesh.Viewer.QtViewer import QtViewer
 from PySide import QtGui
 import sys
 

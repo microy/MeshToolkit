@@ -5,7 +5,7 @@
 # External dependencies
 #
 from numpy import array
-from .Mesh import Mesh
+from PyMesh.Mesh import Mesh
 
 
 #

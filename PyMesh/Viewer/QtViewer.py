@@ -8,9 +8,9 @@ import platform
 import PySide
 from PySide import QtGui, QtCore
 from PySide.QtGui import QMainWindow, QFileDialog, QMessageBox
-from Core.Mesh import UpdateNormals
-from Core.Repair import CheckMesh
-from Core.Vrml import ReadVrml, WriteVrml
+from PyMesh.Mesh import UpdateNormals
+from PyMesh.Tools.Repair import CheckMesh
+from PyMesh.File.Vrml import ReadVrml, WriteVrml
 from QtViewerUI import Ui_MainWindow
 
 

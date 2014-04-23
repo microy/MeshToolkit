@@ -15,9 +15,9 @@ from PySide import QtGui, QtCore, QtOpenGL
 from PySide.QtOpenGL import QGLWidget, QGLFormat, QGL
 from math import tan, pi
 from numpy import array, identity, dot, float32, uint32, zeros
-from Core.Color import Value2Color, Value2ColorAlternate
-from Core.Mesh import GetBoundingSphere
-from .Trackball import Trackball
+from PyMesh.Tools.Color import Value2Color, Value2ColorAlternate
+from PyMesh.Mesh import GetBoundingSphere
+from PyMesh.Viewer.Trackball import Trackball
 
 
 #
@@ -469,9 +469,9 @@ class OpenGLWidget( QGLWidget ) :
 def LoadShader( name, geometry_enabled=False ) :
 
 	# Create the shaders
-	vertex_shader = CreateShader( 'Viewer/Shaders/'+name+'.vert.glsl', GL_VERTEX_SHADER )
-	fragment_shader = CreateShader( 'Viewer/Shaders/'+name+'.frag.glsl', GL_FRAGMENT_SHADER )
-	if geometry_enabled : geometry_shader = CreateShader( 'Viewer/Shaders/'+name+'.geom.glsl', GL_GEOMETRY_SHADER )
+	vertex_shader = CreateShader( 'PyMesh/Viewer/Shaders/'+name+'.vert.glsl', GL_VERTEX_SHADER )
+	fragment_shader = CreateShader( 'PyMesh/Viewer/Shaders/'+name+'.frag.glsl', GL_FRAGMENT_SHADER )
+	if geometry_enabled : geometry_shader = CreateShader( 'PyMesh/Viewer/Shaders/'+name+'.geom.glsl', GL_GEOMETRY_SHADER )
 
 	# Create the program
 	program_id = glCreateProgram()

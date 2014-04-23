@@ -9,11 +9,11 @@ import numpy
 from numpy import bincount, cross, sqrt, zeros
 
 
-from Core.Mesh import Mesh, UpdateNormals, GetNeighborFaces, GetNeighborVertices, GetBorderVertices
-from Core.Repair import CheckMesh, CheckNeighborhood, RemoveIsolatedVertices, InvertFacesOrientation
-from Core.Curvature import GetNormalCurvature, GetGaussianCurvature, GetNormalCurvature2
-from Core.Color import Array2Colors, VectorArray2Colors
-from Core.Vrml import ReadVrml, WriteVrml
+from PyMesh.Mesh import Mesh, UpdateNormals, GetNeighborFaces, GetNeighborVertices, GetBorderVertices
+from PyMesh.Tools.Repair import CheckMesh, CheckNeighborhood, RemoveIsolatedVertices, InvertFacesOrientation
+from PyMesh.Tools.Curvature import GetNormalCurvature, GetGaussianCurvature, GetNormalCurvature2
+from PyMesh.Tools.Color import Array2Colors, VectorArray2Colors
+from PyMesh.File.Vrml import ReadVrml, WriteVrml
 
 
 def test( mesh ) :
