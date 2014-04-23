@@ -2,13 +2,12 @@
 # -*- coding:utf-8 -*- 
 
 
+#
+# External dependencies
+#
 import sys
 import timeit
-import numpy
-
-from numpy import bincount, cross, sqrt, zeros
-
-
+from numpy import bincount, cross, sqrt, zeros, allclose
 from PyMesh.Mesh import Mesh, UpdateNormals, GetNeighborFaces, GetNeighborVertices, GetBorderVertices
 from PyMesh.Tools.Repair import CheckMesh, CheckNeighborhood, RemoveIsolatedVertices, InvertFacesOrientation
 from PyMesh.Tools.Curvature import GetNormalCurvature, GetGaussianCurvature, GetNormalCurvature2
@@ -16,14 +15,17 @@ from PyMesh.Tools.Color import Array2Colors, VectorArray2Colors
 from PyMesh.File.Vrml import ReadVrml, WriteVrml
 
 
-def test( mesh ) :
-#	for v in range(len(mesh.vertices)) :
-#		if mesh.IsBorderVertex( v ) : pass
-#	normal_curvature = GetNormalCurvature( mesh )
-#	InvertFacesOrientation( mesh )
-#	mesh.UpdateNeighbors()
-	neighbor_vertices =  GetNeighborVertices( mesh ) 
-	neighbor_faces =  GetNeighborFaces( mesh )
+
+#
+# Curvature computation test
+#
+
+def TestCurvature( mesh ) :
+	c1 = GetNormalCurvature( mesh )
+	c2 = GetNormalCurvature2( mesh )
+	print( "Curvature 1 : {}".format( timeit.timeit("GetNormalCurvature(mesh)", setup="from __main__ import mesh, GetNormalCurvature", number=1) ) )
+	print( "Curvature 2 : {} {}".format( timeit.timeit("GetNormalCurvature2(mesh)", setup="from __main__ import mesh, GetNormalCurvature2", number=1),
+		allclose( c1, c2 ) ) )
 
 	
 	
@@ -36,7 +38,9 @@ def TestNormals( mesh ) :
 	vn1 = GetNormals1( mesh )
 	vn2 = GetNormals2( mesh )
 	vn3 = GetNormals3( mesh )
-	
+	print( "GetNormals 1 : {}".format( timeit.timeit("GetNormals1(mesh)", setup="from __main__ import mesh, GetNormals1", number=1) ) )
+	print( "GetNormals 2 : {} {}".format( timeit.timeit("GetNormals2(mesh)", setup="from __main__ import mesh, GetNormals2", number=1), allclose( vn1, vn2 ) ) )
+	print( "GetNormals 3 : {} {}".format( timeit.timeit("GetNormals3(mesh)", setup="from __main__ import mesh, GetNormals3", number=1), allclose( vn1, vn3 ) ) )
 	
 def GetNormals1( mesh ) :
 	tris = mesh.vertices[ mesh.faces ]
@@ -69,10 +73,9 @@ def GetNormals3( mesh ) :
 		
 	
 	
-	
-	
-	
-
+#
+# Main
+#
 if __name__ == "__main__" :
 
 	filename = ''
@@ -105,12 +108,6 @@ if __name__ == "__main__" :
 #	print len( mesh.edges.keys() )
 #	print mesh.edges
 
-	print( '~~ Time ~~' )
-#	print(timeit.timeit("test(mesh)", setup="from __main__ import mesh, test", number=100))
-	print( "Curvature 1 : {}".format( timeit.timeit("GetNormalCurvature(mesh)", setup="from __main__ import mesh, GetNormalCurvature", number=1) ) )
-	print( "Curvature 2 : {}".format( timeit.timeit("GetNormalCurvature2(mesh)", setup="from __main__ import mesh, GetNormalCurvature2", number=1) ) )
-	print( '  Done.' )
-
 #	print( '~~ Compute curvature ~~' )
 #	curvature = GetNormalCurvature( mesh )
 #	curvature = GetGaussianCurvature( mesh )
@@ -122,7 +119,13 @@ if __name__ == "__main__" :
 #	mesh.colors = Array2Colors( border )
 #	print( '  Done.' )
 
+	print( '~~ Test curvature ~~' )
+	TestCurvature( mesh )
+	print( '  Done.' )
+
+#	print( '~~ Test normals ~~' )
 #	TestNormals( mesh )
+#	print( '  Done.' )
 
 	print( mesh )
 
