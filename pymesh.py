@@ -6,6 +6,7 @@
 # External dependencies
 #
 import argparse
+import sys
 from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
 from PyMesh.Tool.Curvature import *
@@ -35,60 +36,72 @@ if __name__ == "__main__" :
 	# Read the input mesh file
 	if args.input_mesh_file :
 
-		print( '~~ Read file ' + args.input_mesh_file + ' ...' )
+		sys.stdout.write( 'Read file ' + args.input_mesh_file + '... ' )
+		sys.stdout.flush()
 		mesh = ReadVrml( args.input_mesh_file )
-		print( '  Done.' )
+		print( 'Done.' )
 
 		# Print mesh informations
 		if args.info :
 
-			print( '~~ Mesh informations ...' )
+			print( 'Mesh informations...' )
 			print( mesh )
 	
 		# Compute face and vertex normals
 		if args.normals :
 
-			print( '~~ Compute normals ...' )
+			sys.stdout.write( 'Compute normals... ' )
+			sys.stdout.flush()
 			UpdateNormals( mesh )
-			print( '  Done.' )
+			print( 'Done.' )
 
 		# Check some mesh parameters
 		if args.check :
 
-			print( '~~ Check mesh ...' )
+			sys.stdout.write( 'Check mesh... ' )
+			sys.stdout.flush()
 			log_message = CheckMesh( mesh )
-			if log_message : print( log_message )
-			print( '  Done.' )
+			if log_message : print( 'Failed\n' + log_message )
+			else : print( 'Done.' )
+
 
 		# Compute normal curvature
 		if args.normalcurvature :
 
-			print( '~~ Compute curvature ...' )
+			sys.stdout.write( 'Compute curvature... ' )
+			sys.stdout.flush()
 			curvature = GetNormalCurvature( mesh )
 			mesh.colors = VectorArray2Colors( curvature )
-			print( '  Done.' )
+			print( 'Done.' )
 
 		# Write resulting mesh
 		if args.output :
 
-			print( '~~ Write file ' + args.output + ' ...' )
+			sys.stdout.write( 'Write file ' + args.output + '... ' )
+			sys.stdout.flush()
 			WriteVrml( mesh, args.output )
-			print( '  Done.' )
+			print( 'Done.' )
 
 		# Launch GlutViewer
 		if args.glutviewer :
 
+			print( 'Launch GLUT viewer...' )
 			from PyMesh.Viewer.GlutViewer import GlutViewer
 			v = GlutViewer( mesh )
 			v.PrintInfo()
 			v.Run()
 
 	# No input file
-	else : print( 'No input mesh file given...' )
+	elif not args.qtviewer :
+		
+		# Print help message
+		print( 'No input mesh file given...' )
+		parser.print_help()
 	
 	# Launch QtViewer
 	if args.qtviewer :
 
+		print( 'Launch Qt viewer...' )
 		import sys
 		from PySide import QtGui
 		from PyMesh.Viewer.QtViewer import QtViewer
@@ -96,11 +109,6 @@ if __name__ == "__main__" :
 		window = QtViewer()
 		window.show()
 		sys.exit( app.exec_() )
-		
-	# Print help message
-	else : parser.print_help()
-
-
 
 #	print( '~~ Color border vertices ~~' )
 #	border = GetBorderVertices( mesh )
