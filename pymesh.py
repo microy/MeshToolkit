@@ -21,12 +21,16 @@ from PyMesh.Tool.Repair import *
 #
 def Parser() :
 	
-	parser = argparse.ArgumentParser( prog='pymesh', description='Process 3D triangular meshes.' )
-	parser.add_argument( 'filename', metavar='filename', help='Name of the VRML file representing the mesh to process' )
-	parser.add_argument( '--info', action='store_true', help='Print mesh informations' )
+	parser = argparse.ArgumentParser( prog='pymesh', description='Process 3D triangular meshes.',
+		usage='%(prog)s [-h] [options] input_mesh_file' )
+	parser.add_argument( 'input_mesh_file', nargs='?', default=None, help='Input mesh file in VRML format' )
+	parser.add_argument( '--info',  action='store_true', help='Print mesh informations' )
 	parser.add_argument( '--check', action='store_true', help='Check different mesh parameters' )
 	parser.add_argument( '--normals', action='store_true', help='Compute the surface normals' )
 	parser.add_argument( '--normalcurvature', action='store_true', help='Compute the surface normal curvature of the mesh' )
+	parser.add_argument( '--output', metavar='filename', action='store', help='Write the resulting mesh to a VRML file' )
+	parser.add_argument( '--qtviewer', action='store_true', help='Launch OpenGL viewer with Qt' )
+	parser.add_argument( '--glutviewer', action='store_true', help='Launch OpenGL viewer with GLUT' )
 	return parser.parse_args()
 
 
@@ -38,61 +42,75 @@ if __name__ == "__main__" :
 	# Process command line parameters
 	args = Parser()
 	
-	# Read the mesh file
-	print( '~~ Read file ' + args.filename + ' ~~' )
-	mesh = ReadVrml( args.filename )
-	print( '  Done.' )
+	# Read the input mesh file
+	if args.input_mesh_file :
 
-	# Print mesh informations
-	if args.info :
-		print( '~~ Mesh informations ~~' )
-		print( mesh )
+		print( '~~ Read file ' + args.input_mesh_file + ' ...' )
+		mesh = ReadVrml( args.input_mesh_file )
+		print( '  Done.' )
+
+		# Print mesh informations
+		if args.info :
+
+			print( '~~ Mesh informations ...' )
+			print( mesh )
 	
-	# Compute face and vertex normals
-	if args.normals :
-		print( '~~ Compute normals ~~' )
-		UpdateNormals( mesh )
-		print( '  Done.' )
+		# Compute face and vertex normals
+		if args.normals :
 
-	# Check some mesh parameters
-	if args.check :
-		print( '~~ Check mesh ~~' )
-		log_message = CheckMesh( mesh )
-		if log_message : print( log_message )
-		print( '  Done.' )
+			print( '~~ Compute normals ...' )
+			UpdateNormals( mesh )
+			print( '  Done.' )
 
-	# Compute normal curvature
-	if args.normalcurvature :
-		print( '~~ Compute curvature ~~' )
-		curvature = GetNormalCurvature( mesh )
-		mesh.colors = VectorArray2Colors( curvature )
-		print( '  Done.' )
+		# Check some mesh parameters
+		if args.check :
+
+			print( '~~ Check mesh ...' )
+			log_message = CheckMesh( mesh )
+			if log_message : print( log_message )
+			print( '  Done.' )
+
+		# Compute normal curvature
+		if args.normalcurvature :
+
+			print( '~~ Compute curvature ...' )
+			curvature = GetNormalCurvature( mesh )
+			mesh.colors = VectorArray2Colors( curvature )
+			print( '  Done.' )
+
+		# Write resulting mesh
+		if args.output :
+
+			print( '~~ Write file ' + args.output + ' ...' )
+			WriteVrml( mesh, args.output )
+			print( '  Done.' )
+
+	# No input file
+	else : print( 'No input mesh file given...' )
+	
+	# Launch QtViewer
+	if args.qtviewer :
+
+		from PySide import QtGui
+		from PyMesh.Viewer.QtViewer import QtViewer
+		app = QtGui.QApplication( sys.argv )
+		window = QtViewer()
+		window.show()
+		sys.exit( app.exec_() )
+
+
 
 #	print( '~~ Color border vertices ~~' )
 #	border = GetBorderVertices( mesh )
 #	mesh.colors = Array2Colors( border )
 #	print( '  Done.' )
 
-#	print( '~~ Test curvature ~~' )
-#	TestCurvature( mesh )
-#	print( '  Done.' )
-
 #	print( '~~ Test normals ~~' )
 #	TestNormals( mesh )
 #	print( '  Done.' )
 
-#	print( '~~ Write file ' + sys.argv[2] + ' ~~' )
-#	WriteVrml( mesh, sys.argv[2] )
-#	print( '  Done.' )
 		
 
-def QtViewer() :
 
-	from PySide import QtGui
-	from PyMesh.Viewer.QtViewer import QtViewer
-	app = QtGui.QApplication( sys.argv )
-	window = QtViewer()
-	window.show()
-	sys.exit( app.exec_() )
 
 
