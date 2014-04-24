@@ -33,16 +33,20 @@ class Mesh :
 	#
 	def __str__( self ) :
 		
-		log_message = '~~~ Mesh informations ~~~\n'
-		log_message  += '  Name :               {}\n'.format( self.name )
-		log_message  += '  Vertices :           {}\n'.format( len(self.vertices) )
-		log_message  += '  Faces :              {}\n'.format( len(self.faces) )
-		log_message  += '  Colors :             {}\n'.format( len(self.colors) )
-		log_message  += '  Faces normals :      {}\n'.format( len(self.face_normals) )
-		log_message  += '  Vertex normals :     {}\n'.format( len(self.vertex_normals) )
-		log_message  += '  Textures :           {}\n'.format( len(self.textures) )
-		log_message  += '  Texture filename :   {}'.format( self.texture_name )
-		return log_message
+		info   = '  Name :               {}\n'.format( self.name )
+		info  += '  Vertices :           {}\n'.format( len(self.vertices) )
+		info  += '  Faces :              {}'.format( len(self.faces) )
+		if len(self.colors) :
+			info  += '\n  Colors :             {}'.format( len(self.colors) )
+		if len(self.face_normals) :
+			info  += '\n  Faces normals :      {}'.format( len(self.face_normals) )
+		if len(self.vertex_normals) :
+			info  += '\n  Vertex normals :     {}'.format( len(self.vertex_normals) )
+		if len(self.textures) :
+			info  += '\n  Textures :           {}'.format( len(self.textures) )
+		if self.texture_name :
+			info  += '\n  Texture filename :   {}'.format( self.texture_name )
+		return info
 
 
 #
