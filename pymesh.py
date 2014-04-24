@@ -9,7 +9,6 @@ import argparse
 import sys
 import timeit
 from numpy import bincount, cross, sqrt, zeros, allclose
-from PyMesh.Core.Mesh import *
 from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
 from PyMesh.Tool.Curvature import *
