@@ -4,8 +4,8 @@
 #
 # External dependencies
 #
-from Mesh import Mesh
 from numpy import array
+from PyMesh.Core.Mesh import Mesh
 
 
 #

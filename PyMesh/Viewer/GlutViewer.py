@@ -1,10 +1,10 @@
-#! /usr/bin/env python
 # -*- coding:utf-8 -*- 
 
 
 #
 # External dependencies
 #
+import sys
 import OpenGL
 OpenGL.FORWARD_COMPATIBLE_ONLY = True
 #OpenGL.ERROR_CHECKING = False
@@ -12,9 +12,8 @@ OpenGL.FORWARD_COMPATIBLE_ONLY = True
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-from numpy import *
-from .MeshViewer import *
-import sys
+#from numpy import *
+#from .MeshViewer import *
 
 
 #

@@ -15,15 +15,7 @@
 #
 from numpy import array, cross, dot, sqrt, zeros
 from math import pi, atan2
-from PyMesh.Mesh import GetBorderVertices
-
-
-#
-# Cotangent between two arrays of vectors
-#
-def Cotangent( u, v ) :
-
-	return ( u * v ).sum(axis=1) / sqrt( ( u**2 ).sum(axis=1) * ( v**2 ).sum(axis=1) - ( u * v ).sum(axis=1) ** 2 )
+from PyMesh.Core.Mesh import GetBorderVertices
 
 
 #
@@ -145,6 +137,14 @@ def GetGaussianCurvature( mesh ) :
 		gaussian_curvature[i] = ( 2.0 * pi - angle_sum ) / area
 		
 	return gaussian_curvature
+
+
+#
+# Cotangent between two arrays of vectors
+#
+def Cotangent( u, v ) :
+
+	return ( u * v ).sum(axis=1) / sqrt( ( u**2 ).sum(axis=1) * ( v**2 ).sum(axis=1) - ( u * v ).sum(axis=1) ** 2 )
 
 
 #
