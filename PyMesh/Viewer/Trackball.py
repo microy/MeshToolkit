@@ -15,12 +15,12 @@
 #
 # External dependencies
 #
-from math import cos, sin, pi, sqrt, radians
-from numpy import array, identity, zeros, float32, dot, cross, copy
+from math import cos, sin, pi, sqrt
+from numpy import array, identity, zeros, float32, dot, cross
 
 
 #
-# Create a trackball for smooth object manipulation
+# Create a trackball for smooth object transformation
 #
 class Trackball :
 
@@ -93,11 +93,12 @@ class Trackball :
 		translation = zeros( 3 )
 		translation[2] -= delta * 2.0
 
-		# Compute the translation according to the camera view
-		translation = self.Camera2Model( translation )
+		# Project the translation vector to the object space
+		translation = dot( self.transformation[:3,:3], translation )
 
-		# Update the transformation matrix
-		self.transformation = self.TranslateMatrix( self.transformation, translation )
+		# Translate the transformation matrix
+		m = self.transformation
+		m[3] = m[0] * translation[0] + m[1] * translation[1] + m[2] * translation[2] + m[3]
 
 
 	#
@@ -105,14 +106,33 @@ class Trackball :
 	#
 	def Motion( self, current_mouse_position ) :
 
-		# Trackball rotation
+		# Rotation
 		if self.button == 1 :
 
-			# Update the rotation of the trackball
-			self.TrackballRotation( current_mouse_position )
+			# Map the mouse positions
+			previous_position = self.TrackballMapping( self.previous_mouse_position )
+			current_position = self.TrackballMapping( current_mouse_position )
 
-			# Require a display update
-			return True
+			# Project the rotation axis to the object space
+			rotation_axis = dot( self.transformation[:3,:3], cross( previous_position, current_position ) )
+
+			# Rotation angle
+			rotation_angle = sqrt( ((current_position - previous_position)**2).sum() ) * 2.0
+
+			# Create a rotation matrix according to the given angle and axis
+			c, s = cos( rotation_angle ), sin( rotation_angle )
+			n = sqrt( (rotation_axis**2).sum() )
+			if n == 0 : n = 1.0
+			rotation_axis /= n
+			x, y, z = rotation_axis
+			cx, cy, cz = (1 - c) * x, (1 - c) * y, (1 - c) * z
+			R = array([ [   cx*x + c, cy*x - z*s, cz*x + y*s, 0],
+					[ cx*y + z*s,   cy*y + c, cz*y - x*s, 0],
+					[ cx*z - y*s, cy*z + x*s,   cz*z + c, 0],
+					[          0,          0,          0, 1] ], dtype=float32 ).T
+
+			# Rotate the transformation matrix
+			self.transformation = dot( R, self.transformation )
 
 		# XY translation
 		elif self.button ==  2 :
@@ -122,44 +142,23 @@ class Trackball :
 			translation[0] -= (self.previous_mouse_position[0] - current_mouse_position[0])*0.02
 			translation[1] += (self.previous_mouse_position[1] - current_mouse_position[1])*0.02
 
-			# Compute the translation according to the camera view
-			translation = self.Camera2Model( translation )
+			# Project the translation vector to the object space
+			translation = dot( self.transformation[:3,:3], translation )
 
-			# Update the transformation matrix
-			self.transformation = self.TranslateMatrix( self.transformation, translation )
-
-			# Save the mouse position
-			self.previous_mouse_position = current_mouse_position
-
-			# Require a display update
-			return True
+			# Translate the transformation matrix
+			m = self.transformation
+			m[3] = m[0] * translation[0] + m[1] * translation[1] + m[2] * translation[2] + m[3]
 
 		# No update
-		return False
-
-	
-	#
-	# Update the rotation of the trackball
-	#
-	def TrackballRotation( self, current_mouse_position ) :
-
-		# Map the mouse positions
-		previous_position = self.TrackballMapping( self.previous_mouse_position )
-		current_position = self.TrackballMapping( current_mouse_position )
-
-		# Compute the rotation axis according to the camera view
-		rotation_axis = self.Camera2Model( cross( previous_position, current_position ) )
-
-		# Rotation angle
-		rotation_angle = 90.0 * sqrt( ((current_position - previous_position)**2).sum() ) * 1.5
-
-		# Update transformation matrix
-		self.transformation = self.RotateMatrix( self.transformation, rotation_angle, rotation_axis )
+		else : return False
 
 		# Save the mouse position
 		self.previous_mouse_position = current_mouse_position
 
+		# Require a display update
+		return True
 
+	
 	#
 	# Map the mouse position onto a unit sphere
 	#
@@ -172,43 +171,3 @@ class Trackball :
 		if d > 1.0 : d = 1.0
 		v[2] = cos( pi / 2.0 * d )
 		return v / sqrt(( v**2 ).sum())
-
-
-	#
-	# Transform a vector from the camera space to the object space
-	#
-	def Camera2Model( self, vector ) :
-
-		# Transform the vector from the camera space to the model space
-		return dot( self.transformation[:3,:3], vector )
-
-
-	#
-	# Translate a matrix with a direction vector
-	#
-	def TranslateMatrix( self, matrix, direction ) :
-
-		# Translate the matrix
-		T = copy( matrix )
-		T[3] = matrix[0] * direction[0] + matrix[1] * direction[1] + matrix[2] * direction[2] + matrix[3]
-		return T
-
-
-	#
-	# Rotate a matrix according to a given angle and axis
-	#
-	def RotateMatrix( self, matrix, angle, axis ) :
-
-		# Rotate the matrix according to the given angle and axis
-		angle = radians( angle )
-		c, s = cos( angle ), sin( angle )
-		n = sqrt( (axis**2).sum() )
-		if n == 0 : n = 1.0
-		axis /= n
-		x, y, z = axis[0], axis[1], axis[2]
-		cx, cy, cz = (1 - c) * x, (1 - c) * y, (1 - c) * z
-		R = array([ [   cx*x + c, cy*x - z*s, cz*x + y*s, 0],
-			    [ cx*y + z*s,   cy*y + c, cz*y - x*s, 0],
-			    [ cx*z - y*s, cy*z + x*s,   cz*z + c, 0],
-			    [          0,          0,          0, 1] ], dtype=float32 ).T
-		return dot( R, matrix )
