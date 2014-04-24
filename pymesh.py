@@ -6,9 +6,6 @@
 # External dependencies
 #
 import argparse
-import sys
-import timeit
-from numpy import bincount, cross, sqrt, zeros, allclose
 from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
 from PyMesh.Tool.Curvature import *
@@ -16,30 +13,24 @@ from PyMesh.Tool.Repair import *
 
 	
 #
-# Command line argument parser
-#
-def Parser() :
-	
-	parser = argparse.ArgumentParser( prog='pymesh', description='Process 3D triangular meshes.',
-		usage='%(prog)s [-h] [options] input_mesh_file' )
-	parser.add_argument( 'input_mesh_file', nargs='?', default=None, help='Input mesh file in VRML format' )
-	parser.add_argument( '--info',  action='store_true', help='Print mesh informations' )
-	parser.add_argument( '--check', action='store_true', help='Check different mesh parameters' )
-	parser.add_argument( '--normals', action='store_true', help='Compute the surface normals' )
-	parser.add_argument( '--normalcurvature', action='store_true', help='Compute the surface normal curvature of the mesh' )
-	parser.add_argument( '--output', metavar='filename', action='store', help='Write the resulting mesh to a VRML file' )
-	parser.add_argument( '--qtviewer', action='store_true', help='Launch OpenGL viewer with Qt' )
-	parser.add_argument( '--glutviewer', action='store_true', help='Launch OpenGL viewer with GLUT' )
-	return parser.parse_args()
-
-
-#
 # Main
 #
 if __name__ == "__main__" :
 
+	# Create a command line argument parser
+	parser = argparse.ArgumentParser( prog='pymesh', description='Process 3D triangular meshes.',
+		usage='%(prog)s [-h] [options] input_mesh_file' )
+	parser.add_argument( 'input_mesh_file', nargs='?', default=None, help='Input mesh file in VRML format' )
+	parser.add_argument( '-info',  action='store_true', help='Print mesh informations' )
+	parser.add_argument( '-check', action='store_true', help='Check different mesh parameters' )
+	parser.add_argument( '-normals', action='store_true', help='Compute the surface normals' )
+	parser.add_argument( '-normalcurvature', action='store_true', help='Compute the surface normal curvature of the mesh' )
+	parser.add_argument( '-output', metavar='filename', action='store', help='Write the resulting mesh to a VRML file' )
+	parser.add_argument( '-qtviewer', action='store_true', help='Launch OpenGL viewer with Qt' )
+	parser.add_argument( '-glutviewer', action='store_true', help='Launch OpenGL viewer with GLUT' )
+
 	# Process command line parameters
-	args = Parser()
+	args = parser.parse_args()
 	
 	# Read the input mesh file
 	if args.input_mesh_file :
@@ -84,18 +75,30 @@ if __name__ == "__main__" :
 			WriteVrml( mesh, args.output )
 			print( '  Done.' )
 
+		# Launch GlutViewer
+		if args.glutviewer :
+
+			from PyMesh.Viewer.GlutViewer import GlutViewer
+			v = GlutViewer( mesh )
+			v.PrintInfo()
+			v.Run()
+
 	# No input file
 	else : print( 'No input mesh file given...' )
 	
 	# Launch QtViewer
 	if args.qtviewer :
 
+		import sys
 		from PySide import QtGui
 		from PyMesh.Viewer.QtViewer import QtViewer
 		app = QtGui.QApplication( sys.argv )
 		window = QtViewer()
 		window.show()
 		sys.exit( app.exec_() )
+		
+	# Print help message
+	else : parser.print_help()
 
 
 
