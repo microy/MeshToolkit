@@ -2,6 +2,11 @@
 
 
 #
+# Display a mesh with OpenGL 3 core profile
+#
+
+
+#
 # External dependencies
 #
 import OpenGL
@@ -19,9 +24,12 @@ class MeshViewer( Trackball ) :
 
 
 	#
-	# Initialize
+	# Initialization
 	#
 	def Initialize( self, width, height ) :
+
+		# Initialise the trackball
+		Trackball.Initialize( self, width, height )
 
 		# Default background color
 		glClearColor( 1, 1, 1, 1 )
@@ -39,9 +47,6 @@ class MeshViewer( Trackball ) :
 		# Enable multisampling (antialiasing)
 		glEnable( GL_MULTISAMPLE )
 
-		# Initialise the trackball
-		Trackball.__init__( self, width, height )
-
 		# Initialise the projection transformation matrix
 		self.SetProjectionMatrix( width, height )
 
@@ -57,7 +62,7 @@ class MeshViewer( Trackball ) :
 
 
 	#
-	# LoadMesh
+	# Load the mesh to display
 	#
 	def LoadMesh( self, mesh ) :
 

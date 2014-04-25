@@ -3,6 +3,11 @@
 
 
 #
+# Application to demonstrate the use of the PyMesh library
+#
+
+
+#
 # External dependencies
 #
 import argparse
@@ -39,7 +44,7 @@ if __name__ == "__main__" :
 		sys.stdout.write( 'Read file ' + args.input_mesh_file + '... ' )
 		sys.stdout.flush()
 		mesh = ReadVrml( args.input_mesh_file )
-		print( 'Done.' )
+		print( 'done.' )
 
 		# Print mesh informations
 		if args.info :
@@ -53,7 +58,7 @@ if __name__ == "__main__" :
 			sys.stdout.write( 'Compute normals... ' )
 			sys.stdout.flush()
 			UpdateNormals( mesh )
-			print( 'Done.' )
+			print( 'done.' )
 
 		# Check some mesh parameters
 		if args.check :
@@ -62,7 +67,7 @@ if __name__ == "__main__" :
 			sys.stdout.flush()
 			log_message = CheckMesh( mesh )
 			if log_message : print( 'Failed\n' + log_message )
-			else : print( 'Done.' )
+			else : print( 'done.' )
 
 
 		# Compute normal curvature
@@ -72,7 +77,7 @@ if __name__ == "__main__" :
 			sys.stdout.flush()
 			curvature = GetNormalCurvature( mesh )
 			mesh.colors = VectorArray2Colors( curvature )
-			print( 'Done.' )
+			print( 'done.' )
 
 		# Write resulting mesh
 		if args.output :
@@ -80,7 +85,7 @@ if __name__ == "__main__" :
 			sys.stdout.write( 'Write file ' + args.output + '... ' )
 			sys.stdout.flush()
 			WriteVrml( mesh, args.output )
-			print( 'Done.' )
+			print( 'done.' )
 
 		# Launch GlutViewer
 		if args.glutviewer :
@@ -88,7 +93,6 @@ if __name__ == "__main__" :
 			print( 'Launch GLUT viewer...' )
 			from PyMesh.Viewer.GlutViewer import GlutViewer
 			v = GlutViewer( mesh )
-			v.PrintInfo()
 			v.Run()
 
 	# No input file

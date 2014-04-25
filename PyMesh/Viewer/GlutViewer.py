@@ -2,6 +2,11 @@
 
 
 #
+# Create an OpenGL window with GLUT to diplay a 3D mesh
+#
+
+
+#
 # External dependencies
 #
 import OpenGL
@@ -19,7 +24,7 @@ class GlutViewer( MeshViewer ) :
 	#
 	# Initialisation
 	#
-	def __init__( self, mesh=None, title="GlutViewer", width=1024, height=768 ) :
+	def __init__( self, mesh, title="GlutViewer", width=1024, height=768 ) :
 
 		# Initialise OpenGL / GLUT
 		glutInit()
@@ -35,11 +40,11 @@ class GlutViewer( MeshViewer ) :
 		glutKeyboardFunc( self.Keyboard )
 		glutMouseFunc( self.Mouse )
 		glutMotionFunc( self.Motion )
-		glutReshapeFunc( self.Reshape )
+		glutReshapeFunc( self.Resize )
 
 		# OpenGL initialization
 		MeshViewer.Initialize( self, width, height )
-		if mesh : MeshViewer.LoadMesh( self, mesh )
+		MeshViewer.LoadMesh( self, mesh )
 
 
 	#
@@ -59,6 +64,30 @@ class GlutViewer( MeshViewer ) :
 			# Reset model translation and rotation
 			MeshViewer.Reset( self )
 
+		# I
+		elif key in [ 'i', 'I' ] :
+
+			# Reset model translation and rotation
+			self.PrintInfo()
+
+		# 0
+		elif key == '0' :
+
+			# Display the mesh with solid rendering
+			self.wireframe_mode = 0
+
+		# 1
+		elif key == '1' :
+
+			# Display the mesh with wireframe rendering
+			self.wireframe_mode = 1
+
+		# 2
+		elif key == '2' :
+
+			# Display the mesh with hidden line removal rendering
+			self.wireframe_mode = 2
+			
 
 	#
 	# Mouse
@@ -88,24 +117,6 @@ class GlutViewer( MeshViewer ) :
 
 
 	#
-	# Motion
-	#
-	def Motion( self, x, y ) :
-
-		# Update the trackball
-		MeshViewer.Motion( self, [ x, y ] )
-
-
-	#
-	# Reshape
-	#
-	def Reshape( self, width, height ) :
-
-		# Resize the mesh viewer
-		MeshViewer.Resize( self, width, height )
-
-
-	#
 	# Display
 	#
 	def Display( self ) :
@@ -117,6 +128,7 @@ class GlutViewer( MeshViewer ) :
 		glutSwapBuffers()
 		glutPostRedisplay()
 
+
 	#
 	# Idle
 	#
@@ -125,15 +137,6 @@ class GlutViewer( MeshViewer ) :
 		# Redraw
 		glutPostRedisplay()
 
-
-	#
-	# Close
-	#
-	def Close( self ) :
-
-		# Close the mesh
-		MeshViewer.Close( self )
-	
 
 	#
 	# Run
@@ -151,8 +154,8 @@ class GlutViewer( MeshViewer ) :
 	def PrintInfo( self ) :
 
 		# Display OpenGL driver informations
-		print( '~~~ OpenGL Informations ~~~' )
-		print( '  Vendor :   ' + glGetString( GL_VENDOR ) )
-		print( '  Renderer : ' + glGetString( GL_RENDERER ) )
-		print( '  Version :  ' + glGetString( GL_VERSION ) )
-		print( '  Shader :   ' + glGetString( GL_SHADING_LANGUAGE_VERSION ) )
+		print( 'OpenGL Informations' )
+		print( '  Vendor :     ' + glGetString( GL_VENDOR ) )
+		print( '  Renderer :   ' + glGetString( GL_RENDERER ) )
+		print( '  Version :    ' + glGetString( GL_VERSION ) )
+		print( '  Shader :     ' + glGetString( GL_SHADING_LANGUAGE_VERSION ) )

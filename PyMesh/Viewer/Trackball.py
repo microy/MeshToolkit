@@ -2,6 +2,11 @@
 
 
 #
+# Implement a trackball to manipulate the 3D model inside the OpenGL frame.
+#
+
+
+#
 # Inspired from :
 #
 #       - Nate Robins' Programs
@@ -20,15 +25,15 @@ from numpy import array, identity, zeros, float32, dot, cross
 
 
 #
-# Create a trackball for smooth object transformation
+# Create a trackball class for smooth object transformation
 #
-class Trackball :
+class Trackball( object ) :
 
 
 	#
 	# Initialisation
 	#
-	def __init__( self, width, height ) :
+	def Initialize( self, width, height ) :
 
 		# Window size
 		self.width = width
@@ -104,14 +109,14 @@ class Trackball :
 	#
 	# Handle when the mouse is moved
 	#
-	def Motion( self, current_mouse_position ) :
+	def Motion( self, mouse_x, mouse_y ) :
 
 		# Rotation
 		if self.button == 1 :
 
 			# Map the mouse positions
 			previous_position = self.TrackballMapping( self.previous_mouse_position )
-			current_position = self.TrackballMapping( current_mouse_position )
+			current_position = self.TrackballMapping( [ mouse_x, mouse_y ] )
 
 			# Project the rotation axis to the object space
 			rotation_axis = dot( self.transformation[:3,:3], cross( previous_position, current_position ) )
@@ -139,8 +144,8 @@ class Trackball :
 
 			# Compute the XY-translation
 			translation = zeros( 3 )
-			translation[0] -= (self.previous_mouse_position[0] - current_mouse_position[0])*0.02
-			translation[1] += (self.previous_mouse_position[1] - current_mouse_position[1])*0.02
+			translation[0] -= (self.previous_mouse_position[0] - mouse_x)*0.02
+			translation[1] += (self.previous_mouse_position[1] - mouse_y)*0.02
 
 			# Project the translation vector to the object space
 			translation = dot( self.transformation[:3,:3], translation )
@@ -153,7 +158,7 @@ class Trackball :
 		else : return False
 
 		# Save the mouse position
-		self.previous_mouse_position = current_mouse_position
+		self.previous_mouse_position = [ mouse_x, mouse_y ]
 
 		# Require a display update
 		return True
