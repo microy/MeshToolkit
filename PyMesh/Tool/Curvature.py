@@ -2,6 +2,11 @@
 
 
 #
+# Compute the normal and the gaussian curvature of a mesh
+#
+
+
+#
 # Based on :
 #
 #   Discrete Differential-Geometry Operators for Triangulated 2-Manifolds

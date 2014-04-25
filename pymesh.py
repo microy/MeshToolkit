@@ -22,6 +22,9 @@ from PyMesh.Tool.Repair import *
 # Main
 #
 if __name__ == "__main__" :
+	
+	# Initialisation
+	mesh = None
 
 	# Create a command line argument parser
 	parser = argparse.ArgumentParser( prog='pymesh', description='Process 3D triangular meshes.',
@@ -110,7 +113,7 @@ if __name__ == "__main__" :
 		from PySide import QtGui
 		from PyMesh.Viewer.QtViewer import QtViewer
 		app = QtGui.QApplication( sys.argv )
-		window = QtViewer()
+		window = QtViewer( mesh=mesh )
 		window.show()
 		sys.exit( app.exec_() )
 

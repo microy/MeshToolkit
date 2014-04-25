@@ -39,11 +39,11 @@ class GlutViewer( MeshViewer ) :
 		glutIdleFunc( self.Idle )
 		glutKeyboardFunc( self.Keyboard )
 		glutMouseFunc( self.Mouse )
-		glutMotionFunc( self.Motion )
+		glutMotionFunc( self.MouseMove )
 		glutReshapeFunc( self.Resize )
 
 		# OpenGL initialization
-		MeshViewer.Initialize( self, width, height )
+		MeshViewer.Initialise( self, width, height )
 		MeshViewer.LoadMesh( self, mesh )
 
 

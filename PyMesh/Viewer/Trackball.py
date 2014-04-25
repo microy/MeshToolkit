@@ -33,7 +33,7 @@ class Trackball( object ) :
 	#
 	# Initialisation
 	#
-	def Initialize( self, width, height ) :
+	def Initialise( self, width, height ) :
 
 		# Window size
 		self.width = width
@@ -92,7 +92,7 @@ class Trackball( object ) :
 	#
 	# Handle when the mouse wheel is used
 	#
-	def WheelEvent( self, delta ) :
+	def MouseWheel( self, delta ) :
 
 		# Compute the Z-translation
 		translation = zeros( 3 )
@@ -109,7 +109,7 @@ class Trackball( object ) :
 	#
 	# Handle when the mouse is moved
 	#
-	def Motion( self, mouse_x, mouse_y ) :
+	def MouseMove( self, mouse_x, mouse_y ) :
 
 		# Rotation
 		if self.button == 1 :

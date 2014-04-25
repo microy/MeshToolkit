@@ -2,7 +2,7 @@
 
 
 #
-# Create an OpenGL widget with Qt to diplay a 3D mesh
+# Create an OpenGL widget with Qt to display a 3D mesh
 #
 
 
@@ -37,6 +37,9 @@ class OpenGLWidget( MeshViewer, QGLWidget ) :
 
 		# Track mouse events
 		self.setMouseTracking( True )
+		
+		# Initialise the mesh
+		self.mesh = None
 
 
 	#
@@ -45,7 +48,10 @@ class OpenGLWidget( MeshViewer, QGLWidget ) :
 	def initializeGL( self ) :
 
 		# OpenGL initialization
-		MeshViewer.Initialize( self, self.width(), self.height() )
+		MeshViewer.Initialise( self, self.width(), self.height() )
+		
+		# Load the mesh
+		if self.mesh : MeshViewer.LoadMesh( self, self.mesh )
 
 
 	#
@@ -55,9 +61,6 @@ class OpenGLWidget( MeshViewer, QGLWidget ) :
 
 		# Display the mesh
 		MeshViewer.Display( self )
-
-		# Swap buffers
-		self.swapBuffers()
 
 
 	#
@@ -102,7 +105,7 @@ class OpenGLWidget( MeshViewer, QGLWidget ) :
 	def mouseMoveEvent( self, mouseEvent ) :
 
 		# Update the trackball
-		if MeshViewer.Motion( self, mouseEvent.x(), mouseEvent.y() ) :
+		if MeshViewer.MouseMove( self, mouseEvent.x(), mouseEvent.y() ) :
 
 			# Refresh display
 			self.update()
@@ -117,7 +120,7 @@ class OpenGLWidget( MeshViewer, QGLWidget ) :
 		delta = event.delta()
 
 		# Update the trackball
-		MeshViewer.WheelEvent( delta and delta // abs(delta) )
+		MeshViewer.MouseWheel( self, delta and delta // abs(delta) )
 
 		# Refresh display
 		self.update()

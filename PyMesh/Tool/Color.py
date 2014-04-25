@@ -1,10 +1,15 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
+
+
+#
+# Provide utility functions to convert a value array to pseudo-colors
+#
 
 
 #
 # External dependencies
 #
-from numpy import array, copy, zeros, sqrt
+from numpy import array, sqrt
 
 
 #

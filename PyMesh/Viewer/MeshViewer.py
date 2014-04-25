@@ -24,12 +24,12 @@ class MeshViewer( Trackball ) :
 
 
 	#
-	# Initialization
+	# Initialisation of OpenGL
 	#
-	def Initialize( self, width, height ) :
+	def Initialise( self, width, height ) :
 
 		# Initialise the trackball
-		Trackball.Initialize( self, width, height )
+		Trackball.Resize( self, width, height )
 
 		# Default background color
 		glClearColor( 1, 1, 1, 1 )
@@ -59,6 +59,10 @@ class MeshViewer( Trackball ) :
 		self.wireframe_mode = 0
 		self.element_number = 0
 		self.color_enabled = False
+		
+		# Initialise the trackball
+		Trackball.Initialise( self, width, height )
+
 
 
 	#

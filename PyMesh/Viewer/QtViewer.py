@@ -2,6 +2,11 @@
 
 
 #
+# Create a Qt application to display a 3D mesh with OpenGL
+#
+
+
+#
 # External dependencies
 #
 import platform
@@ -23,7 +28,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 	#
 	# Initialisation
 	#
-	def __init__( self, parent=None ) :
+	def __init__( self, parent=None, mesh=None ) :
 
 		# Initialise the main window
 		super( QtViewer, self ).__init__( parent ) 
@@ -32,7 +37,8 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.setupUi( self )
 
 		# Initialise the mesh
-		self.mesh = None
+		self.mesh = mesh
+		self.opengl_widget.mesh = mesh
 
 
 	#
@@ -97,6 +103,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		# Close the mesh
 		self.opengl_widget.Close()
 		self.mesh = None
+		self.opengl_widget.update()
 
 
 	#
@@ -108,6 +115,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.action_view_flat.setChecked( True )
 		self.action_view_smooth.setChecked( False )
 		self.opengl_widget.SetShader( 'FlatShading' )
+		self.opengl_widget.update()
 
 
 	#
@@ -119,6 +127,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.action_view_flat.setChecked( False )
 		self.action_view_smooth.setChecked( True )
 		self.opengl_widget.SetShader( 'SmoothShading' )
+		self.opengl_widget.update()
 
 
 	#
@@ -168,6 +177,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		# Enable / Disable antialiasing
 		self.action_view_antialiasing.setChecked( self.action_view_antialiasing.isChecked() )
 		self.opengl_widget.SetAntialiasing( self.action_view_antialiasing.isChecked() )
+		self.opengl_widget.update()
 
 
 	#
@@ -187,7 +197,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 	def ViewReset( self ) :
 
 		# Reset model transformation
-		self.opengl_widget.trackball.Reset()
+		self.opengl_widget.Reset()
 		self.opengl_widget.update()
 
 

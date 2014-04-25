@@ -2,10 +2,15 @@
 
 
 #
+# Provides functions to check and fix meshes
+#
+
+
+#
 # External dependencies
 #
 from numpy import array, isfinite, zeros
-from PyMesh.Core.Mesh import Mesh, UpdateNormals
+from PyMesh.Core.Mesh import UpdateNormals
 
 
 #

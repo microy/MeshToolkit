@@ -1,4 +1,10 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
+
+
+#
+# Provide a class to contain 3D triangular mesh data.
+# Give some basic processing functions (normals, neighbors, bounding box...)
+#
 
 
 #
@@ -9,23 +15,39 @@ from numpy import amin, amax, array, bincount, cross, sort, sqrt, zeros
 
 #
 # Define a class representing a triangular mesh
+# The data are encapsulated into numpy arrays
 #
-class Mesh :
+class Mesh( object ) :
 
 
 	#
 	# Initialisation
 	#
-	def __init__( self, name='', vertices=[], faces=[], colors=[], texture_name='', textures=[], face_normals=[], vertex_normals=[] ) :
+	def __init__( self, name='', vertices=[], faces=[], colors=[], texture_name='', textures=[], vertex_normals=[] ) :
 
+		# Mesh name
 		self.name = name
-		self.vertices = vertices
-		self.faces = faces
-		self.colors = colors
+		
+		# Vertex array
+		self.vertices = array( vertices )
+		
+		# Face index array
+		self.faces = array( faces )
+		
+		# Per-vertex color array
+		self.colors = array( colors )
+		
+		# Texture filename
 		self.texture_name = texture_name
-		self.textures = textures
-		self.face_normals = face_normals
-		self.vertex_normals = vertex_normals
+		
+		# Texture coordinate array
+		self.textures = array( textures )
+		
+		# Per-face normal array
+		self.face_normals = array( [] )
+		
+		# Per-vertex normal array
+		self.vertex_normals = array( vertex_normals )
 
 
 	#

@@ -2,9 +2,13 @@
 
 
 #
+# Provide import and export functions for VRML / Inventor / X3D files
+#
+
+
+#
 # External dependencies
 #
-from numpy import array
 from PyMesh.Core.Mesh import Mesh
 
 
@@ -38,17 +42,16 @@ def ReadVrml( filename ) :
 	# Check the header
 	header = vrmlfile.readline().split()
 	if header[0] not in [ '#VRML', '#X3D', '#Inventor' ] :
+		
+		# Unknown file header
 		vrmlfile.close()
 		raise RuntimeError( 'Wrong file format !' )
 
 	# Read each line in the file
 	for line in vrmlfile :
 
-		# Empty line
-		if line.isspace() : continue
-
-		# Comment
-		if line.startswith( '#' ) : continue
+		# Empty line / Comment
+		if line.isspace() or line.startswith( '#' ) : continue
 
 		# Remove comma
 		line = line.replace( ',', ' ' )
@@ -243,9 +246,8 @@ def ReadVrml( filename ) :
 	if (normal_binding != 'PER_VERTEX') or (len(normals) != len(vertices)) : normals=[]
 
 	# Return the final mesh
-	return Mesh( name=filename, vertices=array(vertices), faces=array(faces),
-		vertex_normals=array(normals), colors=array(colors),
-		textures=array(texcoords), texture_name=material )
+	return Mesh( name=filename, vertices=vertices, faces=faces, colors=colors,
+		vertex_normals=normals, textures=texcoords, texture_name=material )
 
 
 #
