@@ -9,7 +9,7 @@
 # External dependencies
 #
 import timeit
-from numpy import bincount, cross, sqrt, zeros, allclose
+from numpy import *
 from PyMesh.Core.Mesh import *
 from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
@@ -23,48 +23,57 @@ testmesh = None
 
 
 #
-# Normal computation test
+# Test function
 #
 
-def TestNormals( mesh ) :
+def Test( mesh ) :
 	
 	global testmesh
 	testmesh = mesh
-	vn1 = GetNormals1(  )
-	vn2 = GetNormals2(  )
-	vn3 = GetNormals3(  )
-	print( "GetNormals 1 : {}".format( timeit.timeit("GetNormals1()", setup="from test import GetNormals1", number=10) ) )
-	print( "GetNormals 2 : {} {}".format( timeit.timeit("GetNormals2()", setup="from test import GetNormals2", number=10), allclose( vn1, vn2 ) ) )
-	print( "GetNormals 3 : {} {}".format( timeit.timeit("GetNormals3()", setup="from test import GetNormals3", number=10), allclose( vn1, vn3 ) ) )
-	
-def GetNormals1(  ) :
-	tris = testmesh.vertices[ testmesh.faces ]
-	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
-	face_normals /= sqrt( (face_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
-	vertex_normals = zeros( testmesh.vertices.shape )
-	for i, f in enumerate( testmesh.faces ) : vertex_normals[ f ] += face_normals[ i ]
-	return vertex_normals / sqrt( (vertex_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+	r1 = Test1()
+	r2 = Test2()
+	print( "Test 1 : {}".format( timeit.timeit("Test1()", setup="from test import Test1", number=1) ) )
+	print( "Test 2 : {}".format( timeit.timeit("Test2()", setup="from test import Test2", number=1) ) )
+#	print( r1[0] )
+#	print( r2[0] )
 
-def GetNormals2(  ) :
-	tris = testmesh.vertices[ testmesh.faces ]
-	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
-	face_normals /= sqrt( (face_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
-	vertex_normals = zeros( testmesh.vertices.shape )
-	for i in range(vertex_normals.shape[-1]) :
-		vertex_normals[:, i] += bincount( testmesh.faces[:, 0], face_normals[:, i], minlength=len(vertex_normals) )
-		vertex_normals[:, i] += bincount( testmesh.faces[:, 1], face_normals[:, i], minlength=len(vertex_normals) )
-		vertex_normals[:, i] += bincount( testmesh.faces[:, 2], face_normals[:, i], minlength=len(vertex_normals) )
-	return vertex_normals / sqrt( (vertex_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
+	
+def Test1() :
 
-def GetNormals3(  ) :
-	tris = testmesh.vertices[ testmesh.faces ]
-	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
-	face_normals /= sqrt( (face_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
-	vertex_normals = zeros( testmesh.vertices.shape )
-	vertex_normals[ testmesh.faces[:,0] ] += face_normals
-	vertex_normals[ testmesh.faces[:,1] ] += face_normals
-	vertex_normals[ testmesh.faces[:,2] ] += face_normals
-	return vertex_normals / sqrt( (vertex_normals ** 2).sum( axis=1 ) ).reshape( -1, 1 )
-		
-	
-	
+	# Initialization
+	neighbor_vertices = [ [] for i in range(len( testmesh.vertices )) ]
+
+	# Loop through the faces
+	for i, (a, b ,c) in enumerate( testmesh.faces ) :
+
+		# Add vertices link by a face
+		neighbor_vertices[ a ].append( b )
+		neighbor_vertices[ a ].append( c )
+		neighbor_vertices[ b ].append( a )
+		neighbor_vertices[ b ].append( c )
+		neighbor_vertices[ c ].append( a )
+		neighbor_vertices[ c ].append( b )
+
+	# Return the list of neighbors without duplicates
+	return [ set( i ) for i in neighbor_vertices ] 
+
+
+def Test2() :
+
+	# Initialization
+	neighbor_vertices = [ set() for i in range(len( testmesh.vertices )) ]
+
+	# Loop through the faces
+	for i, (a, b ,c) in enumerate( testmesh.faces ) :
+
+		# Add vertices link by a face
+		neighbor_vertices[ a ].add( b )
+		neighbor_vertices[ a ].add( c )
+		neighbor_vertices[ b ].add( a )
+		neighbor_vertices[ b ].add( c )
+		neighbor_vertices[ c ].add( a )
+		neighbor_vertices[ c ].add( b )
+
+	# Return the list of neighbors without duplicates
+	return neighbor_vertices
+

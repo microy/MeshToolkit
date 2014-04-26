@@ -107,18 +107,18 @@ def UpdateNormals( mesh ) :
 def GetNeighborFaces( mesh ) :
 
 	# Initialization
-	neighbor_faces = [ [] for i in range(len( mesh.vertices )) ]
+	neighbor_faces = [ set() for i in range(len( mesh.vertices )) ]
 
 	# Loop through the faces
 	for i, (a, b ,c) in enumerate( mesh.faces ) :
 
 		# Add faces bound to each vertex
-		neighbor_faces[ a ].append( i )
-		neighbor_faces[ b ].append( i )
-		neighbor_faces[ c ].append( i )
+		neighbor_faces[ a ].add( i )
+		neighbor_faces[ b ].add( i )
+		neighbor_faces[ c ].add( i )
 
 	# Return the list of neighbors without duplicates
-	return  [ set( i ) for i in neighbor_faces ] 
+	return  neighbor_faces
 
 
 #
@@ -127,21 +127,21 @@ def GetNeighborFaces( mesh ) :
 def GetNeighborVertices( mesh ) :
 
 	# Initialization
-	neighbor_vertices = [ [] for i in range(len( mesh.vertices )) ]
+	neighbor_vertices = [ set() for i in range(len( mesh.vertices )) ]
 
 	# Loop through the faces
 	for i, (a, b ,c) in enumerate( mesh.faces ) :
 
 		# Add vertices link by a face
-		neighbor_vertices[ a ].append( b )
-		neighbor_vertices[ a ].append( c )
-		neighbor_vertices[ b ].append( a )
-		neighbor_vertices[ b ].append( c )
-		neighbor_vertices[ c ].append( a )
-		neighbor_vertices[ c ].append( b )
+		neighbor_vertices[ a ].add( b )
+		neighbor_vertices[ a ].add( c )
+		neighbor_vertices[ b ].add( a )
+		neighbor_vertices[ b ].add( c )
+		neighbor_vertices[ c ].add( a )
+		neighbor_vertices[ c ].add( b )
 
 	# Return the list of neighbors without duplicates
-	return [ set( i ) for i in neighbor_vertices ] 
+	return neighbor_vertices 
 
 
 #

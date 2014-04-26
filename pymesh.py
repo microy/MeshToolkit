@@ -16,7 +16,7 @@ from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
 from PyMesh.Tool.Curvature import *
 from PyMesh.Tool.Repair import *
-from test import TestNormals
+from test import Test
 
 	
 #
@@ -32,6 +32,7 @@ if __name__ == "__main__" :
 		usage='%(prog)s [-h] [options] input_mesh_file' )
 	parser.add_argument( 'input_mesh_file', nargs='?', default=None, help='Input mesh file in VRML format' )
 	parser.add_argument( '-info',  action='store_true', help='Print mesh informations' )
+	parser.add_argument( '-border',  action='store_true', help='Color vertices on a border' )
 	parser.add_argument( '-check', action='store_true', help='Check different mesh parameters' )
 	parser.add_argument( '-normals', action='store_true', help='Compute the surface normals' )
 	parser.add_argument( '-normalcurvature', action='store_true', help='Compute the surface normal curvature of the mesh' )
@@ -74,6 +75,15 @@ if __name__ == "__main__" :
 			if log_message : print( 'Failed\n' + log_message )
 			else : print( 'done.' )
 
+		# Color vertices on a border
+		if args.border :
+
+			sys.stdout.write( 'Color border vertices... ' )
+			sys.stdout.flush()
+			border = GetBorderVertices( mesh )
+			mesh.colors = Array2Colors( border )
+			print( 'done.' )
+
 		# Compute normal curvature
 		if args.normalcurvature :
 
@@ -87,7 +97,7 @@ if __name__ == "__main__" :
 		if args.test :
 
 			print( 'Test... ' )
-			TestNormals( mesh )
+			Test( mesh )
 
 		# Write resulting mesh
 		if args.output :
@@ -123,15 +133,6 @@ if __name__ == "__main__" :
 		window = QtViewer( mesh=mesh )
 		window.show()
 		sys.exit( app.exec_() )
-
-#	print( '~~ Color border vertices ~~' )
-#	border = GetBorderVertices( mesh )
-#	mesh.colors = Array2Colors( border )
-#	print( '  Done.' )
-
-#	print( '~~ Test normals ~~' )
-#	TestNormals( mesh )
-#	print( '  Done.' )
 
 		
 
