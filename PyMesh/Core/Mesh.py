@@ -150,16 +150,16 @@ def GetNeighborVertices( mesh ) :
 def GetEdges( mesh ) :
 
 	# Edge dictionary
-#	edges = { e : {} for a, b in sort( testmesh.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) }
+#	edges = { e : {} for a, b in sort( mesh.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) }
 
 	# Edge set (unordered unique list)
-#	edges = set( e for a, b in sort( testmesh.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) )
+#	edges = set( e for a, b in sort( mesh.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) )
 
 	# Initialization
 	edges = {}
 	
 	# Create an indexed view of the edges per face
-	face_edges = [ zip(a,b) for a,b in sort( testmesh.faces )[:,[[0,0,1],[1,2,2]]] ]
+	face_edges = [ zip(a,b) for a,b in sort( mesh.faces )[:,[[0,0,1],[1,2,2]]] ]
 
 	# Create a dictionary of the mesh edges
 	# and register associated faces
