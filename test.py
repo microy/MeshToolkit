@@ -34,22 +34,36 @@ def Test( mesh ) :
 	r2 = Test2()
 	print( "Test 1 : {}".format( timeit.timeit("Test1()", setup="from test import Test1", number=10) ) )
 	print( "Test 2 : {}".format( timeit.timeit("Test2()", setup="from test import Test2", number=10) ) )
-	print( len(r1) )
-	print( len(r2) )
-	print( (sort(list(r1.keys())) == sort(list(r2))).all() )
+	print( (r1 == r2).all() )
 
 	
 def Test1() :
 
-	# Edge dictionary
-	edges = { e : {} for a, b in sort( testmesh.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) }
+	neighbor_vertices =  GetNeighborVertices( testmesh ) 
+	neighbor_faces =  GetNeighborFaces( testmesh )
+	border_vertices = zeros( len(testmesh.vertices), dtype=bool )
+	
+	# Loop through the neighbor vertices
+	for va, vn in enumerate( neighbor_vertices ) :
+		for vb in vn :
+			
+			# Check the number of faces in common between the initial vertex and the neighbor
+			if len( neighbor_faces[va] & neighbor_faces[vb] ) < 2 :
+				border_vertices[ va ] = True
+				break
 
-	return edges
+	return border_vertices
 
 
 def Test2() :
 
-	# Edge set (unordered unique list)
-	edges = set( e for a, b in sort( testmesh.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) )
+	edges =  GetEdges( testmesh ) 
+	border_vertices = zeros( len(testmesh.vertices), dtype=bool )
+	
+	# Loop through the neighbor vertices
+	for key in edges.keys() :
+		if len( edges[key]['face'] ) < 2 :
+			border_vertices[ key[0] ] = True
+			border_vertices[ key[1] ] = True
 
-	return edges
+	return border_vertices
