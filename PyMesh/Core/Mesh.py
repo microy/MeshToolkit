@@ -89,17 +89,13 @@ def UpdateNormals( mesh ) :
 	mesh.vertex_normals = zeros( mesh.vertices.shape )
 
 	# Add the face normals to the vertex normals
-	for i, f in enumerate( mesh.faces ) : mesh.vertex_normals[ f ] += mesh.face_normals[ i ]
-	
-	#~ for i in range(self.vertex_normals.shape[-1]) :
-		#~ self.vertex_normals[:, i] += bincount( self.faces[:, 0], self.face_normals[:, i], minlength=len(self.vertex_normals) )
-		#~ self.vertex_normals[:, i] += bincount( self.faces[:, 1], self.face_normals[:, i], minlength=len(self.vertex_normals) )
-		#~ self.vertex_normals[:, i] += bincount( self.faces[:, 2], self.face_normals[:, i], minlength=len(self.vertex_normals) )
-	
-	# Bug :(
-#		self.vertex_normals[ self.faces[:,0] ] += self.face_normals
-#		self.vertex_normals[ self.faces[:,1] ] += self.face_normals
-#		self.vertex_normals[ self.faces[:,2] ] += self.face_normals
+	# Standard implementation :
+	#	for i, f in enumerate( mesh.faces ) : mesh.vertex_normals[ f ] += mesh.face_normals[ i ]
+	# Optimized implementation :
+	for i in range( 3 ) :
+		mesh.vertex_normals[:, i] += bincount( mesh.faces[:, 0], mesh.face_normals[:, i], minlength=len(mesh.vertices) )
+		mesh.vertex_normals[:, i] += bincount( mesh.faces[:, 1], mesh.face_normals[:, i], minlength=len(mesh.vertices) )
+		mesh.vertex_normals[:, i] += bincount( mesh.faces[:, 2], mesh.face_normals[:, i], minlength=len(mesh.vertices) )
 	
 	# Normalise the vertex normals
 	mesh.vertex_normals /= sqrt( ( mesh.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )

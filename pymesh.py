@@ -16,6 +16,7 @@ from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
 from PyMesh.Tool.Curvature import *
 from PyMesh.Tool.Repair import *
+from test import TestNormals
 
 	
 #
@@ -35,6 +36,7 @@ if __name__ == "__main__" :
 	parser.add_argument( '-normals', action='store_true', help='Compute the surface normals' )
 	parser.add_argument( '-normalcurvature', action='store_true', help='Compute the surface normal curvature of the mesh' )
 	parser.add_argument( '-output', metavar='filename', action='store', help='Write the resulting mesh to a VRML file' )
+	parser.add_argument( '-test', action='store_true', help='Test function' )
 	parser.add_argument( '-qtviewer', action='store_true', help='Launch OpenGL viewer with Qt' )
 	parser.add_argument( '-glutviewer', action='store_true', help='Launch OpenGL viewer with GLUT' )
 
@@ -72,7 +74,6 @@ if __name__ == "__main__" :
 			if log_message : print( 'Failed\n' + log_message )
 			else : print( 'done.' )
 
-
 		# Compute normal curvature
 		if args.normalcurvature :
 
@@ -81,6 +82,13 @@ if __name__ == "__main__" :
 			curvature = GetNormalCurvature( mesh )
 			mesh.colors = VectorArray2Colors( curvature )
 			print( 'done.' )
+
+		# Test
+		if args.test :
+
+			print( 'Test... ' )
+			sys.stdout.flush()
+			TestNormals( mesh )
 
 		# Write resulting mesh
 		if args.output :
