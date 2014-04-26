@@ -16,6 +16,7 @@ from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
 from PyMesh.Tool.Curvature import *
 from PyMesh.Tool.Repair import *
+from PyMesh.Tool.Denoising import *
 from test import Test
 
 	
@@ -36,6 +37,7 @@ if __name__ == "__main__" :
 	parser.add_argument( '-check', action='store_true', help='Check different mesh parameters' )
 	parser.add_argument( '-normals', action='store_true', help='Compute the surface normals' )
 	parser.add_argument( '-normalcurvature', action='store_true', help='Compute the surface normal curvature of the mesh' )
+	parser.add_argument( '-uniformlaplacian', action='store_true', help='Uniform laplacian smoothing' )
 	parser.add_argument( '-output', metavar='filename', action='store', help='Write the resulting mesh to a VRML file' )
 	parser.add_argument( '-test', action='store_true', help='Test function' )
 	parser.add_argument( '-qtviewer', action='store_true', help='Launch OpenGL viewer with Qt' )
@@ -91,6 +93,14 @@ if __name__ == "__main__" :
 			sys.stdout.flush()
 			curvature = GetNormalCurvature( mesh )
 			mesh.colors = VectorArray2Colors( curvature )
+			print( 'done.' )
+
+		# Compute normal curvature
+		if args.uniformlaplacian :
+
+			sys.stdout.write( 'Uniform laplacian smoothing... ' )
+			sys.stdout.flush()
+			mesh.vertices = UniformLaplacianSmoothing( mesh, 5, 1 )
 			print( 'done.' )
 
 		# Test

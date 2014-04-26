@@ -9,17 +9,19 @@
 # External dependencies
 #
 import timeit
-from numpy import unique
+from numpy import allclose
 from PyMesh.Core.Mesh import *
 from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
 from PyMesh.Tool.Curvature import *
 from PyMesh.Tool.Repair import *
+from PyMesh.Tool.Denoising import *
 
 
 # Global variables
 testmesh = None
-
+iteration = 5
+diffusion = 1
 
 
 #
@@ -30,40 +32,70 @@ def Test( mesh ) :
 	
 	global testmesh
 	testmesh = mesh
-	r1 = Test1()
-	r2 = Test2()
-	print( "Test 1 : {}".format( timeit.timeit("Test1()", setup="from test import Test1", number=10) ) )
-	print( "Test 2 : {}".format( timeit.timeit("Test2()", setup="from test import Test2", number=10) ) )
-	print( (r1 == r2).all() )
+	
+	mesh.vertices = UniformLaplacianSmoothing( mesh, iteration, diffusion )
+	
+#	r1 = Test1()
+#	r2 = Test2()
+#	print( "Test 1 : {}".format( timeit.timeit("Test1()", setup="from test import Test1", number=10) ) )
+#	print( "Test 2 : {}".format( timeit.timeit("Test2()", setup="from test import Test2", number=10) ) )
+#	print( allclose(r1, r2) )
 
 	
 def Test1() :
 
+	# Get neighbors
 	neighbor_vertices =  GetNeighborVertices( testmesh ) 
 	neighbor_faces =  GetNeighborFaces( testmesh )
-	border_vertices = zeros( len(testmesh.vertices), dtype=bool )
 	
-	# Loop through the neighbor vertices
+	# Get border
+	border = zeros( len(testmesh.vertices), dtype=bool )
 	for va, vn in enumerate( neighbor_vertices ) :
 		for vb in vn :
-			
-			# Check the number of faces in common between the initial vertex and the neighbor
 			if len( neighbor_faces[va] & neighbor_faces[vb] ) < 2 :
-				border_vertices[ va ] = True
+				border[ va ] = True
 				break
 
-	return border_vertices
+	# Smooth
+	vertices = testmesh.vertices.copy()
+	for i in range( iteration ) :
+		
+		smoothed = zeros( vertices.shape )
+
+		for v in range( len(vertices) ) :
+			
+			# Don't smooth border vertex
+			if border[v] : smoothed[v] = vertices[v]
+			else :
+			
+				for n in neighbor_vertices[v] :	smoothed[v] += vertices[n] - vertices[v]
+				smoothed[v] = vertices[v] + diffusion * smoothed[v] / len( neighbor_vertices[v] )
+
+		vertices = smoothed
+
+	return vertices
+
 
 
 def Test2() :
 
-	edges =  GetEdges( testmesh ) 
-	border_vertices = zeros( len(testmesh.vertices), dtype=bool )
-	
-	# Loop through the neighbor vertices
-	for key in edges.keys() :
-		if len( edges[key]['face'] ) < 2 :
-			border_vertices[ key[0] ] = True
-			border_vertices[ key[1] ] = True
+	# Get neighbors
+	neighbors =  [ array(list(v)) for v in GetNeighborVertices( testmesh ) ]
+	neighbor_number = array( [ len(i) for i in neighbors ] ).reshape(-1,1)
+	border = GetBorderVertices( testmesh )
 
-	return border_vertices
+	# Smooth
+	vertices = testmesh.vertices.copy()
+	for i in range( iteration ) :
+		
+		smoothed = [ (vertices[neighbors[v]]).sum(axis=0) for v in range( len(vertices) ) ]
+		smoothed /= neighbor_number
+		smoothed -= vertices
+		smoothed *= diffusion
+		smoothed += vertices
+		for v in range( len(vertices) ) :
+			if border[v] : smoothed[v] = vertices[v]
+		vertices = smoothed
+
+	return vertices
+
