@@ -18,7 +18,7 @@ from PyMesh.Tool.Repair import *
 
 
 # Global variables
-global testmesh
+testmesh = None
 
 
 

@@ -87,7 +87,6 @@ if __name__ == "__main__" :
 		if args.test :
 
 			print( 'Test... ' )
-			sys.stdout.flush()
 			TestNormals( mesh )
 
 		# Write resulting mesh
