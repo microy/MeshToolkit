@@ -13,7 +13,7 @@ import OpenGL
 from OpenGL.GL import *
 from math import tan, pi
 from numpy import array, identity, dot, float32, uint32, zeros
-from PyMesh.Core.Mesh import GetBoundingSphere
+from PyMesh.Core.Mesh import GetBoundingSphere, UpdateNormals
 from PyMesh.Viewer.Trackball import Trackball
 
 
@@ -29,7 +29,7 @@ class MeshViewer( Trackball ) :
 	def Initialise( self, width, height ) :
 
 		# Initialise the trackball
-		Trackball.Resize( self, width, height )
+		Trackball.Initialise( self, width, height )
 
 		# Default background color
 		glClearColor( 1, 1, 1, 1 )
@@ -60,10 +60,6 @@ class MeshViewer( Trackball ) :
 		self.element_number = 0
 		self.color_enabled = False
 		
-		# Initialise the trackball
-		Trackball.Initialise( self, width, height )
-
-
 
 	#
 	# Load the mesh to display
@@ -72,6 +68,9 @@ class MeshViewer( Trackball ) :
 
 		# Close previous mesh
 		self.Close()
+
+		# Compute mesh normals if necessary
+		if len(mesh.vertex_normals) != len(mesh.vertices) :	UpdateNormals( mesh )
 
 		# Cast input data (required for OpenGL)
 		vertices = array( mesh.vertices, dtype=float32 )

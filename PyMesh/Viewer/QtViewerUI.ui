@@ -62,7 +62,6 @@
     <addaction name="action_view_hiddenlines"/>
     <addaction name="separator"/>
     <addaction name="action_view_antialiasing"/>
-    <addaction name="action_view_colorbar"/>
     <addaction name="separator"/>
     <addaction name="action_view_reset"/>
    </widget>
@@ -71,8 +70,8 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="action_help_about"/>
-    <addaction name="action_help_qt"/>
     <addaction name="action_help_opengl"/>
+    <addaction name="action_help_qt"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_view"/>
@@ -197,20 +196,6 @@
    </property>
    <property name="shortcut">
     <string>A</string>
-   </property>
-  </action>
-  <action name="action_view_colorbar">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>&amp;Color bar</string>
-   </property>
-   <property name="toolTip">
-    <string>Display the color bar</string>
-   </property>
-   <property name="shortcut">
-    <string>C</string>
    </property>
   </action>
   <action name="action_view_reset">
@@ -413,22 +398,6 @@
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>ViewAntialiasing()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>511</x>
-     <y>383</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>action_view_colorbar</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>ViewColorbar()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

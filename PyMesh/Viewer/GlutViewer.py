@@ -45,6 +45,7 @@ class GlutViewer( MeshViewer ) :
 		# OpenGL initialization
 		MeshViewer.Initialise( self, width, height )
 		MeshViewer.LoadMesh( self, mesh )
+		self.antialiasing = True
 
 
 	#
@@ -58,17 +59,36 @@ class GlutViewer( MeshViewer ) :
 			# Exit
 			sys.exit()
 
-		# R
-		elif key in [ 'r', 'R' ] :
+		# A
+		elif key in [ 'a', 'A' ] :
 
-			# Reset model translation and rotation
-			MeshViewer.Reset( self )
+			# Flat shading
+			self.antialiasing = not self.antialiasing
+			MeshViewer.SetAntialiasing( self, self.antialiasing )
+
+		# F
+		elif key in [ 'f', 'F' ] :
+
+			# Flat shading
+			MeshViewer.SetShader( self, 'FlatShading' )
+
+		# G
+		elif key in [ 'g', 'G' ] :
+
+			# Smooth shading
+			MeshViewer.SetShader( self, 'SmoothShading' )
 
 		# I
 		elif key in [ 'i', 'I' ] :
 
 			# Reset model translation and rotation
 			self.PrintInfo()
+
+		# R
+		elif key in [ 'r', 'R' ] :
+
+			# Reset model translation and rotation
+			MeshViewer.Reset( self )
 
 		# 0
 		elif key == '0' :
@@ -106,14 +126,29 @@ class GlutViewer( MeshViewer ) :
 			# Right button
 			elif button == GLUT_RIGHT_BUTTON :
 
-				# Z translation
+				# Trackball XY translation
 				MeshViewer.MousePress( self, [ x, y ], 2 )
 		
 		# Button up
 		elif state == GLUT_UP :
 
-			# Stop motion
-			MeshViewer.MouseRelease( self )
+			# Wheel up
+			if button == 3 :
+
+				# Trackball Z translation 
+				MeshViewer.MouseWheel( self, 1 )
+
+			# Wheel down
+			elif button == 4 :
+				
+				# Trackball Z translation 
+				MeshViewer.MouseWheel( self, -1 )
+				
+			# Mouse button released
+			else :
+				
+				# Stop motion
+				MeshViewer.MouseRelease( self )
 
 
 	#

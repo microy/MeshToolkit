@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'Viewer/QtViewerUI.ui'
+# Form implementation generated from reading ui file 'QtViewerUI.ui'
 #
-# Created: Tue Dec  3 17:22:37 2013
+# Created: Sat Apr 26 04:47:53 2014
 #      by: pyside-uic 0.2.13 running on PySide 1.1.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -62,9 +62,6 @@ class Ui_MainWindow(object):
         self.action_view_antialiasing.setCheckable(True)
         self.action_view_antialiasing.setChecked(True)
         self.action_view_antialiasing.setObjectName("action_view_antialiasing")
-        self.action_view_colorbar = QtGui.QAction(MainWindow)
-        self.action_view_colorbar.setCheckable(True)
-        self.action_view_colorbar.setObjectName("action_view_colorbar")
         self.action_view_reset = QtGui.QAction(MainWindow)
         self.action_view_reset.setObjectName("action_view_reset")
         self.action_help_about = QtGui.QAction(MainWindow)
@@ -95,12 +92,11 @@ class Ui_MainWindow(object):
         self.menu_view.addAction(self.action_view_hiddenlines)
         self.menu_view.addSeparator()
         self.menu_view.addAction(self.action_view_antialiasing)
-        self.menu_view.addAction(self.action_view_colorbar)
         self.menu_view.addSeparator()
         self.menu_view.addAction(self.action_view_reset)
         self.menu_help.addAction(self.action_help_about)
-        self.menu_help.addAction(self.action_help_qt)
         self.menu_help.addAction(self.action_help_opengl)
+        self.menu_help.addAction(self.action_help_qt)
         self.menubar.addAction(self.menu_file.menuAction())
         self.menubar.addAction(self.menu_view.menuAction())
         self.menubar.addAction(self.menu_help.menuAction())
@@ -114,7 +110,6 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.action_view_flat, QtCore.SIGNAL("triggered()"), MainWindow.ViewFlat)
         QtCore.QObject.connect(self.action_view_smooth, QtCore.SIGNAL("triggered()"), MainWindow.ViewSmooth)
         QtCore.QObject.connect(self.action_view_antialiasing, QtCore.SIGNAL("triggered()"), MainWindow.ViewAntialiasing)
-        QtCore.QObject.connect(self.action_view_colorbar, QtCore.SIGNAL("triggered()"), MainWindow.ViewColorbar)
         QtCore.QObject.connect(self.action_view_wireframe, QtCore.SIGNAL("triggered()"), MainWindow.ViewWireframe)
         QtCore.QObject.connect(self.action_view_reset, QtCore.SIGNAL("triggered()"), MainWindow.ViewReset)
         QtCore.QObject.connect(self.action_help_about, QtCore.SIGNAL("triggered()"), MainWindow.HelpAbout)
@@ -156,9 +151,6 @@ class Ui_MainWindow(object):
         self.action_view_antialiasing.setText(QtGui.QApplication.translate("MainWindow", "&Antialiasing", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_antialiasing.setToolTip(QtGui.QApplication.translate("MainWindow", "Enable antialiasing", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_antialiasing.setShortcut(QtGui.QApplication.translate("MainWindow", "A", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_view_colorbar.setText(QtGui.QApplication.translate("MainWindow", "&Color bar", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_view_colorbar.setToolTip(QtGui.QApplication.translate("MainWindow", "Display the color bar", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_view_colorbar.setShortcut(QtGui.QApplication.translate("MainWindow", "C", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_reset.setText(QtGui.QApplication.translate("MainWindow", "&Reset", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_reset.setToolTip(QtGui.QApplication.translate("MainWindow", "Reset the current view", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_reset.setShortcut(QtGui.QApplication.translate("MainWindow", "R", None, QtGui.QApplication.UnicodeUTF8))

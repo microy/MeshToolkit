@@ -56,10 +56,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		# Read VRML/X3D/Inventor file
 		self.mesh = ReadVrml( unicode(filename) )
 
-		# Compute mesh normals if necessary
-		if len(self.mesh.vertex_normals) != len(self.mesh.vertices) :
-			UpdateNormals( self.mesh )
-
 		# Send the mesh to the OpenGL viewer
 		self.opengl_widget.LoadMesh( self.mesh )
 
@@ -181,17 +177,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 
 	#
-	# ViewColorbar
-	#
-	def ViewColorbar( self ) :
-
-		# Enable / Disable color bar display
-		self.action_view_colorbar.setChecked( self.action_view_colorbar.isChecked() )
-		self.opengl_widget.colorbar_enabled = self.action_view_colorbar.isChecked()
-		self.opengl_widget.update()
-
-
-	#
 	# ViewReset
 	#
 	def ViewReset( self ) :
@@ -209,7 +194,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		QMessageBox.about( self, 'About QtViewer',
 		'''<b>PyMesh QtViewer</b>
         <p>Copyright (c) 2013-2014 Michael Roy.</p>
-        <p>All rights reserved in accordance with MIT License.</p>
+        <p>All rights reserved in accordance with the MIT License.</p>
         <i><p>Python {}</p><p>PySide version {}</p><p>Qt version {} on {}</p></i>'''.format(
         platform.python_version(), PySide.__version__, PySide.QtCore.__version__,
         platform.system()))
