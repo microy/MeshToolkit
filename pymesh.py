@@ -79,7 +79,7 @@ if __name__ == "__main__" :
 
 			sys.stdout.write( 'Check mesh... ' )
 			sys.stdout.flush()
-			log_message = CheckMesh( input_mesh )
+			log_message = Check( input_mesh )
 			if log_message : print( 'Failed\n' + log_message )
 			else : print( 'done.' )
 

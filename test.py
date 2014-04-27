@@ -15,7 +15,7 @@ from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
 from PyMesh.Tool.Curvature import *
 from PyMesh.Tool.Repair import *
-from PyMesh.Tool.Denoising import *
+from PyMesh.Tool.Smoothing import *
 
 
 # Global variables

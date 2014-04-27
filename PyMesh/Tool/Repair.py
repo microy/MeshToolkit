@@ -9,14 +9,14 @@
 #
 # External dependencies
 #
-from numpy import array, isfinite, zeros
+from numpy import array, cross, isfinite, sqrt, zeros
 from PyMesh.Core.Mesh import UpdateNormals
 
 
 #
 # Check several parameters of a given mesh
 #
-def CheckMesh( mesh ) :
+def Check( mesh ) :
 
 	# Initialisation
 	log_message = ''
@@ -73,21 +73,15 @@ def CheckMesh( mesh ) :
 	if (mesh.textures < 0).any() or (mesh.textures > 1).any() :
 		log_message += 'Bad texture coordinates\n'
 
-	# Return the log message
-	return log_message
-
-
-#
-# Check neighborhood parameters of a given mesh
-#
-def CheckNeighborhood( mesh ) :
-
-	# Initialization
-	log_message = ''
-
 	# Check isolated vertices
 	if (array([len(neighbor) for neighbor in mesh.neighbor_faces]) == 0).any() :
 		log_message += 'Isolated vertices\n'
+		
+	# Check degenerated faces
+	tris = mesh.vertices[ mesh.faces ]
+	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+	if ( sqrt( (face_normals ** 2).sum(axis=1) ) == 0 ).any() :
+		log_message += 'Degenerated faces\n'
 
 	# Return the log message
 	return log_message

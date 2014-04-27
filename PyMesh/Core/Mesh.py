@@ -184,7 +184,7 @@ def GetAxisAlignedBoundingBox( mesh ) :
 
 
 #
-# Compute the bounding sphere
+# Compute (an approximation of) the bounding sphere
 #
 def GetBoundingSphere( mesh ) :
 
