@@ -23,7 +23,7 @@ class Mesh( object ) :
 	#
 	# Initialisation
 	#
-	def __init__( self, name='', vertices=[], faces=[], colors=[], texture_name='', textures=[], vertex_normals=[] ) :
+	def __init__( self, name='', vertices=[], faces=[], colors=[], texture_name='', textures=[], face_normals=[], vertex_normals=[] ) :
 
 		# Mesh name
 		self.name = name
@@ -44,7 +44,7 @@ class Mesh( object ) :
 		self.textures = array( textures )
 		
 		# Per-face normal array
-		self.face_normals = array( [] )
+		self.face_normals = array( face_normals )
 		
 		# Per-vertex normal array
 		self.vertex_normals = array( vertex_normals )
@@ -102,46 +102,29 @@ def UpdateNormals( mesh ) :
 
 
 #
-# Collect the neighbor faces
+# Register neighborhood informations
 #
-def GetNeighborFaces( mesh ) :
+def UpdateNeighbors( mesh ) :
 
 	# Initialization
-	neighbor_faces = [ set() for i in range(len( mesh.vertices )) ]
+	mesh.neighbor_faces = [ set() for i in range(len( mesh.vertices )) ]
+	mesh.neighbor_vertices = [ set() for i in range(len( mesh.vertices )) ]
 
 	# Loop through the faces
 	for i, (a, b ,c) in enumerate( mesh.faces ) :
 
 		# Add faces bound to each vertex
-		neighbor_faces[ a ].add( i )
-		neighbor_faces[ b ].add( i )
-		neighbor_faces[ c ].add( i )
-
-	# Return the list of neighbors without duplicates
-	return  neighbor_faces
-
-
-#
-# Collect the neighborhoods vertices
-#
-def GetNeighborVertices( mesh ) :
-
-	# Initialization
-	neighbor_vertices = [ set() for i in range(len( mesh.vertices )) ]
-
-	# Loop through the faces
-	for i, (a, b ,c) in enumerate( mesh.faces ) :
+		mesh.neighbor_faces[ a ].add( i )
+		mesh.neighbor_faces[ b ].add( i )
+		mesh.neighbor_faces[ c ].add( i )
 
 		# Add vertices link by a face
-		neighbor_vertices[ a ].add( b )
-		neighbor_vertices[ a ].add( c )
-		neighbor_vertices[ b ].add( a )
-		neighbor_vertices[ b ].add( c )
-		neighbor_vertices[ c ].add( a )
-		neighbor_vertices[ c ].add( b )
-
-	# Return the list of neighbors without duplicates
-	return neighbor_vertices 
+		mesh.neighbor_vertices[ a ].add( b )
+		mesh.neighbor_vertices[ a ].add( c )
+		mesh.neighbor_vertices[ b ].add( a )
+		mesh.neighbor_vertices[ b ].add( c )
+		mesh.neighbor_vertices[ c ].add( a )
+		mesh.neighbor_vertices[ c ].add( b )
 
 
 #
@@ -178,16 +161,14 @@ def GetEdges( mesh ) :
 #
 def GetBorderVertices( mesh ) :
 	
-	neighbor_vertices =  GetNeighborVertices( mesh ) 
-	neighbor_faces =  GetNeighborFaces( mesh )
 	border_vertices = zeros( len(mesh.vertices), dtype=bool )
 	
 	# Loop through the neighbor vertices
-	for va, vn in enumerate( neighbor_vertices ) :
+	for va, vn in enumerate( mesh.neighbor_vertices ) :
 		for vb in vn :
 			
 			# Check the number of faces in common between the initial vertex and the neighbor
-			if len( neighbor_faces[va] & neighbor_faces[vb] ) < 2 :
+			if len( mesh.neighbor_faces[va] & mesh.neighbor_faces[vb] ) < 2 :
 				border_vertices[ va ] = True
 				break
 

@@ -97,8 +97,7 @@ def GetNormalCurvature( mesh ) :
 	normal_curvature /= 2.0 * mixed_area.reshape( -1, 1 )
 
 	# Remove border vertices
-	for v, on_border in enumerate( GetBorderVertices( mesh ) ) :
-		if on_border : normal_curvature[ v ] = 0.0
+	normal_curvature[ GetBorderVertices( mesh ) ] = 0.0
 
 	# Return the normal curvature vector array
 	return normal_curvature

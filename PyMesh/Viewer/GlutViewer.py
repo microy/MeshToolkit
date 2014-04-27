@@ -2,7 +2,7 @@
 
 
 #
-# Create an OpenGL window with GLUT to diplay a 3D mesh
+# Create an OpenGL window with GLUT to display a 3D mesh
 #
 
 

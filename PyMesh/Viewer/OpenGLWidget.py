@@ -38,8 +38,8 @@ class OpenGLWidget( MeshViewer, QGLWidget ) :
 		# Track mouse events
 		self.setMouseTracking( True )
 		
-		# Initialise the mesh
-		self.mesh = None
+		# Mesh loaded at the initialisation
+		self.init_mesh = None
 
 
 	#
@@ -50,8 +50,8 @@ class OpenGLWidget( MeshViewer, QGLWidget ) :
 		# OpenGL initialization
 		MeshViewer.Initialise( self, self.width(), self.height() )
 		
-		# Load the mesh
-		if self.mesh : MeshViewer.LoadMesh( self, self.mesh )
+		# Load the initial mesh
+		if self.init_mesh : MeshViewer.LoadMesh( self, self.init_mesh )
 
 
 	#

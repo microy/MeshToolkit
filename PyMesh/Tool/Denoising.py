@@ -9,8 +9,8 @@
 #
 # External dependencies
 #
+from PyMesh.Core.Mesh import GetBorderVertices
 from numpy import array, zeros
-from PyMesh.Core.Mesh import GetBorderVertices, GetNeighborVertices, GetNeighborFaces
 
 
 #
@@ -23,23 +23,27 @@ from PyMesh.Core.Mesh import GetBorderVertices, GetNeighborVertices, GetNeighbor
 #
 def UniformLaplacianSmoothing( mesh, iteration, diffusion ) :
 	
-	# Get neighbors
-	neighbors =  [ array(list(v)) for v in GetNeighborVertices( mesh ) ]
+	# Convert neighbor list to numpy array for fancy indexing
+	neighbors =  [ array(list(v)) for v in mesh.neighbor_vertices ]
+	
+	# Get neighbor vertex number
 	neighbor_number = array( [ len(i) for i in neighbors ] ).reshape(-1,1)
+	
+	# Get border vertices
 	border = GetBorderVertices( mesh )
 
-	# Smooth
-	vertices = mesh.vertices.copy()
+	# Iteration steps
 	for i in range( iteration ) :
 		
-		smoothed = [ (vertices[neighbors[v]]).sum(axis=0) for v in range( len(vertices) ) ]
+		# Average neighbor vertices
+		smoothed = [ (mesh.vertices[neighbors[v]]).sum(axis=0) for v in range( len(mesh.vertices) ) ]
 		smoothed /= neighbor_number
-		smoothed -= vertices
-		smoothed *= diffusion
-		smoothed += vertices
+		
+		# Get new vertex position
+		smoothed = mesh.vertices + diffusion * ( smoothed - mesh.vertices )
+		
 		# Don't change border vertices
-		for v in range( len(vertices) ) :
-			if border[v] : smoothed[v] = vertices[v]
-		vertices = smoothed
-
-	return vertices
+		smoothed[ border ] = mesh.vertices[ border ]
+		
+		# Update original vertices
+		mesh.vertices = smoothed

@@ -9,7 +9,7 @@
 # External dependencies
 #
 import timeit
-from numpy import allclose
+from numpy import allclose, invert
 from PyMesh.Core.Mesh import *
 from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
@@ -37,7 +37,7 @@ def Test( mesh ) :
 	
 #	r1 = Test1()
 #	r2 = Test2()
-#	print( "Test 1 : {}".format( timeit.timeit("Test1()", setup="from test import Test1", number=10) ) )
+#	print( "Test 1 : {}".format( timeit.timeit("Test1()", setup="from test import Test1", number=1) ) )
 #	print( "Test 2 : {}".format( timeit.timeit("Test2()", setup="from test import Test2", number=10) ) )
 #	print( allclose(r1, r2) )
 
@@ -82,7 +82,8 @@ def Test2() :
 	# Get neighbors
 	neighbors =  [ array(list(v)) for v in GetNeighborVertices( testmesh ) ]
 	neighbor_number = array( [ len(i) for i in neighbors ] ).reshape(-1,1)
-	border = GetBorderVertices( testmesh )
+	not_on_border = invert( GetBorderVertices( testmesh ) )
+#	border = GetBorderVertices( testmesh )
 
 	# Smooth
 	vertices = testmesh.vertices.copy()
@@ -93,9 +94,11 @@ def Test2() :
 		smoothed -= vertices
 		smoothed *= diffusion
 		smoothed += vertices
-		for v in range( len(vertices) ) :
-			if border[v] : smoothed[v] = vertices[v]
-		vertices = smoothed
+		vertices[ not_on_border ] = smoothed[ not_on_border ]
+#		smoothed[border] = vertices[border]
+#		vertices = smoothed
+#		for v in range( len(vertices) ) :
+#			if border[v] : smoothed[v] = vertices[v]
 
 	return vertices
 

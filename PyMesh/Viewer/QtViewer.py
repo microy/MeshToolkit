@@ -38,7 +38,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 		# Initialise the mesh
 		self.mesh = mesh
-		self.opengl_widget.mesh = mesh
+		self.opengl_widget.init_mesh = mesh
 
 
 	#
