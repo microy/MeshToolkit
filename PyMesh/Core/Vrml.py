@@ -2,7 +2,7 @@
 
 
 #
-# Provide import and export functions for VRML / Inventor / X3D files
+# Import and export VRML / Inventor / X3D files
 #
 
 

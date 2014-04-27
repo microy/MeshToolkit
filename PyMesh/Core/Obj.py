@@ -2,7 +2,7 @@
 
 
 #
-# Provide a function to import OBJ files
+# Import OBJ files
 #
 
 

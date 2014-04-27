@@ -2,7 +2,7 @@
 
 
 #
-# Provide functions to denoise a mesh
+# Provide functions to smooth mesh
 #
 
 
@@ -11,7 +11,7 @@
 #
 from numpy import array, zeros
 from PyMesh.Core.Mesh import GetBorderVertices
-from PyMesh.Tool.Curvature import Cotangent
+from PyMesh.Core.Curvature import Cotangent
 
 
 #

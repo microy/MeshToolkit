@@ -10,12 +10,7 @@
 #
 import timeit
 from numpy import allclose, invert
-from PyMesh.Core.Mesh import *
-from PyMesh.File.Vrml import *
-from PyMesh.Tool.Color import *
-from PyMesh.Tool.Curvature import *
-from PyMesh.Tool.Repair import *
-from PyMesh.Tool.Smoothing import *
+from PyMesh import *
 
 
 # Global variables

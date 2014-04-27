@@ -169,4 +169,4 @@ class Ui_MainWindow(object):
         self.action_view_solid.setToolTip(QtGui.QApplication.translate("MainWindow", "Enable solid rendering", None, QtGui.QApplication.UnicodeUTF8))
         self.action_view_solid.setShortcut(QtGui.QApplication.translate("MainWindow", "1", None, QtGui.QApplication.UnicodeUTF8))
 
-from OpenGLWidget import OpenGLWidget
+from .OpenGLWidget import OpenGLWidget

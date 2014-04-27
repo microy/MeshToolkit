@@ -14,9 +14,9 @@ import PySide
 from PySide import QtGui, QtCore
 from PySide.QtGui import QMainWindow, QFileDialog, QMessageBox
 from PyMesh.Core.Mesh import UpdateNormals
-from PyMesh.Tool.Repair import CheckMesh
-from PyMesh.File.Vrml import ReadVrml, WriteVrml
-from QtViewerUI import Ui_MainWindow
+from PyMesh.Core.Repair import Check
+from PyMesh.Core.Vrml import ReadVrml, WriteVrml
+from .QtViewerUI import Ui_MainWindow
 
 
 #
@@ -88,7 +88,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		if not self.mesh : return
 
 		# Check different parameters of the mesh
-		CheckMesh( self.mesh )
+		Check( self.mesh )
 
 
 	#
