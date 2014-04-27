@@ -2,18 +2,19 @@
 
 
 #
-# Import OBJ files
+# Import OBJ / SMF files
 #
 
 
 #
 # External dependencies
 #
+from numpy import array
 from PyMesh.Core.Mesh import Mesh
 
 
 #
-# Import a mesh from a OBJ file
+# Import a mesh from a OBJ / SMF file
 #
 def ReadObj( filename ) :
 #
@@ -43,10 +44,10 @@ def ReadObj( filename ) :
 
 		# Face (index starts at 1)
 		elif values[0] == 'f' :
-			faces.append( [ x-1 for x in map( int, values[1:4] ) ] )
+			faces.append( map( int, values[1:4] ) )
 
 		# Normal
-		elif values[0] == 'n' :
+		elif values[0] in [ 'n', 'vn' ] :
 			normals.append( map( float, values[1:4] ) )
 
 		# Color
@@ -54,12 +55,15 @@ def ReadObj( filename ) :
 			colors.append( map( float, values[1:4] ) )
 
 		# Texture
-		elif values[0] == 'r' :
+		elif values[0] in [ 'r', 'vt' ] :
 			texcoords.append( map( float, values[1:3] ) )
 
 		# Texture filename
 		elif values[0] == 'text' :
 			material = values[1]
+		
+	# Remap face indices
+	faces = array(faces) - 1
 
 	# Return the final mesh
 	return Mesh( name=filename, vertices=vertices, faces=faces, colors=colors,

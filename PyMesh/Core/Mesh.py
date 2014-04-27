@@ -40,7 +40,7 @@ class Mesh( object ) :
 		# Texture filename
 		self.texture_name = texture_name
 		
-		# Texture coordinate array
+		# Per-vertex texture coordinate array
 		self.textures = array( textures )
 		
 		# Per-face normal array
