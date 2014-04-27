@@ -17,7 +17,7 @@ from PyMesh.File.Vrml import *
 from PyMesh.Tool.Color import *
 from PyMesh.Tool.Curvature import *
 from PyMesh.Tool.Repair import *
-from PyMesh.Tool.Denoising import *
+from PyMesh.Tool.Smoothing import *
 from test import Test
 
 	
@@ -38,6 +38,7 @@ if __name__ == "__main__" :
 	parser.add_argument( '-c', action='store_true', help='Check different mesh parameters' )
 	parser.add_argument( '-nc', action='store_true', help='Compute the surface normal curvature' )
 	parser.add_argument( '-ul', nargs=2, metavar=('n', 'd'), help='Uniform laplacian smoothing with n iteration and d diffusion' )
+	parser.add_argument( '-cf', nargs=2, metavar=('n', 'd'), help='Curvature flow smoothing with n iteration and d diffusion' )
 	parser.add_argument( '-o', metavar='file', action='store', help='Write the resulting mesh to a VRML file' )
 	parser.add_argument( '-t', action='store_true', help='Test function' )
 	parser.add_argument( '-qt', action='store_true', help='Launch OpenGL viewer with Qt' )
@@ -104,6 +105,14 @@ if __name__ == "__main__" :
 			sys.stdout.write( 'Uniform laplacian smoothing... ' )
 			sys.stdout.flush()
 			UniformLaplacianSmoothing( input_mesh, int( args.ul[0] ), float( args.ul[1] ) )
+			print( 'done.' )
+
+		# Apply curvature flow smoothing
+		if args.cf :
+			
+			sys.stdout.write( 'Curvature flow smoothing... ' )
+			sys.stdout.flush()
+			CurvatureFlowSmoothing( input_mesh, int( args.cf[0] ), float( args.cf[1] ) )
 			print( 'done.' )
 
 		# Test
