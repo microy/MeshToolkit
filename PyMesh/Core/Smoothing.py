@@ -28,29 +28,28 @@ def UniformLaplacianSmoothing( mesh, iteration, diffusion ) :
 	
 	# Get neighbor vertex number
 	neighbor_number = array( [ len(i) for i in neighbors ] ).reshape(-1,1)
-	
+
 	# Get border vertices
 	border = GetBorderVertices( mesh )
 
 	# Iteration steps
 	for i in range( iteration ) :
 		
-		# Average neighbor vertices
-		smoothed = [ (mesh.vertices[neighbors[v]]).sum(axis=0) for v in range( len(mesh.vertices) ) ]
-		smoothed /= neighbor_number
+		# Compute average position of neighbor vertices
+		displacement  = [ (mesh.vertices[neighbors[v]]).sum(axis=0) for v in range( len(mesh.vertices) ) ] / neighbor_number
 		
-		# Get new vertex position
-		smoothed = mesh.vertices + diffusion * ( smoothed - mesh.vertices )
+		# Get the difference with the original center vertex
+		displacement -= mesh.vertices
 		
 		# Don't change border vertices
-		smoothed[ border ] = mesh.vertices[ border ]
+		displacement[ border ] = 0
 		
-		# Update original vertices
-		mesh.vertices = smoothed
+		# Update vertex position
+		mesh.vertices += diffusion * displacement
 
 
 #
-# Curvature flow smoothing
+# Normalized curvature flow smoothing
 #
 # Based on :
 #
@@ -58,7 +57,7 @@ def UniformLaplacianSmoothing( mesh, iteration, diffusion ) :
 #     M. Desbrun, M. Meyer, P. Schröder, A. Barr
 #     Proceedings of SIGGRAPH '99
 #
-def CurvatureFlowSmoothing( mesh, iteration, diffusion ) :
+def NormalizedCurvatureFlowSmoothing( mesh, iteration, diffusion ) :
 	
 	# Get border vertices
 	border = GetBorderVertices( mesh )
@@ -81,9 +80,9 @@ def CurvatureFlowSmoothing( mesh, iteration, diffusion ) :
 		vertex_weight = array( [ cotangent[::,2] + cotangent[::,1], cotangent[::,0] + cotangent[::,2],	cotangent[::,0] + cotangent[::,1]	] )
 
 		# Compute the curvature part of the vertices in each face
-		vertex_curvature = array( [ w * cotangent[::,1].reshape(-1,1) - u * cotangent[::,2].reshape(-1,1),
-						u * cotangent[::,2].reshape(-1,1) - v * cotangent[::,0].reshape(-1,1),
-						v * cotangent[::,0].reshape(-1,1) - w * cotangent[::,1].reshape(-1,1) ] )
+		vertex_curvature = array( [ u * cotangent[::,2].reshape(-1,1) - w * cotangent[::,1].reshape(-1,1),
+						v * cotangent[::,0].reshape(-1,1) - u * cotangent[::,2].reshape(-1,1),
+						w * cotangent[::,1].reshape(-1,1) - v * cotangent[::,0].reshape(-1,1) ] )
 						
 		# Compute the normal curvature vector of each vertex
 		smoothed = zeros( mesh.vertices.shape )
@@ -98,10 +97,10 @@ def CurvatureFlowSmoothing( mesh, iteration, diffusion ) :
 			weight[c] += vertex_weight[2,i]
 
 		# Get new vertex position
-		smoothed = mesh.vertices - diffusion * smoothed / weight.reshape(-1,1)
+		smoothed = diffusion * smoothed / weight.reshape(-1,1)
 		
 		# Don't change border vertices
-		smoothed[ border ] = mesh.vertices[ border ]
+		smoothed[ border ] = 0
 		
 		# Update original vertices
-		mesh.vertices = smoothed
+		mesh.vertices += smoothed

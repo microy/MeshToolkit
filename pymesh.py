@@ -32,8 +32,8 @@ if __name__ == "__main__" :
 	parser.add_argument( '-b',  action='store_true', help='Color vertices on a border' )
 	parser.add_argument( '-c', action='store_true', help='Check different mesh parameters' )
 	parser.add_argument( '-nc', action='store_true', help='Compute the surface normal curvature' )
-	parser.add_argument( '-ul', nargs=2, metavar=('n', 'd'), help='Uniform laplacian smoothing with n iteration and d diffusion' )
-	parser.add_argument( '-cf', nargs=2, metavar=('n', 'd'), help='Curvature flow smoothing with n iteration and d diffusion' )
+	parser.add_argument( '-ul', nargs=2, metavar=('n', 'dc'), help='Uniform laplacian smoothing with n iteration steps and d diffusion constant' )
+	parser.add_argument( '-ncf', nargs=2, metavar=('n', 'dc'), help='Normalized curvature flow smoothing with n iteration steps and d diffusion constant' )
 	parser.add_argument( '-o', metavar='file', action='store', help='Write the resulting mesh to a VRML file' )
 	parser.add_argument( '-t', action='store_true', help='Test function' )
 	parser.add_argument( '-qt', action='store_true', help='Launch OpenGL viewer with Qt' )
@@ -102,12 +102,12 @@ if __name__ == "__main__" :
 			UniformLaplacianSmoothing( input_mesh, int( args.ul[0] ), float( args.ul[1] ) )
 			print( 'done.' )
 
-		# Apply curvature flow smoothing
-		if args.cf :
+		# Apply normalized curvature flow smoothing
+		if args.ncf :
 			
-			sys.stdout.write( 'Curvature flow smoothing... ' )
+			sys.stdout.write( 'Normalized curvature flow smoothing... ' )
 			sys.stdout.flush()
-			CurvatureFlowSmoothing( input_mesh, int( args.cf[0] ), float( args.cf[1] ) )
+			NormalizedCurvatureFlowSmoothing( input_mesh, int( args.ncf[0] ), float( args.ncf[1] ) )
 			print( 'done.' )
 
 		# Test
