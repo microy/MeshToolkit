@@ -2,7 +2,7 @@
 
 
 #
-# Import OBJ / SMF files
+# Import OBJ files
 #
 
 
@@ -44,10 +44,10 @@ def ReadObj( filename ) :
 
 		# Face (index starts at 1)
 		elif values[0] == 'f' :
-			faces.append( map( int, values[1:4] ) )
+			faces.append( map( int, [ (v.split('/'))[0] for v in values[1:4] ] ) )
 
 		# Normal
-		elif values[0] in [ 'n', 'vn' ] :
+		elif values[0] == 'vn' :
 			normals.append( map( float, values[1:4] ) )
 
 		# Color
@@ -55,11 +55,11 @@ def ReadObj( filename ) :
 			colors.append( map( float, values[1:4] ) )
 
 		# Texture
-		elif values[0] in [ 'r', 'vt' ] :
+		elif values[0] == 'vt' :
 			texcoords.append( map( float, values[1:3] ) )
 
 		# Texture filename
-		elif values[0] == 'text' :
+		elif values[0] == 'mtllib' :
 			material = values[1]
 		
 	# Remap face indices
