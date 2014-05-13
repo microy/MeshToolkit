@@ -5,4 +5,5 @@ from .Obj import *
 from .Repair import *
 from .Smoothing import *
 from .Vrml import *
+from .X3d import *
 
