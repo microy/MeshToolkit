@@ -63,7 +63,7 @@ def ReadVrml( filename ) :
 		for word in line.split() :
 
 			# Left bracket or brace
-			if word in [ '[', '{' ] :
+			if word in '[{' :
 
 				# Increment left deliminter number
 				nlbrack += 1
@@ -79,7 +79,7 @@ def ReadVrml( filename ) :
 				ixyz = 0
 
 			# Right bracket or brace
-			elif word in [ '}', ']' ] :
+			elif word in '}]' :
 
 				# Increment right deliminter number
 				nrbrack += 1
