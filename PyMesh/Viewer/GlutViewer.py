@@ -62,7 +62,7 @@ class GlutViewer( MeshViewer ) :
 		# A
 		elif key in [ 'a', 'A' ] :
 
-			# Flat shading
+			# Antialiasing
 			self.antialiasing = not self.antialiasing
 			MeshViewer.SetAntialiasing( self, self.antialiasing )
 
@@ -81,7 +81,7 @@ class GlutViewer( MeshViewer ) :
 		# I
 		elif key in [ 'i', 'I' ] :
 
-			# Reset model translation and rotation
+			# Print OpenGL informations
 			self.PrintInfo()
 
 		# R
@@ -189,7 +189,7 @@ class GlutViewer( MeshViewer ) :
 	def PrintInfo( self ) :
 
 		# Display OpenGL driver informations
-		print( 'OpenGL Informations' )
+		print( 'OpenGL Informations...' )
 		print( '  Vendor :     ' + glGetString( GL_VENDOR ) )
 		print( '  Renderer :   ' + glGetString( GL_RENDERER ) )
 		print( '  Version :    ' + glGetString( GL_VERSION ) )
