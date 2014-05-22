@@ -90,20 +90,20 @@ class GlutViewer( MeshViewer ) :
 			# Reset model translation and rotation
 			MeshViewer.Reset( self )
 
-		# 0
-		elif key == '0' :
+		# 1
+		elif key == '1' :
 
 			# Display the mesh with solid rendering
 			self.wireframe_mode = 0
 
-		# 1
-		elif key == '1' :
+		# 2
+		elif key == '2' :
 
 			# Display the mesh with wireframe rendering
 			self.wireframe_mode = 1
 
-		# 2
-		elif key == '2' :
+		# 3
+		elif key == '3' :
 
 			# Display the mesh with hidden line removal rendering
 			self.wireframe_mode = 2
