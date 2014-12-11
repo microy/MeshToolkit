@@ -1,4 +1,4 @@
-# PyMesh
+# PyMeshToolkit
 
 Implement a 3D triangular mesh processing library in Python for research purpose.
 
