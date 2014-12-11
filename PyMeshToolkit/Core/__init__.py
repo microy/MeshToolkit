@@ -4,6 +4,7 @@ from .Mesh import *
 from .Obj import *
 from .Repair import *
 from .Smoothing import *
+from .Test import *
 from .Vrml import *
 from .X3d import *
 
