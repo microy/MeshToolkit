@@ -13,7 +13,7 @@
 import argparse
 import sys
 from PyMeshToolkit import *
-from test import Test
+from PyMeshToolkit.Core.test import Test
 
 	
 #
