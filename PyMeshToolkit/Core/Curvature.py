@@ -20,7 +20,7 @@
 #
 from numpy import array, cross, dot, sqrt, zeros
 from math import pi, atan2
-from PyMesh.Core.Mesh import GetBorderVertices
+from PyMeshToolkit.Core.Mesh import GetBorderVertices
 
 
 #

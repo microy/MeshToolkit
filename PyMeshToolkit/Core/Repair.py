@@ -10,7 +10,7 @@
 # External dependencies
 #
 from numpy import array, cross, isfinite, sqrt, zeros
-from PyMesh.Core.Mesh import UpdateNormals
+from PyMeshToolkit.Core.Mesh import UpdateNormals
 
 
 #

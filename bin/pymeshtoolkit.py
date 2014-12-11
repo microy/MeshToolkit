@@ -3,7 +3,7 @@
 
 
 #
-# Application to demonstrate the use of the PyMesh library
+# Application to demonstrate the use of the PyMeshToolkit library
 #
 
 
@@ -12,7 +12,7 @@
 #
 import argparse
 import sys
-from PyMesh import *
+from PyMeshToolkit import *
 from test import Test
 
 	

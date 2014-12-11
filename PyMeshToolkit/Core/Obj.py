@@ -10,7 +10,7 @@
 # External dependencies
 #
 from numpy import array
-from PyMesh.Core.Mesh import Mesh
+from PyMeshToolkit.Core.Mesh import Mesh
 
 
 #

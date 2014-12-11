@@ -12,7 +12,7 @@
 import OpenGL
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-from PyMesh.Viewer.MeshViewer import MeshViewer
+from PyMeshToolkit.Viewer.MeshViewer import MeshViewer
 
 
 #

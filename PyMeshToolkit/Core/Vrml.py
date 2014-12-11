@@ -9,7 +9,7 @@
 #
 # External dependencies
 #
-from PyMesh.Core.Mesh import Mesh
+from PyMeshToolkit.Core.Mesh import Mesh
 
 
 #

@@ -10,7 +10,7 @@
 #
 import timeit
 from numpy import allclose, invert, copy
-from PyMesh import *
+from PyMeshToolkit import *
 
 
 # Global variables

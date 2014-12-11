@@ -11,7 +11,7 @@
 #
 from xml.etree.ElementTree import parse
 from numpy import fromstring
-from PyMesh.Core.Mesh import Mesh
+from PyMeshToolkit.Core.Mesh import Mesh
 
 
 #

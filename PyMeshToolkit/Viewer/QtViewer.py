@@ -13,9 +13,9 @@ import platform
 import PySide
 from PySide import QtGui, QtCore
 from PySide.QtGui import QMainWindow, QFileDialog, QMessageBox
-from PyMesh.Core.Mesh import UpdateNormals
-from PyMesh.Core.Repair import Check
-from PyMesh.Core.Vrml import ReadVrml, WriteVrml
+from PyMeshToolkit.Core.Mesh import UpdateNormals
+from PyMeshToolkit.Core.Repair import Check
+from PyMeshToolkit.Core.Vrml import ReadVrml, WriteVrml
 from .QtViewerUI import Ui_MainWindow
 
 
@@ -192,7 +192,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 	def HelpAbout( self ) :
 
 		QMessageBox.about( self, 'About QtViewer',
-		'''<b>PyMesh QtViewer</b>
+		'''<b>PyMeshToolkit QtViewer</b>
         <p>Copyright (c) 2013-2014 Michael Roy.</p>
         <p>All rights reserved in accordance with the MIT License.</p>
         <i><p>Python {}</p><p>PySide version {}</p><p>Qt version {} on {}</p></i>'''.format(

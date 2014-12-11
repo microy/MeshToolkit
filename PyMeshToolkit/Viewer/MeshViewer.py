@@ -13,8 +13,8 @@ import OpenGL
 from OpenGL.GL import *
 from math import tan, pi
 from numpy import array, identity, dot, float32, uint32, zeros
-from PyMesh.Core.Mesh import GetBoundingSphere, UpdateNormals
-from PyMesh.Viewer.Trackball import Trackball
+from PyMeshToolkit.Core.Mesh import GetBoundingSphere, UpdateNormals
+from PyMeshToolkit.Viewer.Trackball import Trackball
 
 
 #
@@ -295,9 +295,9 @@ class MeshViewer( Trackball ) :
 def LoadShader( name, geometry_enabled=False ) :
 
 	# Create the shaders
-	vertex_shader = CreateShader( 'PyMesh/Viewer/Shaders/'+name+'.vert.glsl', GL_VERTEX_SHADER )
-	fragment_shader = CreateShader( 'PyMesh/Viewer/Shaders/'+name+'.frag.glsl', GL_FRAGMENT_SHADER )
-	if geometry_enabled : geometry_shader = CreateShader( 'PyMesh/Viewer/Shaders/'+name+'.geom.glsl', GL_GEOMETRY_SHADER )
+	vertex_shader = CreateShader( 'PyMeshToolkit/Viewer/Shaders/'+name+'.vert.glsl', GL_VERTEX_SHADER )
+	fragment_shader = CreateShader( 'PyMeshToolkit/Viewer/Shaders/'+name+'.frag.glsl', GL_FRAGMENT_SHADER )
+	if geometry_enabled : geometry_shader = CreateShader( 'PyMeshToolkit/Viewer/Shaders/'+name+'.geom.glsl', GL_GEOMETRY_SHADER )
 
 	# Create the program
 	program_id = glCreateProgram()
