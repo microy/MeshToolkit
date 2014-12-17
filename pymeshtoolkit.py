@@ -19,7 +19,7 @@ from PyMeshToolkit import *
 input_mesh = None
 
 # Create a command line argument parser
-parser = argparse.ArgumentParser( prog='pymeshtoolkit.py', description='Process 3D triangular meshes.', usage='%(prog)s [options] input_mesh' )
+parser = argparse.ArgumentParser( description='Process 3D triangular meshes.', usage='%(prog)s [options] input_mesh' )
 parser.add_argument( 'input_mesh', nargs='?', default=None, help='Input mesh file in VRML format' )
 parser.add_argument( '-i',  action='store_true', help='Print mesh informations' )
 parser.add_argument( '-b',  action='store_true', help='Color vertices on a border' )
