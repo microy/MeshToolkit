@@ -1,4 +1,5 @@
 Models/
+Sur.py
 *.py[co]
 *~
 *.vrml
@@ -7,3 +8,4 @@ Models/
 *.x3d
 *.x3dv
 *.obj
+

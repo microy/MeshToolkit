@@ -15,7 +15,7 @@ from PySide import QtGui, QtCore
 from PySide.QtGui import QMainWindow, QFileDialog, QMessageBox
 from PyMeshToolkit.Core.Mesh import UpdateNormals
 from PyMeshToolkit.Core.Repair import Check
-from PyMeshToolkit.Core.Vrml import ReadVrml, WriteVrml
+from PyMeshToolkit.File.Vrml import ReadVrml, WriteVrml
 from .QtViewerUI import Ui_MainWindow
 
 
