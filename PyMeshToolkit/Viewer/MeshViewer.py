@@ -13,6 +13,7 @@ import OpenGL
 from OpenGL.GL import *
 from math import tan, pi
 from numpy import array, identity, dot, float32, uint32, zeros
+from PyMeshToolkit.Viewer.Shader import LoadShader
 from PyMeshToolkit.Core.Mesh import GetBoundingSphere, UpdateNormals
 from PyMeshToolkit.Viewer.Trackball import Trackball
 
@@ -51,9 +52,9 @@ class MeshViewer( Trackball ) :
 		self.SetProjectionMatrix( width, height )
 
 		# Load the shaders
-		self.smooth_shader_id = LoadShader( 'SmoothShading' )
-		self.flat_shader_id = LoadShader( 'FlatShading' )
-		self.shader_program_id = self.smooth_shader_id
+		self.smooth_shader = LoadShader( 'Smooth' )
+		self.flat_shader = LoadShader( 'Flat' )
+		self.shader_program = self.smooth_shader
 
 		# Initialise viewing parameters
 		self.wireframe_mode = 0
@@ -155,8 +156,8 @@ class MeshViewer( Trackball ) :
 	def SetShader( self, shader ) :
 
 		# Setup the shader program
-		if shader == 'SmoothShading' : self.shader_program_id = self.smooth_shader_id
-		elif shader == 'FlatShading' : self.shader_program_id = self.flat_shader_id
+		if shader == 'SmoothShading' : self.shader_program = self.smooth_shader
+		elif shader == 'FlatShading' : self.shader_program = self.flat_shader
 
 
 	#
@@ -221,7 +222,7 @@ class MeshViewer( Trackball ) :
 	def DisplayMesh( self, wireframe_mode = 0 ) :
 
 		# Use the shader program
-		glUseProgram( self.shader_program_id )
+		glUseProgram( self.shader_program )
 
 		# Initialise Model-View transformation matrix
 		modelview_matrix = identity( 4, dtype=float32 )
@@ -233,16 +234,16 @@ class MeshViewer( Trackball ) :
 		modelview_matrix = dot( self.transformation, modelview_matrix )
 
 		# Send the transformation matrices to the shader
-		glUniformMatrix3fv( glGetUniformLocation( self.shader_program_id, "Normal_Matrix" ),
+		glUniformMatrix3fv( glGetUniformLocation( self.shader_program, "Normal_Matrix" ),
 			1, GL_FALSE, array( self.transformation[ :3, :3 ] ) )
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program_id, "MVP_Matrix" ),
+		glUniformMatrix4fv( glGetUniformLocation( self.shader_program, "MVP_Matrix" ),
 			1, GL_FALSE, dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
-		glUniform1i( glGetUniformLocation( self.shader_program_id, "color_enabled" ), self.color_enabled )
+		glUniform1i( glGetUniformLocation( self.shader_program, "color_enabled" ), self.color_enabled )
 		
 		# Activate hidden lines in the shader for wireframe rendering
-		glUniform1i( glGetUniformLocation( self.shader_program_id, "wireframe_mode" ), wireframe_mode )
+		glUniform1i( glGetUniformLocation( self.shader_program, "wireframe_mode" ), wireframe_mode )
 		
 		# Vertex array object
 		glBindVertexArray( self.vertex_array_id )
@@ -287,68 +288,3 @@ class MeshViewer( Trackball ) :
 		self.projection_matrix[2,2] = - (far + near) / (far - near)
 		self.projection_matrix[2,3] = - 1.0
 		self.projection_matrix[3,2] = - 2.0 * near * far / (far - near)
-		
-		
-#
-#  LoadShader
-#
-def LoadShader( name, geometry_enabled=False ) :
-
-	# Create the shaders
-	vertex_shader = CreateShader( 'PyMeshToolkit/Viewer/Shaders/'+name+'.vert.glsl', GL_VERTEX_SHADER )
-	fragment_shader = CreateShader( 'PyMeshToolkit/Viewer/Shaders/'+name+'.frag.glsl', GL_FRAGMENT_SHADER )
-	if geometry_enabled : geometry_shader = CreateShader( 'PyMeshToolkit/Viewer/Shaders/'+name+'.geom.glsl', GL_GEOMETRY_SHADER )
-
-	# Create the program
-	program_id = glCreateProgram()
-
-	# Attach the shaders to the program
-	glAttachShader( program_id, vertex_shader )
-	glAttachShader( program_id, fragment_shader )
-	if geometry_enabled : glAttachShader( program_id, geometry_shader )
-
-	# Link the program
-	glLinkProgram( program_id )
-
-	# Check the program
-	if not glGetProgramiv( program_id, GL_LINK_STATUS ) :
-		raise RuntimeError( 'Shader program linking failed.\n' + glGetProgramInfoLog( program_id ) )
-
-	# Detach the shaders from the program
-	glDetachShader( program_id, vertex_shader )
-	glDetachShader( program_id, fragment_shader )
-	if geometry_enabled : glDetachShader( program_id, geometry_shader )
-
-	# Delete the shaders
-	glDeleteShader( vertex_shader )
-	glDeleteShader( fragment_shader )
-	if geometry_enabled : glDeleteShader( geometry_shader )
-
-	# Return shader program ID
-	return program_id
-
-
-#
-#  CreateShader
-#
-def CreateShader( filename, shader_type ) :
-
-	# Load shader source files
-	with open( filename, 'r') as shader_file :
-		shader_source = shader_file.read()
-
-	# Create the shaders
-	shader_id = glCreateShader( shader_type )
-
-	# Load shader source codes
-	glShaderSource( shader_id, shader_source )
-
-	# Compile the shaders
-	glCompileShader( shader_id )
-
-	# Check the shaders
-	if not glGetShaderiv( shader_id, GL_COMPILE_STATUS ) :
-		raise RuntimeError( 'Shader compilation failed.\n' + glGetShaderInfoLog( shader_id ) )
-
-	# Return the shader ID
-	return shader_id
