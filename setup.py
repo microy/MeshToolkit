@@ -14,6 +14,7 @@ setup(
     name = "PyMeshToolkit",
     version = "0.1dev",
     packages = find_packages(),
+    scripts = ['Scripts/pymeshtoolkit.py'],
     author = "Michaël Roy",
     author_email = "microygh@gmail.com",
     description = "Python 3D Mesh Toolkit",
