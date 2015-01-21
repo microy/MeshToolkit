@@ -19,7 +19,6 @@ from numpy import amin, amax, array, bincount, cross, sort, sqrt, zeros
 #
 class Mesh( object ) :
 
-
 	#
 	# Initialisation
 	#
@@ -49,26 +48,68 @@ class Mesh( object ) :
 		# Per-vertex normal array
 		self.vertex_normals = array( vertex_normals )
 
-
 	#
 	# Return mesh informations
 	#
 	def __str__( self ) :
 		
 		info   = '  Name :               {}\n'.format( self.name )
-		info  += '  Vertices :           {}\n'.format( len(self.vertices) )
-		info  += '  Faces :              {}'.format( len(self.faces) )
+		info  += '  Vertices :           {}\n'.format( self.vertex_number )
+		info  += '  Faces :              {}'.format( self.face_number )
 		if len(self.colors) :
-			info  += '\n  Colors :             {}'.format( len(self.colors) )
+			info  += '\n  Colors :             {}'.format( self.color_number )
 		if len(self.face_normals) :
-			info  += '\n  Faces normals :      {}'.format( len(self.face_normals) )
+			info  += '\n  Faces normals :      {}'.format( self.face_normal_number )
 		if len(self.vertex_normals) :
-			info  += '\n  Vertex normals :     {}'.format( len(self.vertex_normals) )
+			info  += '\n  Vertex normals :     {}'.format( self.vertex_normal_number )
 		if len(self.textures) :
-			info  += '\n  Textures :           {}'.format( len(self.textures) )
+			info  += '\n  Textures :           {}'.format( self.texture_number )
 		if self.texture_name :
 			info  += '\n  Texture filename :   {}'.format( self.texture_name )
 		return info
+
+	#
+	# Vertex number
+	#
+	@property
+	def vertex_number( self ) :
+		return len( self.vertices )
+
+	#
+	# Face number
+	#
+	@property
+	def face_number( self ) :
+		return len( self.faces )
+
+	#
+	# Color number
+	#
+	@property
+	def color_number( self ) :
+		return len( self.colors )
+
+	#
+	# Texture number
+	#
+	@property
+	def texture_number( self ) :
+		return len( self.textures )
+
+	#
+	# face normal number
+	#
+	@property
+	def face_normal_number( self ) :
+		return len( self.face_normals )
+
+	#
+	# Vertex normal number
+	#
+	@property
+	def vertex_normal_number( self ) :
+		return len( self.vertex_normals )
+
 
 
 #
