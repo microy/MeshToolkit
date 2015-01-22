@@ -49,8 +49,8 @@ class MeshViewer( Trackball ) :
 		self.SetProjectionMatrix( width, height )
 
 		# Load the shaders
-		self.smooth_shader = PyMeshToolkit.Viewer.Shader.LoadShader( 'Smooth' )
-		self.flat_shader = PyMeshToolkit.Viewer.Shader.LoadShader( 'Flat' )
+		self.smooth_shader = PyMeshToolkit.Viewer.Shader( 'Smooth' )
+		self.flat_shader = PyMeshToolkit.Viewer.Shader( 'Flat' )
 		self.shader_program = self.smooth_shader
 
 		# Initialise viewing parameters
@@ -67,7 +67,7 @@ class MeshViewer( Trackball ) :
 		self.Close()
 
 		# Compute mesh normals if necessary
-		if len(mesh.vertex_normals) != len(mesh.vertices) :	mesh.UpdateNormals()
+		if mesh.vertex_normal_number != mesh.vertex_number : mesh.UpdateNormals()
 
 		# Cast input data (required for OpenGL)
 		vertices = np.array( mesh.vertices, dtype=np.float32 )
@@ -213,7 +213,7 @@ class MeshViewer( Trackball ) :
 	def DisplayMesh( self, wireframe_mode = 0 ) :
 
 		# Use the shader program
-		gl.glUseProgram( self.shader_program )
+		gl.glUseProgram( self.shader_program.program_id )
 
 		# Initialise Model-View transformation matrix
 		modelview_matrix = np.identity( 4, dtype=np.float32 )
@@ -225,16 +225,16 @@ class MeshViewer( Trackball ) :
 		modelview_matrix = np.dot( self.transformation, modelview_matrix )
 
 		# Send the transformation matrices to the shader
-		gl.glUniformMatrix3fv( gl.glGetUniformLocation( self.shader_program, "Normal_Matrix" ),
+		gl.glUniformMatrix3fv( gl.glGetUniformLocation( self.shader_program.program_id, "Normal_Matrix" ),
 			1, gl.GL_FALSE, np.array( self.transformation[ :3, :3 ] ) )
-		gl.glUniformMatrix4fv( gl.glGetUniformLocation( self.shader_program, "MVP_Matrix" ),
+		gl.glUniformMatrix4fv( gl.glGetUniformLocation( self.shader_program.program_id, "MVP_Matrix" ),
 			1, gl.GL_FALSE, np.dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
-		gl.glUniform1i( gl.glGetUniformLocation( self.shader_program, "color_enabled" ), self.color_enabled )
+		gl.glUniform1i( gl.glGetUniformLocation( self.shader_program.program_id, "color_enabled" ), self.color_enabled )
 		
 		# Activate hidden lines in the shader for wireframe rendering
-		gl.glUniform1i( gl.glGetUniformLocation( self.shader_program, "wireframe_mode" ), wireframe_mode )
+		gl.glUniform1i( gl.glGetUniformLocation( self.shader_program.program_id, "wireframe_mode" ), wireframe_mode )
 		
 		# Vertex array object
 		gl.glBindVertexArray( self.vertex_array_id )
