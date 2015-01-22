@@ -47,13 +47,13 @@ if args.input_mesh :
 	# Compute surface normals
 	sys.stdout.write( 'Compute normals... ' )
 	sys.stdout.flush()
-	UpdateNormals( input_mesh )
+	input_mesh.UpdateNormals()
 	print( 'done.' )
 
 	# Register neighborhood informations
 	sys.stdout.write( 'Register neighbors... ' )
 	sys.stdout.flush()
-	UpdateNeighbors( input_mesh )
+	input_mesh.UpdateNeighbors()
 	print( 'done.' )
 	
 # Launch standalone QtViewer

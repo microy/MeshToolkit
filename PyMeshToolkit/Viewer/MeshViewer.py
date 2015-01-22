@@ -14,7 +14,6 @@ from OpenGL.GL import *
 from math import tan, pi
 from numpy import array, identity, dot, float32, uint32, zeros
 from PyMeshToolkit.Viewer.Shader import LoadShader
-from PyMeshToolkit.Core.Mesh import GetBoundingSphere, UpdateNormals
 from PyMeshToolkit.Viewer.Trackball import Trackball
 
 
@@ -71,7 +70,7 @@ class MeshViewer( Trackball ) :
 		self.Close()
 
 		# Compute mesh normals if necessary
-		if len(mesh.vertex_normals) != len(mesh.vertices) :	UpdateNormals( mesh )
+		if len(mesh.vertex_normals) != len(mesh.vertices) :	mesh.UpdateNormals()
 
 		# Cast input data (required for OpenGL)
 		vertices = array( mesh.vertices, dtype=float32 )
@@ -80,7 +79,7 @@ class MeshViewer( Trackball ) :
 		colors = array( mesh.colors, dtype=float32 )
 
 		# Normalize the model
-		(center, radius) = GetBoundingSphere( mesh )
+		(center, radius) = mesh.GetBoundingSphere()
 		vertices -= center
 		vertices *= 10.0 / radius
 

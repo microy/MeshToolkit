@@ -110,133 +110,131 @@ class Mesh( object ) :
 	def vertex_normal_number( self ) :
 		return len( self.vertex_normals )
 
+	#
+	# Compute normal vectors of the faces and vertices
+	#
+	def UpdateNormals( self ) :
+
+		# Create an indexed view of the triangles
+		tris = self.vertices[ self.faces ]
+
+		# Calculate the normal for all the triangles
+		self.face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+
+		# Normalise the face normals
+		self.face_normals /= sqrt( ( self.face_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
+
+		# Initialise the vertex normals
+		self.vertex_normals = zeros( self.vertices.shape )
+
+		# Add the face normals to the vertex normals
+		# Standard implementation :
+		#	for i, f in enumerate( self.faces ) : self.vertex_normals[ f ] += self.face_normals[ i ]
+		# Optimized implementation :
+		for i in range( 3 ) :
+			self.vertex_normals[:, i] += bincount( self.faces[:, 0], self.face_normals[:, i], minlength=self.vertex_number )
+			self.vertex_normals[:, i] += bincount( self.faces[:, 1], self.face_normals[:, i], minlength=self.vertex_number )
+			self.vertex_normals[:, i] += bincount( self.faces[:, 2], self.face_normals[:, i], minlength=self.vertex_number )
+		
+		# Normalise the vertex normals
+		self.vertex_normals /= sqrt( ( self.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
 
 
-#
-# Compute normal vectors of the faces and vertices
-#
-def UpdateNormals( mesh ) :
+	#
+	# Register neighborhood informations
+	#
+	def UpdateNeighbors( self ) :
 
-	# Create an indexed view of the triangles
-	tris = mesh.vertices[ mesh.faces ]
+		# Initialization
+		self.neighbor_faces = [ set() for i in range(self.vertex_number) ]
+		self.neighbor_vertices = [ set() for i in range(self.vertex_number) ]
 
-	# Calculate the normal for all the triangles
-	mesh.face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+		# Loop through the faces
+		for i, (a, b ,c) in enumerate( self.faces ) :
 
-	# Normalise the face normals
-	mesh.face_normals /= sqrt( ( mesh.face_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
+			# Add faces bound to each vertex
+			self.neighbor_faces[ a ].add( i )
+			self.neighbor_faces[ b ].add( i )
+			self.neighbor_faces[ c ].add( i )
 
-	# Initialise the vertex normals
-	mesh.vertex_normals = zeros( mesh.vertices.shape )
-
-	# Add the face normals to the vertex normals
-	# Standard implementation :
-	#	for i, f in enumerate( mesh.faces ) : mesh.vertex_normals[ f ] += mesh.face_normals[ i ]
-	# Optimized implementation :
-	for i in range( 3 ) :
-		mesh.vertex_normals[:, i] += bincount( mesh.faces[:, 0], mesh.face_normals[:, i], minlength=len(mesh.vertices) )
-		mesh.vertex_normals[:, i] += bincount( mesh.faces[:, 1], mesh.face_normals[:, i], minlength=len(mesh.vertices) )
-		mesh.vertex_normals[:, i] += bincount( mesh.faces[:, 2], mesh.face_normals[:, i], minlength=len(mesh.vertices) )
-	
-	# Normalise the vertex normals
-	mesh.vertex_normals /= sqrt( ( mesh.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
+			# Add vertices link by a face
+			self.neighbor_vertices[ a ].add( b )
+			self.neighbor_vertices[ a ].add( c )
+			self.neighbor_vertices[ b ].add( a )
+			self.neighbor_vertices[ b ].add( c )
+			self.neighbor_vertices[ c ].add( a )
+			self.neighbor_vertices[ c ].add( b )
 
 
-#
-# Register neighborhood informations
-#
-def UpdateNeighbors( mesh ) :
+	#
+	# Collect the mesh edges
+	#
+	def GetEdges( self ) :
 
-	# Initialization
-	mesh.neighbor_faces = [ set() for i in range(len( mesh.vertices )) ]
-	mesh.neighbor_vertices = [ set() for i in range(len( mesh.vertices )) ]
+		# Edge dictionary
+	#	edges = { e : {} for a, b in sort( self.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) }
 
-	# Loop through the faces
-	for i, (a, b ,c) in enumerate( mesh.faces ) :
+		# Edge set (unordered unique list)
+	#	edges = set( e for a, b in sort( self.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) )
 
-		# Add faces bound to each vertex
-		mesh.neighbor_faces[ a ].add( i )
-		mesh.neighbor_faces[ b ].add( i )
-		mesh.neighbor_faces[ c ].add( i )
+		# Initialization
+		edges = {}
+		
+		# Create an indexed view of the edges per face
+		face_edges = [ zip(a,b) for a,b in sort( self.faces )[:,[[0,0,1],[1,2,2]]] ]
 
-		# Add vertices link by a face
-		mesh.neighbor_vertices[ a ].add( b )
-		mesh.neighbor_vertices[ a ].add( c )
-		mesh.neighbor_vertices[ b ].add( a )
-		mesh.neighbor_vertices[ b ].add( c )
-		mesh.neighbor_vertices[ c ].add( a )
-		mesh.neighbor_vertices[ c ].add( b )
+		# Create a dictionary of the mesh edges
+		# and register associated faces
+		for i, face_edge in enumerate( face_edges ) :
+			for key in face_edge :
+				if key not in edges :
+					edges[key] = {}
+					edges[key]['face'] = []
+				edges[key]['face'].append( i )
 
-
-#
-# Collect the mesh edges
-#
-def GetEdges( mesh ) :
-
-	# Edge dictionary
-#	edges = { e : {} for a, b in sort( mesh.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) }
-
-	# Edge set (unordered unique list)
-#	edges = set( e for a, b in sort( mesh.faces )[:,[[0,0,1],[1,2,2]]] for e in zip(a,b) )
-
-	# Initialization
-	edges = {}
-	
-	# Create an indexed view of the edges per face
-	face_edges = [ zip(a,b) for a,b in sort( mesh.faces )[:,[[0,0,1],[1,2,2]]] ]
-
-	# Create a dictionary of the mesh edges
-	# and register associated faces
-	for i, face_edge in enumerate( face_edges ) :
-		for key in face_edge :
-			if key not in edges :
-				edges[key] = {}
-				edges[key]['face'] = []
-			edges[key]['face'].append( i )
-
-	return edges
+		return edges
 
 
-#
-# Tell which vertex is on a border
-#
-def GetBorderVertices( mesh ) :
-	
-	border_vertices = zeros( len(mesh.vertices), dtype=bool )
-	
-	# Loop through the neighbor vertices
-	for va, vn in enumerate( mesh.neighbor_vertices ) :
-		for vb in vn :
-			
-			# Check the number of faces in common between the initial vertex and the neighbor
-			if len( mesh.neighbor_faces[va] & mesh.neighbor_faces[vb] ) < 2 :
-				border_vertices[ va ] = True
-				break
+	#
+	# Tell which vertex is on a border
+	#
+	def GetBorderVertices( self ) :
+		
+		border_vertices = zeros( self.vertex_number, dtype=bool )
+		
+		# Loop through the neighbor vertices
+		for va, vn in enumerate( self.neighbor_vertices ) :
+			for vb in vn :
+				
+				# Check the number of faces in common between the initial vertex and the neighbor
+				if len( self.neighbor_faces[va] & self.neighbor_faces[vb] ) < 2 :
+					border_vertices[ va ] = True
+					break
 
-	return border_vertices
+		return border_vertices
 
-#
-# Compute the axis-aligned bounding box
-#
-def GetAxisAlignedBoundingBox( mesh ) :
+	#
+	# Compute the axis-aligned bounding box
+	#
+	def GetAxisAlignedBoundingBox( self ) :
 
-	# Return the minimum point and the maximum point for each axis
-	return ( amin( mesh.vertices, axis = 0 ), amax( mesh.vertices, axis = 0 ) )
+		# Return the minimum point and the maximum point for each axis
+		return ( amin( self.vertices, axis = 0 ), amax( self.vertices, axis = 0 ) )
 
 
-#
-# Compute (an approximation of) the bounding sphere
-#
-def GetBoundingSphere( mesh ) :
+	#
+	# Compute (an approximation of) the bounding sphere
+	#
+	def GetBoundingSphere( self ) :
 
-	# Compute axis-aligned bounding box
-	( pmin, pmax ) = GetAxisAlignedBoundingBox( mesh )
+		# Compute axis-aligned bounding box
+		( pmin, pmax ) = GetAxisAlignedBoundingBox( self )
 
-	# Compute center
-	center = 0.5 * (pmin + pmax)
+		# Compute center
+		center = 0.5 * (pmin + pmax)
 
-	# Compute radius
-	radius = sqrt(((center - mesh.vertices) ** 2).sum(axis = 1)).max()
+		# Compute radius
+		radius = sqrt(((center - self.vertices) ** 2).sum(axis = 1)).max()
 
-	# Return result
-	return ( center, radius )
+		# Return result
+		return ( center, radius )

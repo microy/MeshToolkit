@@ -10,7 +10,6 @@
 # External dependencies
 #
 from numpy import array, zeros
-from PyMeshToolkit.Core.Mesh import GetBorderVertices
 from PyMeshToolkit.Core.Curvature import Cotangent
 
 
@@ -30,7 +29,7 @@ def UniformLaplacianSmoothing( mesh, iteration, diffusion ) :
 	neighbor_number = array( [ len(i) for i in neighbors ] ).reshape(-1,1)
 
 	# Get border vertices
-	border = GetBorderVertices( mesh )
+	border = mesh.GetBorderVertices()
 
 	# Iteration steps
 	for i in range( iteration ) :

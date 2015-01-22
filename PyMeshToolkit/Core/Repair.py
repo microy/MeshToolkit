@@ -10,7 +10,6 @@
 # External dependencies
 #
 from numpy import array, cross, isfinite, sqrt, zeros
-from PyMeshToolkit.Core.Mesh import UpdateNormals
 
 
 #
@@ -122,7 +121,7 @@ def RemoveIsolatedVertices( mesh ) :
 	# Update the mesh
 	mesh.vertices = array( new_vertices )
 	mesh.faces = new_faces
-	UpdateNormals( mesh )
+	mesh.UpdateNormals()
 
 
 #
@@ -144,5 +143,5 @@ def InvertFacesOrientation( mesh ) :
 	mesh.faces[ :, [0, 1, 2] ] = mesh.faces[ :, [1, 0, 2] ]
 
 	# Recompute face and vertex normals
-	UpdateNormals( mesh )
+	mesh.UpdateNormals()
 	

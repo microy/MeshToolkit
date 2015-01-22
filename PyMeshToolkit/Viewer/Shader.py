@@ -96,10 +96,10 @@ void main( void ) {
 
 	if( wireframe_mode == 1 ) {
 		FragColor.xyz = vec3( 0.7, 0.2, 0.2 );
-	}	
+	}
 	else if( wireframe_mode == 2 ) {
 		FragColor.xyz = vec3( 1.0, 1.0, 1.0 );
-	}	
+	}
 	else if( color_enabled == 0 ) {
 		FragColor.xyz = vec3( 0.7, 0.7, 0.7 ) * Dot;
 	}
@@ -135,14 +135,14 @@ void main( void ) {
 def LoadShader( name, geometry_enabled=False ) :
 	
 	# Shader program source code correspondance
-	shader_vertex_name = { 'Flat' : flat_shader_vertex, 'Smooth' : smooth_shader_vertex }
-	shader_fragment_name = { 'Flat' : flat_shader_fragment, 'Smooth' : smooth_shader_fragment }
-	shader_geometry_name = {}
+	vertex_shader_source = { 'Flat' : flat_shader_vertex, 'Smooth' : smooth_shader_vertex }
+	fragment_shader_source = { 'Flat' : flat_shader_fragment, 'Smooth' : smooth_shader_fragment }
+	geometry_shader_source = {}
 
 	# Create the shaders
-	vertex_shader = CreateShader( shader_vertex_name[ name ], GL_VERTEX_SHADER )
-	fragment_shader = CreateShader( shader_fragment_name[ name ], GL_FRAGMENT_SHADER )
-	if geometry_enabled : geometry_shader = CreateShader( shader_geometry_name[ name ], GL_GEOMETRY_SHADER )
+	vertex_shader = CreateShader( vertex_shader_source[ name ], GL_VERTEX_SHADER )
+	fragment_shader = CreateShader( fragment_shader_source[ name ], GL_FRAGMENT_SHADER )
+	if geometry_enabled : geometry_shader = CreateShader( geometry_shader_source[ name ], GL_GEOMETRY_SHADER )
 
 	# Create the program
 	program_id = glCreateProgram()
