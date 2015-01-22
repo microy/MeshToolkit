@@ -1,4 +1,4 @@
-from .Color import *
+from .Colormap import *
 from .Curvature import *
 from .Mesh import *
 from .Repair import *

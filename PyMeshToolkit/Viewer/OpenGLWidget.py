@@ -16,7 +16,6 @@ from PySide import QtGui, QtCore, QtOpenGL
 from PySide.QtOpenGL import QGLWidget, QGLFormat, QGL
 from math import tan, pi
 from numpy import array, identity, dot, float32, uint32, zeros
-from PyMeshToolkit.Core.Color import Value2Color, Value2ColorAlternate
 from PyMeshToolkit.Viewer.MeshViewer import MeshViewer
 
 

@@ -2,20 +2,20 @@
 
 
 #
-# Provide utility functions to convert a value array to pseudo-colors
+# Provide utility functions to convert values to pseudo-colors
 #
 
 
 #
 # External dependencies
 #
-from numpy import array, sqrt
+import numpy as np
 
 
 #
-# Convert a value in range [ 0.0, 1.0 ] to a pseudo-color
+# Jet colormap
 #
-def Value2Color( value ) :
+def ColormapJet( value ) :
 
 	if( value < 0.0  ) : return [ 0.0, 0.0 , 1.0 ]
 	if( value < 0.25 ) : return [ 0.0, value * 4.0, 1.0 ]
@@ -26,9 +26,9 @@ def Value2Color( value ) :
 
 
 #
-# Convert a value in range [ 0.0, 1.0 ] to a pseudo-color
+# Rainbow colormap
 #
-def Value2ColorAlternate( value ) :
+def ColormapRainbow( value ) :
 
 	if( value < 0.0  ) : return [ 1.0, 0.0 , 1.0 ]
 	if( value < 0.2  ) : return [ 1.0 - value * 5.0, 0.0 , 1.0 ]
@@ -54,7 +54,7 @@ def Array2Colors( values ) :
 	norm_values = (values - min_value) / value_range
 
 	# Convert each value to a pseudo-color
-	return array( [ Value2Color( i ) for i in norm_values ] )
+	return np.array( [ ColormapJet( i ) for i in norm_values ] )
 
 
 #
@@ -63,6 +63,6 @@ def Array2Colors( values ) :
 def VectorArray2Colors( values ) :
 
 	# Compute value vector lengths and convert them to colors
-	return Array2Colors( sqrt((values**2).sum(axis=1)) )
+	return Array2Colors( np.sqrt((values**2).sum(axis=1)) )
 
 
