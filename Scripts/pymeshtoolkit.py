@@ -148,9 +148,10 @@ if args.glut :
 # Launch QtViewer
 if args.qt :
 
+	import PySide.QtGui as qtgui
 	sys.stdout.write( 'Launch Qt viewer... ' )
 	sys.stdout.flush()
-	app = QtGui.QApplication( sys.argv )
+	app = qtgui.QApplication( sys.argv )
 	window = QtViewer( mesh=input_mesh )
 	window.show()
 	print( 'done.' )

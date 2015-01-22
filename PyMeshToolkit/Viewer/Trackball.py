@@ -29,7 +29,6 @@ import numpy as np
 #
 class Trackball( object ) :
 
-
 	#
 	# Initialisation
 	#
@@ -48,7 +47,6 @@ class Trackball( object ) :
 		# Tranformation matrix
 		self.transformation = np.identity( 4, dtype=np.float32 )
 
-
 	#
 	# Reset the current transformation
 	#
@@ -56,7 +54,6 @@ class Trackball( object ) :
 
 		# Reset the tranformation matrix
 		self.transformation = np.identity( 4, dtype=np.float32 )
-
 
 	#
 	# Resize the viewing parameters
@@ -66,7 +63,6 @@ class Trackball( object ) :
 		# Change window size
 		self.width = width
 		self.height = height
-
 
 	#
 	# Handle when a mouse button is pressed
@@ -79,7 +75,6 @@ class Trackball( object ) :
 		# Record button pressed
 		self.button = button
 
-
 	#
 	# Handle when a mouse button is released
 	#
@@ -87,7 +82,6 @@ class Trackball( object ) :
 
 		# Mouse button release
 		self.button = 0
-
 
 	#
 	# Handle when the mouse wheel is used
@@ -104,7 +98,6 @@ class Trackball( object ) :
 		# Translate the transformation matrix
 		m = self.transformation
 		m[3] = m[0] * translation[0] + m[1] * translation[1] + m[2] * translation[2] + m[3]
-
 
 	#
 	# Handle when the mouse is moved
@@ -162,7 +155,6 @@ class Trackball( object ) :
 
 		# Require a display update
 		return True
-
 	
 	#
 	# Map the mouse position onto a unit sphere

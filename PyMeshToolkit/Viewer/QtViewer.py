@@ -10,9 +10,8 @@
 # External dependencies
 #
 import platform
-import PySide
-from PySide import QtGui, QtCore
-from PySide.QtGui import QMainWindow, QFileDialog, QMessageBox
+import PySide as qt
+import PySide.QtGui as qtgui
 from PyMeshToolkit.Core.Repair import Check
 from PyMeshToolkit.File.Vrml import ReadVrml, WriteVrml
 from .QtViewerUI import Ui_MainWindow
@@ -21,8 +20,7 @@ from .QtViewerUI import Ui_MainWindow
 #
 # Create a mesh viewer with Qt
 #
-class QtViewer( QMainWindow, Ui_MainWindow ) :
-
+class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 
 	#
 	# Initialisation
@@ -39,14 +37,13 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.mesh = mesh
 		self.opengl_widget.init_mesh = mesh
 
-
 	#
 	# FileOpen
 	#
 	def FileOpen( self ) :
 
 		# Open file dialog
-		(filename, selected_filter) = QFileDialog.getOpenFileName( self, 'Open a VRML file...', '',
+		(filename, selected_filter) = qtgui.QFileDialog.getOpenFileName( self, 'Open a VRML file...', '',
 			'VRML files (*.vrml *.wrl *.x3d *.x3dv *.iv);;All files (*.*)' )
 
 		# Check filename
@@ -58,7 +55,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		# Send the mesh to the OpenGL viewer
 		self.opengl_widget.LoadMesh( self.mesh )
 
-
 	#
 	# FileSave
 	#
@@ -68,7 +64,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		if not self.mesh : return
 
 		# Open file dialog
-		(filename, selected_filter) = QFileDialog.getSaveFileName( self, 'Save to a VRML file...', '',
+		(filename, selected_filter) = qtgui.QFileDialog.getSaveFileName( self, 'Save to a VRML file...', '',
 			'VRML files (*.vrml *.wrl *.x3d *.x3dv *.iv);;All files (*.*)' )
 
 		# Check filename
@@ -76,7 +72,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 
 		# Save VRML/X3D/Inventor file
 		WriteVrml( self.mesh, unicode(filename) )
-
 
 	#
 	# FileCheck
@@ -89,7 +84,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		# Check different parameters of the mesh
 		Check( self.mesh )
 
-
 	#
 	# FileClose
 	#
@@ -99,7 +93,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.Close()
 		self.mesh = None
 		self.opengl_widget.update()
-
 
 	#
 	# ViewFlat
@@ -112,7 +105,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.SetShader( 'FlatShading' )
 		self.opengl_widget.update()
 
-
 	#
 	# ViewSmooth
 	#
@@ -123,7 +115,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.action_view_smooth.setChecked( True )
 		self.opengl_widget.SetShader( 'SmoothShading' )
 		self.opengl_widget.update()
-
 
 	#
 	# ViewSolid
@@ -137,7 +128,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.wireframe_mode = 0
 		self.opengl_widget.update()
 
-
 	#
 	# ViewWireframe
 	#
@@ -149,7 +139,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.action_view_hiddenlines.setChecked( False )
 		self.opengl_widget.wireframe_mode = 1
 		self.opengl_widget.update()
-
 
 	#
 	# ViewHiddenlines
@@ -163,7 +152,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.wireframe_mode = 2
 		self.opengl_widget.update()
 
-
 	#
 	# ViewAntialiasing
 	#
@@ -174,7 +162,6 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.SetAntialiasing( self.action_view_antialiasing.isChecked() )
 		self.opengl_widget.update()
 
-
 	#
 	# ViewReset
 	#
@@ -184,28 +171,25 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.Reset()
 		self.opengl_widget.update()
 
-
 	#
 	# HelpAbout
 	#
 	def HelpAbout( self ) :
 
-		QMessageBox.about( self, 'About QtViewer',
+		qtgui.QMessageBox.about( self, 'About QtViewer',
 		'''<b>PyMeshToolkit QtViewer</b>
         <p>Copyright (c) 2013-2014 Michael Roy.</p>
         <p>All rights reserved in accordance with the MIT License.</p>
         <i><p>Python {}</p><p>PySide version {}</p><p>Qt version {} on {}</p></i>'''.format(
-        platform.python_version(), PySide.__version__, PySide.QtCore.__version__,
+        platform.python_version(), qt.__version__, qt.QtCore.__version__,
         platform.system()))
-
 
 	#
 	# HelpAboutQt
 	#
 	def HelpAboutQt( self ) :
 		
-		QMessageBox.aboutQt( self, 'About Qt' )
-		
+		qtgui.QMessageBox.aboutQt( self, 'About Qt' )
 		
 	#
 	# HelpAboutOpenGL
@@ -214,7 +198,7 @@ class QtViewer( QMainWindow, Ui_MainWindow ) :
 		
 		( gl_vendor, gl_renderer, gl_version, gl_shader ) = self.opengl_widget.OpenGLInfo()
 		
-		QMessageBox.about( self, 'About OpenGL', '''<p><b>Vendor :</b> {}</p>
+		qtgui.QMessageBox.about( self, 'About OpenGL', '''<p><b>Vendor :</b> {}</p>
 			<p><b>Renderer :</b> {}</p>
 			<p><b>Version :</b> {}</p>
 			<p><b>Shader :</b> {}</p>'''.format( gl_vendor, gl_renderer, gl_version, gl_shader ) )

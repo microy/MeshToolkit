@@ -9,9 +9,9 @@
 #
 # External dependencies
 #
-import OpenGL
-from OpenGL.GL import *
-from OpenGL.GLUT import *
+import sys
+import OpenGL.GL as gl
+import OpenGL.GLUT as glut
 from PyMeshToolkit.Viewer.MeshViewer import MeshViewer
 
 
@@ -20,33 +20,31 @@ from PyMeshToolkit.Viewer.MeshViewer import MeshViewer
 #
 class GlutViewer( MeshViewer ) :
 
-
 	#
 	# Initialisation
 	#
 	def __init__( self, mesh, title="GlutViewer", width=1024, height=768 ) :
 
 		# Initialise OpenGL / GLUT
-		glutInit()
-		glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE )
-		glutInitWindowSize( width, height )
-		glutInitWindowPosition( 100, 100 )
-		glutCreateWindow( title )
+		glut.glutInit()
+		glut.glutInitDisplayMode( glut.GLUT_DOUBLE | glut.GLUT_RGBA | glut.GLUT_DEPTH | glut.GLUT_MULTISAMPLE )
+		glut.glutInitWindowSize( width, height )
+		glut.glutInitWindowPosition( 100, 100 )
+		glut.glutCreateWindow( title )
 
 		# GLUT function binding
-		glutCloseFunc( self.Close )
-		glutDisplayFunc( self.Display )
-		glutIdleFunc( self.Idle )
-		glutKeyboardFunc( self.Keyboard )
-		glutMouseFunc( self.Mouse )
-		glutMotionFunc( self.MouseMove )
-		glutReshapeFunc( self.Resize )
+		glut.glutCloseFunc( self.Close )
+		glut.glutDisplayFunc( self.Display )
+		glut.glutIdleFunc( self.Idle )
+		glut.glutKeyboardFunc( self.Keyboard )
+		glut.glutMouseFunc( self.Mouse )
+		glut.glutMotionFunc( self.MouseMove )
+		glut.glutReshapeFunc( self.Resize )
 
 		# OpenGL initialization
 		MeshViewer.Initialise( self, width, height )
 		MeshViewer.LoadMesh( self, mesh )
 		self.antialiasing = True
-
 
 	#
 	# Keyboard
@@ -107,7 +105,6 @@ class GlutViewer( MeshViewer ) :
 
 			# Display the mesh with hidden line removal rendering
 			self.wireframe_mode = 2
-			
 
 	#
 	# Mouse
@@ -115,22 +112,22 @@ class GlutViewer( MeshViewer ) :
 	def Mouse( self, button, state, x, y ) :
 
 		# Button down
-		if state == GLUT_DOWN :
+		if state == glut.GLUT_DOWN :
 
 			# Left button
-			if button == GLUT_LEFT_BUTTON :
+			if button == glut.GLUT_LEFT_BUTTON :
 
 				# Trackball rotation
 				MeshViewer.MousePress( self, [ x, y ], 1 )
 
 			# Right button
-			elif button == GLUT_RIGHT_BUTTON :
+			elif button == glut.GLUT_RIGHT_BUTTON :
 
 				# Trackball XY translation
 				MeshViewer.MousePress( self, [ x, y ], 2 )
 		
 		# Button up
-		elif state == GLUT_UP :
+		elif state == glut.GLUT_UP :
 
 			# Wheel up
 			if button == 3 :
@@ -150,7 +147,6 @@ class GlutViewer( MeshViewer ) :
 				# Stop motion
 				MeshViewer.MouseRelease( self )
 
-
 	#
 	# Display
 	#
@@ -160,9 +156,8 @@ class GlutViewer( MeshViewer ) :
 		MeshViewer.Display( self )
 
 		# Swap buffers
-		glutSwapBuffers()
-		glutPostRedisplay()
-
+		glut.glutSwapBuffers()
+		glut.glutPostRedisplay()
 
 	#
 	# Idle
@@ -170,8 +165,7 @@ class GlutViewer( MeshViewer ) :
 	def Idle( self ) :
 
 		# Redraw
-		glutPostRedisplay()
-
+		glut.glutPostRedisplay()
 
 	#
 	# Run
@@ -180,8 +174,7 @@ class GlutViewer( MeshViewer ) :
 	def Run() :
 
 		# Start up the main loop
-		glutMainLoop()
-
+		glut.glutMainLoop()
 
 	#
 	# PrintInfo
@@ -190,7 +183,7 @@ class GlutViewer( MeshViewer ) :
 
 		# Display OpenGL driver informations
 		print( 'OpenGL Informations...' )
-		print( '  Vendor :     ' + glGetString( GL_VENDOR ) )
-		print( '  Renderer :   ' + glGetString( GL_RENDERER ) )
-		print( '  Version :    ' + glGetString( GL_VERSION ) )
-		print( '  Shader :     ' + glGetString( GL_SHADING_LANGUAGE_VERSION ) )
+		print( '  Vendor :     ' + gl.glGetString( gl.GL_VENDOR ) )
+		print( '  Renderer :   ' + gl.glGetString( gl.GL_RENDERER ) )
+		print( '  Version :    ' + gl.glGetString( gl.GL_VERSION ) )
+		print( '  Shader :     ' + gl.glGetString( gl.GL_SHADING_LANGUAGE_VERSION ) )

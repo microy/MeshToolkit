@@ -11,12 +11,8 @@
 #
 import math
 import numpy as np
-import OpenGL
-from OpenGL.GL import *
+import OpenGL.GL as gl
 import PyMeshToolkit
-# FIXME:
-#import PyMeshToolkit.Viewer
-#import PyMeshToolkit.Viewer.Trackball
 from PyMeshToolkit.Viewer.Trackball import Trackball
 
 
@@ -24,7 +20,6 @@ from PyMeshToolkit.Viewer.Trackball import Trackball
 # Display a mesh with OpenGL
 #
 class MeshViewer( Trackball ) :
-
 
 	#
 	# Initialisation of OpenGL
@@ -35,20 +30,20 @@ class MeshViewer( Trackball ) :
 		Trackball.Initialise( self, width, height )
 
 		# Default background color
-		glClearColor( 1, 1, 1, 1 )
+		gl.glClearColor( 1, 1, 1, 1 )
 
 		# Enable depth test
-		glEnable( GL_DEPTH_TEST )
+		gl.glEnable( gl.GL_DEPTH_TEST )
 
 		# Enable face culling
-		glEnable( GL_CULL_FACE )
+		gl.glEnable( gl.GL_CULL_FACE )
 
 		# Enable blending function
-		glEnable( GL_BLEND )
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
+		gl.glEnable( gl.GL_BLEND )
+		gl.glBlendFunc( gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA )
 
 		# Enable multisampling (antialiasing)
-		glEnable( GL_MULTISAMPLE )
+		gl.glEnable( gl.GL_MULTISAMPLE )
 
 		# Initialise the projection transformation matrix
 		self.SetProjectionMatrix( width, height )
@@ -62,7 +57,6 @@ class MeshViewer( Trackball ) :
 		self.wireframe_mode = 0
 		self.element_number = 0
 		self.color_enabled = False
-		
 
 	#
 	# Load the mesh to display
@@ -87,48 +81,47 @@ class MeshViewer( Trackball ) :
 		vertices *= 10.0 / radius
 
 		# Vertex array object
-		self.vertex_array_id = glGenVertexArrays( 1 )
-		glBindVertexArray( self.vertex_array_id )
+		self.vertex_array_id = gl.glGenVertexArrays( 1 )
+		gl.glBindVertexArray( self.vertex_array_id )
 
 		# Face buffer object
-		self.face_buffer_id = glGenBuffers( 1 )
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, faces.nbytes, faces, GL_STATIC_DRAW )
+		self.face_buffer_id = gl.glGenBuffers( 1 )
+		gl.glBindBuffer( gl.GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
+		gl.glBufferData( gl.GL_ELEMENT_ARRAY_BUFFER, faces.nbytes, faces, gl.GL_STATIC_DRAW )
 
 		# Vertex buffer object
-		self.vertex_buffer_id = glGenBuffers( 1 )
-		glBindBuffer( GL_ARRAY_BUFFER, self.vertex_buffer_id )
-		glBufferData( GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW )
-		glEnableVertexAttribArray( 0 )
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, None )
+		self.vertex_buffer_id = gl.glGenBuffers( 1 )
+		gl.glBindBuffer( gl.GL_ARRAY_BUFFER, self.vertex_buffer_id )
+		gl.glBufferData( gl.GL_ARRAY_BUFFER, vertices.nbytes, vertices, gl.GL_STATIC_DRAW )
+		gl.glEnableVertexAttribArray( 0 )
+		gl.glVertexAttribPointer( 0, 3, gl.GL_FLOAT, gl.GL_FALSE, 0, None )
 
 		# Normal buffer object
-		self.normal_buffer_id = glGenBuffers( 1 )
-		glBindBuffer( GL_ARRAY_BUFFER, self.normal_buffer_id )
-		glBufferData( GL_ARRAY_BUFFER, normals.nbytes, normals, GL_STATIC_DRAW )
-		glEnableVertexAttribArray( 1 )
-		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, None )
+		self.normal_buffer_id = gl.glGenBuffers( 1 )
+		gl.glBindBuffer( gl.GL_ARRAY_BUFFER, self.normal_buffer_id )
+		gl.glBufferData( gl.GL_ARRAY_BUFFER, normals.nbytes, normals, gl.GL_STATIC_DRAW )
+		gl.glEnableVertexAttribArray( 1 )
+		gl.glVertexAttribPointer( 1, 3, gl.GL_FLOAT, gl.GL_FALSE, 0, None )
 
 		# Color buffer object
 		if len( colors ) : 
 			self.color_enabled = True
-			self.color_buffer_id = glGenBuffers( 1 )
-			glBindBuffer( GL_ARRAY_BUFFER, self.color_buffer_id )
-			glBufferData( GL_ARRAY_BUFFER, colors.nbytes, colors, GL_STATIC_DRAW )
-			glEnableVertexAttribArray( 2 )
-			glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, None )
+			self.color_buffer_id = gl.glGenBuffers( 1 )
+			gl.glBindBuffer( gl.GL_ARRAY_BUFFER, self.color_buffer_id )
+			gl.glBufferData( gl.GL_ARRAY_BUFFER, colors.nbytes, colors, gl.GL_STATIC_DRAW )
+			gl.glEnableVertexAttribArray( 2 )
+			gl.glVertexAttribPointer( 2, 3, gl.GL_FLOAT, gl.GL_FALSE, 0, None )
 
 		# Release the buffers
-		glBindBuffer( GL_ARRAY_BUFFER, 0 )
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 )
-		glBindVertexArray( 0 )
+		gl.glBindBuffer( gl.GL_ARRAY_BUFFER, 0 )
+		gl.glBindBuffer( gl.GL_ELEMENT_ARRAY_BUFFER, 0 )
+		gl.glBindVertexArray( 0 )
 
 		# Setup model element number
 		self.element_number = len(faces) * 3
 
 		# Reset the trackball
 		Trackball.Reset( self )
-
 
 	#
 	# Close
@@ -139,18 +132,17 @@ class MeshViewer( Trackball ) :
 		if not self.element_number : return
 
 		# Delete buffer objects
-		glDeleteBuffers( 1, np.array([ self.face_buffer_id ]) )
-		glDeleteBuffers( 1, np.array([ self.vertex_buffer_id ]) )
-		glDeleteBuffers( 1, np.array([ self.normal_buffer_id ]) )
-		if self.color_enabled :	glDeleteBuffers( 1, np.array([ self.color_buffer_id ]) )
+		gl.glDeleteBuffers( 1, np.array([ self.face_buffer_id ]) )
+		gl.glDeleteBuffers( 1, np.array([ self.vertex_buffer_id ]) )
+		gl.glDeleteBuffers( 1, np.array([ self.normal_buffer_id ]) )
+		if self.color_enabled :	gl.glDeleteBuffers( 1, np.array([ self.color_buffer_id ]) )
 
 		# Delete vertex array
-		glDeleteVertexArrays( 1, np.array([self.vertex_array_id]) )
+		gl.glDeleteVertexArrays( 1, np.array([self.vertex_array_id]) )
 
 		# Initialise the model parameters
 		self.element_number = 0
 		self.color_enabled = False
-
 
 	#
 	# SetShader
@@ -161,16 +153,14 @@ class MeshViewer( Trackball ) :
 		if shader == 'SmoothShading' : self.shader_program = self.smooth_shader
 		elif shader == 'FlatShading' : self.shader_program = self.flat_shader
 
-
 	#
 	# SetAntialiasing
 	#
 	def SetAntialiasing( self, enabled ) :
 
 		# Enable / Disable antialiasing
-		if enabled : glEnable( GL_MULTISAMPLE )
-		else : glDisable( GL_MULTISAMPLE )
-
+		if enabled : gl.glEnable( gl.GL_MULTISAMPLE )
+		else : gl.glDisable( gl.GL_MULTISAMPLE )
 
 	#
 	# Display
@@ -178,7 +168,7 @@ class MeshViewer( Trackball ) :
 	def Display( self ) :
 
 		# Clear all pixels and depth buffer
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+		gl.glClear( gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT )
 
 		# Nothing to display
 		if not self.element_number : return
@@ -193,30 +183,29 @@ class MeshViewer( Trackball ) :
 		elif self.wireframe_mode == 1 :
 
 			# 1st pass : wireframe model
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
+			gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_LINE )
 			self.DisplayMesh( self.wireframe_mode )
 
 			# 2nd pass : solid model
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
-			glEnable( GL_POLYGON_OFFSET_FILL )
-			glPolygonOffset( 1.0, 1.0 )
+			gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_FILL )
+			gl.glEnable( gl.GL_POLYGON_OFFSET_FILL )
+			gl.glPolygonOffset( 1.0, 1.0 )
 			self.DisplayMesh()
-			glDisable( GL_POLYGON_OFFSET_FILL )
+			gl.glDisable( gl.GL_POLYGON_OFFSET_FILL )
 
 		# Display the mesh with hidden line removal rendering
 		elif self.wireframe_mode == 2 :
 
 			# 1st pass : wireframe model
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE )
+			gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_LINE )
 			self.DisplayMesh()
 
 			# 2nd pass : hidden line removal
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL )
-			glEnable( GL_POLYGON_OFFSET_FILL )
-			glPolygonOffset( 1.0, 1.0 )
+			gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_FILL )
+			gl.glEnable( gl.GL_POLYGON_OFFSET_FILL )
+			gl.glPolygonOffset( 1.0, 1.0 )
 			self.DisplayMesh( self.wireframe_mode )
-			glDisable( GL_POLYGON_OFFSET_FILL )
-
+			gl.glDisable( gl.GL_POLYGON_OFFSET_FILL )
 
 	#
 	# DisplayMesh
@@ -224,7 +213,7 @@ class MeshViewer( Trackball ) :
 	def DisplayMesh( self, wireframe_mode = 0 ) :
 
 		# Use the shader program
-		glUseProgram( self.shader_program )
+		gl.glUseProgram( self.shader_program )
 
 		# Initialise Model-View transformation matrix
 		modelview_matrix = np.identity( 4, dtype=np.float32 )
@@ -236,30 +225,29 @@ class MeshViewer( Trackball ) :
 		modelview_matrix = np.dot( self.transformation, modelview_matrix )
 
 		# Send the transformation matrices to the shader
-		glUniformMatrix3fv( glGetUniformLocation( self.shader_program, "Normal_Matrix" ),
-			1, GL_FALSE, np.array( self.transformation[ :3, :3 ] ) )
-		glUniformMatrix4fv( glGetUniformLocation( self.shader_program, "MVP_Matrix" ),
-			1, GL_FALSE, np.dot( modelview_matrix, self.projection_matrix ) )
+		gl.glUniformMatrix3fv( gl.glGetUniformLocation( self.shader_program, "Normal_Matrix" ),
+			1, gl.GL_FALSE, np.array( self.transformation[ :3, :3 ] ) )
+		gl.glUniformMatrix4fv( gl.glGetUniformLocation( self.shader_program, "MVP_Matrix" ),
+			1, gl.GL_FALSE, np.dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
-		glUniform1i( glGetUniformLocation( self.shader_program, "color_enabled" ), self.color_enabled )
+		gl.glUniform1i( gl.glGetUniformLocation( self.shader_program, "color_enabled" ), self.color_enabled )
 		
 		# Activate hidden lines in the shader for wireframe rendering
-		glUniform1i( glGetUniformLocation( self.shader_program, "wireframe_mode" ), wireframe_mode )
+		gl.glUniform1i( gl.glGetUniformLocation( self.shader_program, "wireframe_mode" ), wireframe_mode )
 		
 		# Vertex array object
-		glBindVertexArray( self.vertex_array_id )
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
+		gl.glBindVertexArray( self.vertex_array_id )
+		gl.glBindBuffer( gl.GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
 
 		# Draw the mesh
-		glDrawElements( GL_TRIANGLES, self.element_number, GL_UNSIGNED_INT, None )
+		gl.glDrawElements( gl.GL_TRIANGLES, self.element_number, gl.GL_UNSIGNED_INT, None )
 
 		# Release the vertex array object
-		glBindVertexArray( 0 )
+		gl.glBindVertexArray( 0 )
 
 		# Release the shader program
-		glUseProgram( 0 )
-
+		gl.glUseProgram( 0 )
 
 	#
 	# Resize
@@ -267,14 +255,13 @@ class MeshViewer( Trackball ) :
 	def Resize( self, width, height ) :
 
 		# Resize the viewport
-		glViewport( 0, 0, width, height )
+		gl.glViewport( 0, 0, width, height )
 
 		# Resize the trackball
 		Trackball.Resize( self, width, height )
 
 		# Compute perspective projection matrix
 		self.SetProjectionMatrix( width, height )
-
 
 	#
 	# SetProjectionMatrix
