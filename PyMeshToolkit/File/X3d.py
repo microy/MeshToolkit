@@ -10,9 +10,8 @@
 # External dependencies
 #
 from xml.etree.ElementTree import parse
-from numpy import fromstring
-from PyMeshToolkit.Core.Mesh import Mesh
-
+import numpy as np
+import PyMeshToolkit
 
 #
 # Import a triangular mesh from a X3D file
@@ -28,13 +27,13 @@ def ReadX3d( filename ) :
 	root = tree.getroot()
 	
 	for face in root.iter( 'IndexedFaceSet' ) :
-		faces = fromstring( face.get( 'coordIndex' ).replace( '-1', '' ), dtype=int, sep=' ' ).reshape( -1, 3 )
+		faces = np.fromstring( face.get( 'coordIndex' ).replace( '-1', '' ), dtype=int, sep=' ' ).reshape( -1, 3 )
 
 	for vertex in root.iter( 'Coordinate' ) :
-		vertices = fromstring( vertex.get( 'point' ), sep=' ' ).reshape( -1, 3 )
+		vertices = np.fromstring( vertex.get( 'point' ), sep=' ' ).reshape( -1, 3 )
 		
 	# Return the final mesh
-	return Mesh( name=filename, vertices=vertices, faces=faces )
+	return PyMeshToolkit.Core.Mesh( name=filename, vertices=vertices, faces=faces )
 
 
 #

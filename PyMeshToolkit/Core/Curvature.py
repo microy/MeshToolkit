@@ -18,8 +18,8 @@
 #
 # External dependencies
 #
-from numpy import array, cross, dot, sqrt, zeros
-from math import pi, atan2
+import math
+import numpy as np
 
 
 #
@@ -36,21 +36,21 @@ def GetNormalCurvature( mesh ) :
 	w = tris[::,0] - tris[::,2]
 
 	# Compute the cotangent of the triangle angles
-	cotangent = array( [ Cotangent( u, -w ), Cotangent( v, -u ), Cotangent( w, -v ) ] ).T
+	cotangent = np.array( [ Cotangent( u, -w ), Cotangent( v, -u ), Cotangent( w, -v ) ] ).T
 
 	# Compute triangle area
-	face_area = sqrt( (cross( u, -w ) ** 2).sum(axis=1) ) / 2.0
+	face_area = np.sqrt( (np.cross( u, -w ) ** 2).sum(axis=1) ) / 2.0
 	
 	# Tell if there is an obtuse angle in the triangles
-	obtuse_angle = ( array( [  (-u*w).sum(axis=1), (-u*v).sum(axis=1), (-w*v).sum(axis=1) ] ) < 0 ).T
+	obtuse_angle = ( np.array( [  (-u*w).sum(axis=1), (-u*v).sum(axis=1), (-w*v).sum(axis=1) ] ) < 0 ).T
 	
 	# Compute the voronoi area of the vertices in each face
-	voronoi_area = array( [ cotangent[::,2] * (u**2).sum(axis=1) + cotangent[::,1] * (w**2).sum(axis=1),
+	voronoi_area = np.array( [ cotangent[::,2] * (u**2).sum(axis=1) + cotangent[::,1] * (w**2).sum(axis=1),
 					cotangent[::,0] * (v**2).sum(axis=1) + cotangent[::,2] * (u**2).sum(axis=1),
 					cotangent[::,0] * (v**2).sum(axis=1) + cotangent[::,1] * (w**2).sum(axis=1)	] ).T / 8.0
 			
 	# Compute the mixed area of each vertex
-	mixed_area = zeros( len(mesh.vertices) )
+	mixed_area = np.zeros( mesh.vertex_number )
 	for i, (a, b, c) in enumerate( mesh.faces ) :
 
 		# Mixed area - Non-obtuse triangle case (Voronoi area)
@@ -80,12 +80,12 @@ def GetNormalCurvature( mesh ) :
 			mixed_area[c] += face_area[i] / 2.0
 	
 	# Compute the curvature part of the vertices in each face
-	vertex_curvature = array( [ w * cotangent[::,1].reshape(-1,1) - u * cotangent[::,2].reshape(-1,1),
+	vertex_curvature = np.array( [ w * cotangent[::,1].reshape(-1,1) - u * cotangent[::,2].reshape(-1,1),
 					u * cotangent[::,2].reshape(-1,1) - v * cotangent[::,0].reshape(-1,1),
 					v * cotangent[::,0].reshape(-1,1) - w * cotangent[::,1].reshape(-1,1) ] )
 					
 	# Compute the normal curvature vector of each vertex
-	normal_curvature = zeros( mesh.vertices.shape )
+	normal_curvature = np.zeros( mesh.vertices.shape )
 	for i, (a, b, c) in enumerate( mesh.faces ) :
 
 		normal_curvature[a] += vertex_curvature[0,i]
@@ -96,7 +96,7 @@ def GetNormalCurvature( mesh ) :
 	normal_curvature /= 2.0 * mixed_area.reshape( -1, 1 )
 
 	# Remove border vertices
-	normal_curvature[ GetBorderVertices( mesh ) ] = 0.0
+	normal_curvature[ mesh.GetBorderVertices() ] = 0.0
 
 	# Return the normal curvature vector array
 	return normal_curvature
@@ -108,10 +108,10 @@ def GetNormalCurvature( mesh ) :
 def GetGaussianCurvature( mesh ) :
 
 	# Resize gaussian curvature array
-	gaussian_curvature = zeros(len( mesh.vertices ))
+	gaussian_curvature = np.zeros( mesh.vertex_number )
 
 	# Loop through the vertices
-	for i in range(len( mesh.vertices ) ) :
+	for i in range( mesh.vertex_number ) :
 
 		# Check border
 		if mesh.IsBorderVertex( i ) : continue
@@ -137,7 +137,7 @@ def GetGaussianCurvature( mesh ) :
 				area += VoronoiRegionArea( mesh.vertices[i], mesh.vertices[mesh.faces[f,0]], mesh.vertices[mesh.faces[f,1]] )
 				angle_sum += AngleFromCotan( mesh.vertices[i], mesh.vertices[mesh.faces[f,0]], mesh.vertices[mesh.faces[f,1]] )
 
-		gaussian_curvature[i] = ( 2.0 * pi - angle_sum ) / area
+		gaussian_curvature[i] = ( 2.0 * math.pi - angle_sum ) / area
 		
 	return gaussian_curvature
 
@@ -147,7 +147,7 @@ def GetGaussianCurvature( mesh ) :
 #
 def Cotangent( u, v ) :
 
-	return ( u * v ).sum(axis=1) / sqrt( ( u**2 ).sum(axis=1) * ( v**2 ).sum(axis=1) - ( u * v ).sum(axis=1) ** 2 )
+	return ( u * v ).sum(axis=1) / np.sqrt( ( u**2 ).sum(axis=1) * ( v**2 ).sum(axis=1) - ( u * v ).sum(axis=1) ** 2 )
 
 
 #
@@ -155,7 +155,7 @@ def Cotangent( u, v ) :
 #
 def AngleFromCotan( u, v ) :
 
-	udotv = dot( u, v )
+	udotv = np.dot( u, v )
 	denom = (u**2).sum()*(v**2).sum() - udotv*udotv;
-	return abs( atan2( sqrt(denom), udotv ) )
+	return abs( math.atan2( math.sqrt(denom), udotv ) )
 

@@ -9,7 +9,7 @@
 #
 # External dependencies
 #
-from numpy import array, zeros
+import numpy as np
 from PyMeshToolkit.Core.Curvature import Cotangent
 
 
@@ -23,10 +23,10 @@ from PyMeshToolkit.Core.Curvature import Cotangent
 def UniformLaplacianSmoothing( mesh, iteration, diffusion ) :
 	
 	# Convert neighbor list to numpy array for fancy indexing
-	neighbors =  [ array(list(v)) for v in mesh.neighbor_vertices ]
+	neighbors =  [ np.array(list(v)) for v in mesh.neighbor_vertices ]
 	
 	# Get neighbor vertex number
-	neighbor_number = array( [ len(i) for i in neighbors ] ).reshape(-1,1)
+	neighbor_number = np.array( [ len(i) for i in neighbors ] ).reshape(-1,1)
 
 	# Get border vertices
 	border = mesh.GetBorderVertices()
@@ -59,7 +59,7 @@ def UniformLaplacianSmoothing( mesh, iteration, diffusion ) :
 def NormalizedCurvatureFlowSmoothing( mesh, iteration, diffusion ) :
 	
 	# Get border vertices
-	border = GetBorderVertices( mesh )
+	border = mesh.GetBorderVertices()
 
 	# Iteration steps
 	for i in range( iteration ) :
@@ -73,19 +73,19 @@ def NormalizedCurvatureFlowSmoothing( mesh, iteration, diffusion ) :
 		w = tris[::,0] - tris[::,2]
 
 		# Compute the cotangent of the triangle angles
-		cotangent = array( [ Cotangent( u, -w ), Cotangent( v, -u ), Cotangent( w, -v ) ] ).T
+		cotangent = np.array( [ Cotangent( u, -w ), Cotangent( v, -u ), Cotangent( w, -v ) ] ).T
 
 		# Compute the voronoi area of the vertices in each face
-		vertex_weight = array( [ cotangent[::,2] + cotangent[::,1], cotangent[::,0] + cotangent[::,2],	cotangent[::,0] + cotangent[::,1]	] )
+		vertex_weight = np.array( [ cotangent[::,2] + cotangent[::,1], cotangent[::,0] + cotangent[::,2],	cotangent[::,0] + cotangent[::,1]	] )
 
 		# Compute the curvature part of the vertices in each face
-		vertex_curvature = array( [ u * cotangent[::,2].reshape(-1,1) - w * cotangent[::,1].reshape(-1,1),
+		vertex_curvature = np.array( [ u * cotangent[::,2].reshape(-1,1) - w * cotangent[::,1].reshape(-1,1),
 						v * cotangent[::,0].reshape(-1,1) - u * cotangent[::,2].reshape(-1,1),
 						w * cotangent[::,1].reshape(-1,1) - v * cotangent[::,0].reshape(-1,1) ] )
 						
 		# Compute the normal curvature vector of each vertex
-		smoothed = zeros( mesh.vertices.shape )
-		weight = zeros( len(mesh.vertices) )
+		smoothed = np.zeros( mesh.vertices.shape )
+		weight = np.zeros( mesh.vertex_number )
 		for i, (a, b, c) in enumerate( mesh.faces ) :
 
 			smoothed[a] += vertex_curvature[0,i]

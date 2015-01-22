@@ -9,7 +9,7 @@
 #
 # External dependencies
 #
-from numpy import array
+import numpy as np
 from PyMeshToolkit.Core.Mesh import Mesh
 
 
@@ -63,7 +63,7 @@ def ReadObj( filename ) :
 			material = values[1]
 		
 	# Remap face indices
-	faces = array(faces) - 1
+	faces = np.array(faces) - 1
 
 	# Return the final mesh
 	return Mesh( name=filename, vertices=vertices, faces=faces, colors=colors,

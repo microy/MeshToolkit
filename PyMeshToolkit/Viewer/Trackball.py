@@ -20,8 +20,8 @@
 #
 # External dependencies
 #
-from math import cos, sin, pi, sqrt
-from numpy import array, identity, zeros, float32, dot, cross
+import math
+import numpy as np
 
 
 #
@@ -46,7 +46,7 @@ class Trackball( object ) :
 		self.previous_mouse_position = [ 0, 0 ]
 
 		# Tranformation matrix
-		self.transformation = identity( 4, dtype=float32 )
+		self.transformation = np.identity( 4, dtype=np.float32 )
 
 
 	#
@@ -55,7 +55,7 @@ class Trackball( object ) :
 	def Reset( self ) :
 
 		# Reset the tranformation matrix
-		self.transformation = identity( 4, dtype=float32 )
+		self.transformation = np.identity( 4, dtype=np.float32 )
 
 
 	#
@@ -95,11 +95,11 @@ class Trackball( object ) :
 	def MouseWheel( self, delta ) :
 
 		# Compute the Z-translation
-		translation = zeros( 3 )
+		translation = np.zeros( 3 )
 		translation[2] -= delta * 2.0
 
 		# Project the translation vector to the object space
-		translation = dot( self.transformation[:3,:3], translation )
+		translation = np.dot( self.transformation[:3,:3], translation )
 
 		# Translate the transformation matrix
 		m = self.transformation
@@ -119,36 +119,36 @@ class Trackball( object ) :
 			current_position = self.TrackballMapping( [ mouse_x, mouse_y ] )
 
 			# Project the rotation axis to the object space
-			rotation_axis = dot( self.transformation[:3,:3], cross( previous_position, current_position ) )
+			rotation_axis = np.dot( self.transformation[:3,:3], np.cross( previous_position, current_position ) )
 
 			# Rotation angle
-			rotation_angle = sqrt( ((current_position - previous_position)**2).sum() ) * 2.0
+			rotation_angle = math.sqrt( ((current_position - previous_position)**2).sum() ) * 2.0
 
 			# Create a rotation matrix according to the given angle and axis
-			c, s = cos( rotation_angle ), sin( rotation_angle )
-			n = sqrt( (rotation_axis**2).sum() )
+			c, s = math.cos( rotation_angle ), math.sin( rotation_angle )
+			n = math.sqrt( (rotation_axis**2).sum() )
 			if n == 0 : n = 1.0
 			rotation_axis /= n
 			x, y, z = rotation_axis
 			cx, cy, cz = (1 - c) * x, (1 - c) * y, (1 - c) * z
-			R = array([ [   cx*x + c, cy*x - z*s, cz*x + y*s, 0],
+			R = np.array([ [   cx*x + c, cy*x - z*s, cz*x + y*s, 0],
 					[ cx*y + z*s,   cy*y + c, cz*y - x*s, 0],
 					[ cx*z - y*s, cy*z + x*s,   cz*z + c, 0],
-					[          0,          0,          0, 1] ], dtype=float32 ).T
+					[          0,          0,          0, 1] ], dtype=np.float32 ).T
 
 			# Rotate the transformation matrix
-			self.transformation = dot( R, self.transformation )
+			self.transformation = np.dot( R, self.transformation )
 
 		# XY translation
 		elif self.button ==  2 :
 
 			# Compute the XY-translation
-			translation = zeros( 3 )
+			translation = np.zeros( 3 )
 			translation[0] -= (self.previous_mouse_position[0] - mouse_x)*0.02
 			translation[1] += (self.previous_mouse_position[1] - mouse_y)*0.02
 
 			# Project the translation vector to the object space
-			translation = dot( self.transformation[:3,:3], translation )
+			translation = np.dot( self.transformation[:3,:3], translation )
 
 			# Translate the transformation matrix
 			m = self.transformation
@@ -169,10 +169,10 @@ class Trackball( object ) :
 	#
 	def TrackballMapping( self, mouse_position ) :
 
-		v = zeros( 3 )
+		v = np.zeros( 3 )
 		v[0] = ( 2.0 * mouse_position[0] - self.width ) / self.width
 		v[1] = ( self.height - 2.0 * mouse_position[1] ) / self.height
-		d = sqrt(( v**2 ).sum())
+		d = math.sqrt(( v**2 ).sum())
 		if d > 1.0 : d = 1.0
-		v[2] = cos( pi / 2.0 * d )
-		return v / sqrt(( v**2 ).sum())
+		v[2] = math.cos( math.pi / 2.0 * d )
+		return v / math.sqrt(( v**2 ).sum())

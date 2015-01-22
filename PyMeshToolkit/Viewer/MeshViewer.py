@@ -9,11 +9,14 @@
 #
 # External dependencies
 #
+import math
+import numpy as np
 import OpenGL
 from OpenGL.GL import *
-from math import tan, pi
-from numpy import array, identity, dot, float32, uint32, zeros
-from PyMeshToolkit.Viewer.Shader import LoadShader
+import PyMeshToolkit
+# FIXME:
+#import PyMeshToolkit.Viewer
+#import PyMeshToolkit.Viewer.Trackball
 from PyMeshToolkit.Viewer.Trackball import Trackball
 
 
@@ -51,8 +54,8 @@ class MeshViewer( Trackball ) :
 		self.SetProjectionMatrix( width, height )
 
 		# Load the shaders
-		self.smooth_shader = LoadShader( 'Smooth' )
-		self.flat_shader = LoadShader( 'Flat' )
+		self.smooth_shader = PyMeshToolkit.Viewer.Shader.LoadShader( 'Smooth' )
+		self.flat_shader = PyMeshToolkit.Viewer.Shader.LoadShader( 'Flat' )
 		self.shader_program = self.smooth_shader
 
 		# Initialise viewing parameters
@@ -73,10 +76,10 @@ class MeshViewer( Trackball ) :
 		if len(mesh.vertex_normals) != len(mesh.vertices) :	mesh.UpdateNormals()
 
 		# Cast input data (required for OpenGL)
-		vertices = array( mesh.vertices, dtype=float32 )
-		faces = array( mesh.faces, dtype=uint32 )
-		normals = array( mesh.vertex_normals, dtype=float32 )
-		colors = array( mesh.colors, dtype=float32 )
+		vertices = np.array( mesh.vertices, dtype=np.float32 )
+		faces = np.array( mesh.faces, dtype=np.uint32 )
+		normals = np.array( mesh.vertex_normals, dtype=np.float32 )
+		colors = np.array( mesh.colors, dtype=np.float32 )
 
 		# Normalize the model
 		(center, radius) = mesh.GetBoundingSphere()
@@ -136,13 +139,13 @@ class MeshViewer( Trackball ) :
 		if not self.element_number : return
 
 		# Delete buffer objects
-		glDeleteBuffers( 1, array([ self.face_buffer_id ]) )
-		glDeleteBuffers( 1, array([ self.vertex_buffer_id ]) )
-		glDeleteBuffers( 1, array([ self.normal_buffer_id ]) )
-		if self.color_enabled :	glDeleteBuffers( 1, array([ self.color_buffer_id ]) )
+		glDeleteBuffers( 1, np.array([ self.face_buffer_id ]) )
+		glDeleteBuffers( 1, np.array([ self.vertex_buffer_id ]) )
+		glDeleteBuffers( 1, np.array([ self.normal_buffer_id ]) )
+		if self.color_enabled :	glDeleteBuffers( 1, np.array([ self.color_buffer_id ]) )
 
 		# Delete vertex array
-		glDeleteVertexArrays( 1, array([self.vertex_array_id]) )
+		glDeleteVertexArrays( 1, np.array([self.vertex_array_id]) )
 
 		# Initialise the model parameters
 		self.element_number = 0
@@ -224,19 +227,19 @@ class MeshViewer( Trackball ) :
 		glUseProgram( self.shader_program )
 
 		# Initialise Model-View transformation matrix
-		modelview_matrix = identity( 4, dtype=float32 )
+		modelview_matrix = np.identity( 4, dtype=np.float32 )
 
 		# Position the scene (camera)
 		modelview_matrix[3,2] = -30.0
 
 		# Apply trackball transformation
-		modelview_matrix = dot( self.transformation, modelview_matrix )
+		modelview_matrix = np.dot( self.transformation, modelview_matrix )
 
 		# Send the transformation matrices to the shader
 		glUniformMatrix3fv( glGetUniformLocation( self.shader_program, "Normal_Matrix" ),
-			1, GL_FALSE, array( self.transformation[ :3, :3 ] ) )
+			1, GL_FALSE, np.array( self.transformation[ :3, :3 ] ) )
 		glUniformMatrix4fv( glGetUniformLocation( self.shader_program, "MVP_Matrix" ),
-			1, GL_FALSE, dot( modelview_matrix, self.projection_matrix ) )
+			1, GL_FALSE, np.dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
 		glUniform1i( glGetUniformLocation( self.shader_program, "color_enabled" ), self.color_enabled )
@@ -279,9 +282,9 @@ class MeshViewer( Trackball ) :
 	def SetProjectionMatrix( self, width, height ) :
 
 		fovy, aspect, near, far = 45.0, float(width)/height, 0.1, 100.0
-		f = tan( pi * fovy / 360.0 )
+		f = math.tan( math.pi * fovy / 360.0 )
 		# Compute the perspective matrix
-		self.projection_matrix = identity( 4, dtype=float32 )
+		self.projection_matrix = np.identity( 4, dtype=np.float32 )
 		self.projection_matrix[0,0] = 1.0 / (f * aspect)
 		self.projection_matrix[1,1] = 1.0 / f
 		self.projection_matrix[2,2] = - (far + near) / (far - near)

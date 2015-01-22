@@ -10,7 +10,7 @@
 #
 # External dependencies
 #
-from numpy import amin, amax, array, bincount, cross, sort, sqrt, zeros
+import numpy as np
 
 
 #
@@ -28,25 +28,25 @@ class Mesh( object ) :
 		self.name = name
 		
 		# Vertex array
-		self.vertices = array( vertices )
+		self.vertices = np.array( vertices )
 		
 		# Face index array
-		self.faces = array( faces )
+		self.faces = np.array( faces )
 		
 		# Per-vertex color array
-		self.colors = array( colors )
+		self.colors = np.array( colors )
 		
 		# Texture filename
 		self.texture_name = texture_name
 		
 		# Per-vertex texture coordinate array
-		self.textures = array( textures )
+		self.textures = np.array( textures )
 		
 		# Per-face normal array
-		self.face_normals = array( face_normals )
+		self.face_normals = np.array( face_normals )
 		
 		# Per-vertex normal array
-		self.vertex_normals = array( vertex_normals )
+		self.vertex_normals = np.array( vertex_normals )
 
 	#
 	# Return mesh informations
@@ -119,26 +119,25 @@ class Mesh( object ) :
 		tris = self.vertices[ self.faces ]
 
 		# Calculate the normal for all the triangles
-		self.face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+		self.face_normals = np.cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
 
 		# Normalise the face normals
-		self.face_normals /= sqrt( ( self.face_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
+		self.face_normals /= np.sqrt( ( self.face_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
 
 		# Initialise the vertex normals
-		self.vertex_normals = zeros( self.vertices.shape )
+		self.vertex_normals = np.zeros( self.vertices.shape )
 
 		# Add the face normals to the vertex normals
 		# Standard implementation :
 		#	for i, f in enumerate( self.faces ) : self.vertex_normals[ f ] += self.face_normals[ i ]
 		# Optimized implementation :
 		for i in range( 3 ) :
-			self.vertex_normals[:, i] += bincount( self.faces[:, 0], self.face_normals[:, i], minlength=self.vertex_number )
-			self.vertex_normals[:, i] += bincount( self.faces[:, 1], self.face_normals[:, i], minlength=self.vertex_number )
-			self.vertex_normals[:, i] += bincount( self.faces[:, 2], self.face_normals[:, i], minlength=self.vertex_number )
+			self.vertex_normals[:, i] += np.bincount( self.faces[:, 0], self.face_normals[:, i], minlength=self.vertex_number )
+			self.vertex_normals[:, i] += np.bincount( self.faces[:, 1], self.face_normals[:, i], minlength=self.vertex_number )
+			self.vertex_normals[:, i] += np.bincount( self.faces[:, 2], self.face_normals[:, i], minlength=self.vertex_number )
 		
 		# Normalise the vertex normals
-		self.vertex_normals /= sqrt( ( self.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
-
+		self.vertex_normals /= np.sqrt( ( self.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
 
 	#
 	# Register neighborhood informations
@@ -164,7 +163,6 @@ class Mesh( object ) :
 			self.neighbor_vertices[ b ].add( c )
 			self.neighbor_vertices[ c ].add( a )
 			self.neighbor_vertices[ c ].add( b )
-
 
 	#
 	# Collect the mesh edges
@@ -200,7 +198,8 @@ class Mesh( object ) :
 	#
 	def GetBorderVertices( self ) :
 		
-		border_vertices = zeros( self.vertex_number, dtype=bool )
+		# Initialize border vertex list
+		border_vertices = np.zeros( self.vertex_number, dtype=np.bool )
 		
 		# Loop through the neighbor vertices
 		for va, vn in enumerate( self.neighbor_vertices ) :
@@ -210,7 +209,8 @@ class Mesh( object ) :
 				if len( self.neighbor_faces[va] & self.neighbor_faces[vb] ) < 2 :
 					border_vertices[ va ] = True
 					break
-
+		
+		# Return the border vertex list
 		return border_vertices
 
 	#
@@ -219,8 +219,7 @@ class Mesh( object ) :
 	def GetAxisAlignedBoundingBox( self ) :
 
 		# Return the minimum point and the maximum point for each axis
-		return ( amin( self.vertices, axis = 0 ), amax( self.vertices, axis = 0 ) )
-
+		return ( np.amin( self.vertices, axis = 0 ), np.amax( self.vertices, axis = 0 ) )
 
 	#
 	# Compute (an approximation of) the bounding sphere
@@ -228,13 +227,13 @@ class Mesh( object ) :
 	def GetBoundingSphere( self ) :
 
 		# Compute axis-aligned bounding box
-		( pmin, pmax ) = GetAxisAlignedBoundingBox( self )
+		( pmin, pmax ) = self.GetAxisAlignedBoundingBox()
 
 		# Compute center
 		center = 0.5 * (pmin + pmax)
 
 		# Compute radius
-		radius = sqrt(((center - self.vertices) ** 2).sum(axis = 1)).max()
+		radius = np.sqrt(((center - self.vertices) ** 2).sum(axis = 1)).max()
 
 		# Return result
 		return ( center, radius )

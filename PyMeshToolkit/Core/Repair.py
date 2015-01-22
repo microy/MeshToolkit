@@ -9,7 +9,7 @@
 #
 # External dependencies
 #
-from numpy import array, cross, isfinite, sqrt, zeros
+import numpy as np
 
 
 #
@@ -29,39 +29,39 @@ def Check( mesh ) :
 		log_message += 'Not enough faces\n'
 
 	# Face normal number
-	if len(mesh.face_normals) and (len(mesh.face_normals) != len(mesh.faces)) :
+	if mesh.face_normal_number and ( mesh.face_normal_number != mesh.face_number ) :
 		log_message += 'Face normal number doesn\'t match face number\n'
 
 	# Vertex normal number
-	if len(mesh.vertex_normals) and (len(mesh.vertex_normals) != len(mesh.vertices)) :
+	if mesh.vertex_normal_number and ( mesh.vertex_normal_number != mesh.vertex_number ) :
 		log_message += 'Vertex normal number doesn\'t match vertex number\n'
 
 	# Color number
-	if len(mesh.colors) and (len(mesh.colors) != len(mesh.vertices)) :
+	if mesh.color_number and ( mesh.color_number != mesh.vertex_number ) :
 		log_message += 'Color number doesn\'t match vertex number\n'
 
 	# Texture coordinate number
-	if len(mesh.textures) and (len(mesh.textures) != len(mesh.vertices)) :
+	if mesh.texture_number and ( mesh.texture_number != mesh.vertex_number ) :
 		log_message += 'Texture coordinate number doesn\'t match vertex number\n'
 
 	# Texture filename
-	if len(mesh.textures) and not mesh.texture_name :
+	if mesh.texture_number and not mesh.texture_name :
 		log_message += 'Empty texture filename\n'
 
 	# Face indices
-	if (mesh.faces < 0).any() or (mesh.faces >= len(mesh.vertices)).any() :
+	if ( mesh.faces < 0 ).any() or ( mesh.faces >= mesh.vertex_number ).any() :
 		log_message += 'Bad face indices\n'
 
 	# Vertex coordinates
-	if not isfinite(mesh.vertices).all() :
+	if not np.isfinite( mesh.vertices ).all() :
 		log_message += 'Bad vertex coordinates\n'
 			
 	# Face normals
-	if not isfinite(mesh.face_normals).all() :
+	if not np.isfinite( mesh.face_normals ).all() :
 		log_message += 'Bad face normals\n'
 			
 	# Vertex normals
-	if not isfinite(mesh.vertex_normals).all() :
+	if not np.isfinite( mesh.vertex_normals ).all() :
 		log_message += 'Bad vertex normals\n'
 			
 	# Colors
@@ -73,13 +73,13 @@ def Check( mesh ) :
 		log_message += 'Bad texture coordinates\n'
 
 	# Check isolated vertices
-	if (array([len(neighbor) for neighbor in mesh.neighbor_faces]) == 0).any() :
+	if (np.array([len(neighbor) for neighbor in mesh.neighbor_faces]) == 0).any() :
 		log_message += 'Isolated vertices\n'
 		
 	# Check degenerated faces
 	tris = mesh.vertices[ mesh.faces ]
-	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
-	if ( sqrt( (face_normals ** 2).sum(axis=1) ) == 0 ).any() :
+	face_normals = np.cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+	if ( np.sqrt( (face_normals ** 2).sum(axis=1) ) == 0 ).any() :
 		log_message += 'Degenerated faces\n'
 
 	# Return the log message
@@ -93,7 +93,7 @@ def Check( mesh ) :
 def RemoveIsolatedVertices( mesh ) :
 
 	# Register isolated vertices
-	isolated_vertices = (array([len(neighbor) for neighbor in mesh.neighbor_faces]) == 0)
+	isolated_vertices = (np.array([len(neighbor) for neighbor in mesh.neighbor_faces]) == 0)
 
 	# Pouet
 #	isolated_vertices = zeros( len(self.vertices) )
@@ -108,7 +108,7 @@ def RemoveIsolatedVertices( mesh ) :
 	# Create the new vertex array and a lookup table
 	new_vertices = []
 	index = 0
-	lut = zeros( len(mesh.vertices), dtype=int )
+	lut = np.zeros( mesh.vertex_number, dtype=int )
 	for ( v, isolated ) in enumerate( isolated_vertices ) :
 		if isolated : continue
 		new_vertices.append( mesh.vertices[v] )
@@ -119,7 +119,7 @@ def RemoveIsolatedVertices( mesh ) :
 	new_faces = lut[mesh.faces].reshape( len(mesh.faces), 3 )
 	
 	# Update the mesh
-	mesh.vertices = array( new_vertices )
+	mesh.vertices = np.array( new_vertices )
 	mesh.faces = new_faces
 	mesh.UpdateNormals()
 
@@ -130,8 +130,8 @@ def RemoveIsolatedVertices( mesh ) :
 def RemoveDegeneratedFaces( mesh ) :
 		
 	tris = mesh.vertices[ mesh.faces ]
-	face_normals = cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
-	print (sqrt((face_normals**2).sum(axis=1))>0).all()
+	face_normals = np.cross( tris[::,1] - tris[::,0]  , tris[::,2] - tris[::,0] )
+	print (np.sqrt((face_normals**2).sum(axis=1))>0).all()
 
 
 #
