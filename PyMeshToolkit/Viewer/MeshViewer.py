@@ -12,8 +12,8 @@
 import math
 import numpy as np
 import OpenGL.GL as gl
-import PyMeshToolkit
 from PyMeshToolkit.Viewer.Trackball import Trackball
+from PyMeshToolkit.Viewer.Shader import FlatShader, SmoothShader
 
 
 #
@@ -49,9 +49,9 @@ class MeshViewer( Trackball ) :
 		self.SetProjectionMatrix( width, height )
 
 		# Load the shaders
-		self.smooth_shader = PyMeshToolkit.Viewer.Shader( 'Smooth' )
-		self.flat_shader = PyMeshToolkit.Viewer.Shader( 'Flat' )
-		self.shader_program = self.smooth_shader
+		self.flat_shader = FlatShader()
+		self.smooth_shader = SmoothShader()
+		self.shader = self.smooth_shader
 
 		# Initialise viewing parameters
 		self.wireframe_mode = 0
@@ -59,7 +59,7 @@ class MeshViewer( Trackball ) :
 		self.color_enabled = False
 
 	#
-	# Load the mesh to display
+	# Load the mesh for display
 	#
 	def LoadMesh( self, mesh ) :
 
@@ -124,7 +124,7 @@ class MeshViewer( Trackball ) :
 		Trackball.Reset( self )
 
 	#
-	# Close
+	# Close the mesh
 	#
 	def Close( self ) :
 
@@ -145,16 +145,16 @@ class MeshViewer( Trackball ) :
 		self.color_enabled = False
 
 	#
-	# SetShader
+	# Set the shader
 	#
 	def SetShader( self, shader ) :
 
 		# Setup the shader program
-		if shader == 'SmoothShading' : self.shader_program = self.smooth_shader
-		elif shader == 'FlatShading' : self.shader_program = self.flat_shader
+		if shader == 'SmoothShading' : self.shader = self.smooth_shader
+		elif shader == 'FlatShading' : self.shader = self.flat_shader
 
 	#
-	# SetAntialiasing
+	# Set antialiasing
 	#
 	def SetAntialiasing( self, enabled ) :
 
@@ -208,12 +208,12 @@ class MeshViewer( Trackball ) :
 			gl.glDisable( gl.GL_POLYGON_OFFSET_FILL )
 
 	#
-	# DisplayMesh
+	# Display the mesh
 	#
 	def DisplayMesh( self, wireframe_mode = 0 ) :
 
 		# Use the shader program
-		gl.glUseProgram( self.shader_program.program_id )
+		gl.glUseProgram( self.shader )
 
 		# Initialise Model-View transformation matrix
 		modelview_matrix = np.identity( 4, dtype=np.float32 )
@@ -225,16 +225,16 @@ class MeshViewer( Trackball ) :
 		modelview_matrix = np.dot( self.transformation, modelview_matrix )
 
 		# Send the transformation matrices to the shader
-		gl.glUniformMatrix3fv( gl.glGetUniformLocation( self.shader_program.program_id, "Normal_Matrix" ),
+		gl.glUniformMatrix3fv( gl.glGetUniformLocation( self.shader, "Normal_Matrix" ),
 			1, gl.GL_FALSE, np.array( self.transformation[ :3, :3 ] ) )
-		gl.glUniformMatrix4fv( gl.glGetUniformLocation( self.shader_program.program_id, "MVP_Matrix" ),
+		gl.glUniformMatrix4fv( gl.glGetUniformLocation( self.shader, "MVP_Matrix" ),
 			1, gl.GL_FALSE, np.dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
-		gl.glUniform1i( gl.glGetUniformLocation( self.shader_program.program_id, "color_enabled" ), self.color_enabled )
+		gl.glUniform1i( gl.glGetUniformLocation( self.shader, "color_enabled" ), self.color_enabled )
 		
 		# Activate hidden lines in the shader for wireframe rendering
-		gl.glUniform1i( gl.glGetUniformLocation( self.shader_program.program_id, "wireframe_mode" ), wireframe_mode )
+		gl.glUniform1i( gl.glGetUniformLocation( self.shader, "wireframe_mode" ), wireframe_mode )
 		
 		# Vertex array object
 		gl.glBindVertexArray( self.vertex_array_id )
@@ -245,12 +245,12 @@ class MeshViewer( Trackball ) :
 
 		# Release the vertex array object
 		gl.glBindVertexArray( 0 )
-
+		
 		# Release the shader program
 		gl.glUseProgram( 0 )
 
 	#
-	# Resize
+	# Resize the viewport
 	#
 	def Resize( self, width, height ) :
 
@@ -264,13 +264,13 @@ class MeshViewer( Trackball ) :
 		self.SetProjectionMatrix( width, height )
 
 	#
-	# SetProjectionMatrix
+	# Compute a perspective matrix
 	#
 	def SetProjectionMatrix( self, width, height ) :
 
 		fovy, aspect, near, far = 45.0, float(width)/height, 0.1, 100.0
 		f = math.tan( math.pi * fovy / 360.0 )
-		# Compute the perspective matrix
+
 		self.projection_matrix = np.identity( 4, dtype=np.float32 )
 		self.projection_matrix[0,0] = 1.0 / (f * aspect)
 		self.projection_matrix[1,1] = 1.0 / f
