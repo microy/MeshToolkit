@@ -54,60 +54,38 @@ class Colormap( object ) :
 
 		return color
 
+#
+# Jet colormap 2
+#
+def ColormapJet( value ) :
+	
+	color = [ 0.0, 0.0, 0.0 ]
 
-	#
-	# Jet colormap 2
-	#
-	def ColormapJet2( self, value ) :
+	if value <= 0.125 :
 		
-		color = [ 1.0, 1.0, 1.0 ]
-
-		if value < 0.25 :
-			
-			color[0] = 0.0
-			color[1] = 4.0 * value
-			
-		elif value < 0.5 :
-			
-			color[0] = 0.0
-			color[2] = 1.0 + 4.0 * ( 0.25 - value )
-			
-		elif value < 0.75 :
-			
-			color[0] = 4.0 * ( value - 0.5 )
-			color[2] = 0
-			
-		else :
-			color[1] = 1.0 + 4.0 * ( 0.75 - value )
-			color[2] = 0
-
-		return color
-
-
-
-
-def interpolate( val, y0, x0, y1, x1 ) :
-    return ( val - x0 ) * ( y1 - y0 ) / ( x1 - x0 ) + y0
-
-def base( val ) :
-    if ( val <= -0.75 ) return 0.0
-    else if ( val <= -0.25 ) return interpolate( val, 0.0, -0.75, 1.0, -0.25 )
-    else if ( val <= 0.25 ) return 1.0
-    else if ( val <= 0.75 ) return interpolate( val, 1.0, 0.25, 0.0, 0.75 )
-    else return 0.0
-
-def red( gray ) :
-    return base( gray - 0.5 )
-
-def green( gray ) :
-    return base( gray )
-
-def blue( gray ) :
-    return base( gray + 0.5 )
-
-
-
-
+		color[2] = 0.5 + 0.5 * value * 8.0
+		
+	elif value <= 0.375 :
+		
+		color[1] = (value - 0.125) * 4.0
+		color[2] = 1.0
+		
+	elif value <= 0.625 :
+		
+		color[0] = 4.0 * ( value - 0.375 )
+		color[1] = 1.0
+		color[2] = 1.0 - ( value - 0.375 ) * 4.0
+		
+	elif value <= 0.875 :
+		
+		color[0] = 1.0
+		color[1] = 1.0 - 4.0 * ( value - 0.625 )
+		
+	else :
+		
+		color[0] = 1.0 - 2.0 * ( value - 0.875 )
+		
+	return color
 
 
 
@@ -117,15 +95,39 @@ def blue( gray ) :
 #
 # Jet colormap
 #
-def ColormapJet( value ) :
+def ColormapHotToCold( value ) :
 
-	if( value < 0.0  ) : return [ 0.0, 0.0 , 1.0 ]
-	if( value < 0.25 ) : return [ 0.0, value * 4.0, 1.0 ]
-	if( value < 0.50 ) : return [ 0.0, 1.0, 1.0 - (value - 0.25) * 4.0 ]
-	if( value < 0.75 ) : return [ (value - 0.5) * 4.0, 1.0, 0.0 ]
-	if( value < 1.0  ) : return [ 1.0, 1.0 - (value - 0.75) * 4.0, 0.0 ]
-	return [ 1.0, 0.0, 0.0 ]
+	#~ if( value < 0.0  ) : return [ 0.0, 0.0 , 1.0 ]
+	#~ if( value < 0.25 ) : return [ 0.0, value * 4.0, 1.0 ]
+	#~ if( value < 0.50 ) : return [ 0.0, 1.0, 1.0 - (value - 0.25) * 4.0 ]
+	#~ if( value < 0.75 ) : return [ (value - 0.5) * 4.0, 1.0, 0.0 ]
+	#~ if( value < 1.0  ) : return [ 1.0, 1.0 - (value - 0.75) * 4.0, 0.0 ]
+	#~ return [ 1.0, 0.0, 0.0 ]
 
+	color = [ 1.0, 1.0, 1.0 ]
+
+	if value < 0.25 :
+		
+		color[0] = 0.0
+		color[1] = 4.0 * value
+		
+	elif value < 0.5 :
+		
+		color[0] = 0.0
+		color[2] = 1.0 + 4.0 * ( 0.25 - value )
+		
+	elif value < 0.75 :
+		
+		color[0] = 4.0 * ( value - 0.5 )
+		color[2] = 0
+		
+	else :
+		color[1] = 1.0 + 4.0 * ( 0.75 - value )
+		color[2] = 0
+		
+	print value, color
+
+	return color
 
 #
 # Rainbow colormap
