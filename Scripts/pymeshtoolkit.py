@@ -28,6 +28,7 @@ parser.add_argument( '-nc', action='store_true', help='Compute the surface norma
 parser.add_argument( '-ul', nargs=2, metavar=('N', 'D'), help='Uniform laplacian smoothing with N iteration steps and D diffusion constant' )
 parser.add_argument( '-ncf', nargs=2, metavar=('N', 'D'), help='Normalized curvature flow smoothing with N iteration steps and D diffusion constant' )
 parser.add_argument( '-o', metavar='file', action='store', help='Write the resulting mesh to a VRML file' )
+parser.add_argument( '-cm', default='CubeHelix', metavar='colormap', action='store', help='Colormap (default: cubehelix)' )
 parser.add_argument( '-t', action='store_true', help='Test function' )
 parser.add_argument( '-qt', action='store_true', help='Launch OpenGL viewer with Qt' )
 parser.add_argument( '-glut', action='store_true', help='Launch OpenGL viewer with GLUT' )
@@ -95,7 +96,7 @@ if args.b :
 
 	sys.stdout.write( 'Color border vertices... ' )
 	sys.stdout.flush()
-	input_mesh.colors = Array2Colors( GetBorderVertices( input_mesh ) )
+	input_mesh.colors = Colormap( args.cm ).ValueArrayToColor( GetBorderVertices( input_mesh ) )
 	print( 'done.' )
 
 # Compute normal curvature
@@ -103,7 +104,7 @@ if args.nc :
 
 	sys.stdout.write( 'Compute curvature... ' )
 	sys.stdout.flush()
-	input_mesh.colors = VectorArray2Colors( GetNormalCurvature( input_mesh ) )
+	input_mesh.colors = Colormap( args.cm ).VectorArrayToColor( GetNormalCurvature( input_mesh ) )
 	print( 'done.' )
 
 # Apply uniform laplacian smoothing
