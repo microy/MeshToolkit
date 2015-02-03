@@ -22,6 +22,106 @@ import math
 import numpy as np
 
 
+
+#
+# Compute the normal curvature vectors of a given mesh
+#
+def GetNormalCurvatureReference( mesh ) :
+
+	# Initialisation
+	normal_curvature = zeros( mesh.vertices.shape )
+#	mixed_area = GetMixedArea( mesh )
+
+	# Loop through the faces
+	for a, b, c in mesh.faces :
+
+		# Get the vertices
+		va, vb, vc = mesh.vertices[[a, b, c]]
+
+		# Compute cotangent of each angle
+		cota = Cotangent( vb-va, vc-va )
+		cotb = Cotangent( va-vb, vc-vb )
+		cotc = Cotangent( va-vc, vb-vc )
+
+		# Add vectors to vertex normal curvature
+		normal_curvature[a] += (va-vc) * cotb + (va-vb) * cotc
+		normal_curvature[b] += (vb-vc) * cota + (vb-va) * cotc
+		normal_curvature[c] += (vc-va) * cotb + (vc-vb) * cota
+
+	# Weight the normal curvature vectors by the mixed area
+#	normal_curvature /= 2.0 * mixed_area.reshape( (len(mesh.vertices),1) )
+	
+	# Remove border vertices
+	for i in range(len( mesh.vertices ) ) :
+		if mesh.IsBorderVertex( i ) : normal_curvature[i] = 0.0
+		
+	# Return the normal curvature vector array
+	return normal_curvature
+
+
+#
+# Compute the mixed area of every vertex of a given mesh
+#
+def GetMixedArea( mesh ) :
+
+	# Initialisation
+	mixed_area = zeros( len(mesh.vertices) )
+
+	# Create an indexed view of the triangles
+	tris = self.vertices[ self.faces ]
+
+	# Compute triangle area
+	face_area = sqrt( (cross( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ) ** 2).sum(axis=1) ) / 2.0
+	
+	# Loop through the faces
+	for a, b, c in mesh.faces :
+
+		# Get the vertices
+		va, vb, vc = mesh.vertices[[a, b, c]]
+
+		# Compute cotangent of each angle
+		cota = Cotangent( vb-va, vc-va )
+		cotb = Cotangent( va-vb, vc-vb )
+		cotc = Cotangent( va-vc, vb-vc )
+
+		# Compute triangle area
+		face_area = sqrt((cross((vb-va),(vc-va))**2).sum()) / 2.0
+
+		# Obtuse triangle cases (Voronoi inappropriate)
+		if dot( vb-va, vc-va ) <  0 :
+			
+			mixed_area[a] += face_area / 2.0
+			mixed_area[b] += face_area / 4.0
+			mixed_area[c] += face_area / 4.0
+			
+		elif dot( va-vb, vc-vb ) <  0 :
+			
+			mixed_area[a] += face_area / 4.0
+			mixed_area[b] += face_area / 2.0
+			mixed_area[c] += face_area / 4.0
+			
+		elif dot( va-vc, vb-vc ) <  0 :
+			
+			mixed_area[a] += face_area / 4.0
+			mixed_area[b] += face_area / 4.0
+			mixed_area[c] += face_area / 2.0
+			
+		# Non-obtuse triangle case (Voronoi area)
+		else :
+		
+			u = ( (va - vb) ** 2 ).sum()
+			v = ( (va - vc) ** 2 ).sum()
+			w = ( (vb - vc) ** 2 ).sum()
+			mixed_area[a] += ( u * cotc + v * cotb ) / 8.0
+			mixed_area[b] += ( u * cotc + w * cota ) / 8.0
+			mixed_area[c] += ( v * cotb + w * cota ) / 8.0
+	
+	# Return the mixed area of every vertex
+	return mixed_area
+
+
+
+
 #
 # Compute the normal curvature vectors of a given mesh
 #
