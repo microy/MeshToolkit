@@ -213,9 +213,6 @@ def GetGaussianCurvature( mesh ) :
 	# Loop through the vertices
 	for i in range( mesh.vertex_number ) :
 
-		# Check border
-		if mesh.IsBorderVertex( i ) : continue
-
 		area = 0.0
 		angle_sum = 0.0
 
@@ -225,19 +222,22 @@ def GetGaussianCurvature( mesh ) :
 			if mesh.faces[f, 0] == i :
 				
 				area += VoronoiRegionArea( mesh.vertices[i], mesh.vertices[mesh.faces[f,1]], mesh.vertices[mesh.faces[f,2]] )
-				angle_sum += AngleFromCotan( mesh.vertices[i], mesh.vertices[mesh.faces[f,1]], mesh.vertices[mesh.faces[f,2]] )
+				angle_sum += AngleFromCotan3( mesh.vertices[i], mesh.vertices[mesh.faces[f,1]], mesh.vertices[mesh.faces[f,2]] )
 				
 			elif mesh.faces[f, 1] == i  :
 				
 				area += VoronoiRegionArea( mesh.vertices[i], mesh.vertices[mesh.faces[f,2]], mesh.vertices[mesh.faces[f,0]] )
-				angle_sum += AngleFromCotan( mesh.vertices[i], mesh.vertices[mesh.faces[f,2]], mesh.vertices[mesh.faces[f,0]] )
+				angle_sum += AngleFromCotan3( mesh.vertices[i], mesh.vertices[mesh.faces[f,2]], mesh.vertices[mesh.faces[f,0]] )
 
 			else :
 				
 				area += VoronoiRegionArea( mesh.vertices[i], mesh.vertices[mesh.faces[f,0]], mesh.vertices[mesh.faces[f,1]] )
-				angle_sum += AngleFromCotan( mesh.vertices[i], mesh.vertices[mesh.faces[f,0]], mesh.vertices[mesh.faces[f,1]] )
+				angle_sum += AngleFromCotan3( mesh.vertices[i], mesh.vertices[mesh.faces[f,0]], mesh.vertices[mesh.faces[f,1]] )
 
 		gaussian_curvature[i] = ( 2.0 * math.pi - angle_sum ) / area
+
+	# Remove border vertices
+	gaussian_curvature[ mesh.GetBorderVertices() ] = 0.0
 		
 	return gaussian_curvature
 
@@ -249,6 +249,17 @@ def Cotangent( u, v ) :
 
 	return ( u * v ).sum(axis=1) / np.sqrt( ( u**2 ).sum(axis=1) * ( v**2 ).sum(axis=1) - ( u * v ).sum(axis=1) ** 2 )
 
+#
+# Cotangent between three points
+#
+def Cotangent3( vo, va, vb ) :
+
+	u = va - vo
+	v = vb - vo
+	lu = np.dot( u, u )
+	lv = np.dot( v, v )
+	dot_uv = np.dot( u, v )
+	return dot_uv / math.sqrt( lu * lv - dot_uv * dot_uv )
 
 #
 # AngleFromCotan
@@ -259,3 +270,39 @@ def AngleFromCotan( u, v ) :
 	denom = (u**2).sum()*(v**2).sum() - udotv*udotv;
 	return abs( math.atan2( math.sqrt(denom), udotv ) )
 
+
+def AngleFromCotan3( vo, va, vb ) :
+	u = va - vo
+	v = vb - vo
+	udotv = np.dot( u , v )
+	lu = np.dot( u, u )
+	lv = np.dot( v, v )
+	denom = lu*lv - udotv*udotv
+	return abs( math.atan2( math.sqrt(denom), udotv ) )
+
+#
+# RegionArea
+#
+def VoronoiRegionArea( vo, va, vb ) :
+
+	face_area = math.sqrt( ( np.cross( (va-vo),  (vb-vo) )**2 ).sum() ) * 0.5
+
+	if face_area == 0.0 : return 0.0
+
+	if ObtuseAngle(vo, va, vb) :
+		
+		return face_area * 0.5
+		
+	if ObtuseAngle(va, vb, vo) or ObtuseAngle(vb, vo, va) :
+		
+		return face_area * 0.25
+		
+	return (Cotangent3(va, vo, vb)*((vo-vb)**2).sum() + Cotangent3(vb, vo, va)*((vo-va)**2).sum()) * 0.125
+	
+	
+#
+# ObtuseAngle
+#
+def ObtuseAngle( vo, va, vb ) :
+
+	return np.dot( va-vo, vb-vo ) < 0
