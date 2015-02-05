@@ -94,7 +94,11 @@ class Colormap( object ) :
 		else : return [ 1.0, 1.0 - (value - 0.8) * 5.0, 0.0 ]
 
 	#
-	# Cubehelix colormap
+	# Cube helix colormap
+	#
+	# A colour scheme for the display of astronomical intensity images
+	# Dave A. Green, Bulletin of the Astronomical Society of India, 39, 289, 2011
+	# https://www.mrao.cam.ac.uk/~dag/CUBEHELIX
 	#
 	def ColormapCubeHelix( self, value, start = 0.5, rots = -1.5, hue = 1.3, gamma = 0.7 ) :
 		
