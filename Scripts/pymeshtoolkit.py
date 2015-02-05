@@ -12,7 +12,17 @@
 #
 import argparse
 import sys
+import numpy as np
 from PyMeshToolkit import *
+
+
+
+def Histogram( values ) :
+	
+	from matplotlib import pyplot
+	
+	pyplot.hist( values, 100 )
+	pyplot.show()
 
 	
 # Initialisation
@@ -24,6 +34,7 @@ parser.add_argument( 'input_mesh', nargs='?', default=None, help='Input mesh fil
 parser.add_argument( '-i',  action='store_true', help='Print mesh informations' )
 parser.add_argument( '-b',  action='store_true', help='Color vertices on a border' )
 parser.add_argument( '-c', action='store_true', help='Check different mesh parameters' )
+parser.add_argument( '-gc', action='store_true', help='Compute the surface gaussian curvature' )
 parser.add_argument( '-nc', action='store_true', help='Compute the surface normal curvature' )
 parser.add_argument( '-ul', nargs=2, metavar=('N', 'D'), help='Uniform laplacian smoothing with N iteration steps and D diffusion constant' )
 parser.add_argument( '-ncf', nargs=2, metavar=('N', 'D'), help='Normalized curvature flow smoothing with N iteration steps and D diffusion constant' )
@@ -99,12 +110,24 @@ if args.b :
 	input_mesh.colors = Colormap( args.cm ).ValueArrayToColor( GetBorderVertices( input_mesh ) )
 	print( 'done.' )
 
+# Compute gaussian curvature
+if args.gc :
+
+	sys.stdout.write( 'Compute gaussian curvature... ' )
+	sys.stdout.flush()
+	curvature = GetGaussianCurvature( input_mesh )
+	Histogram( curvature )
+	input_mesh.colors = Colormap( args.cm ).ValueArrayToColor( curvature )
+	print( 'done.' )
+
 # Compute normal curvature
 if args.nc :
 
-	sys.stdout.write( 'Compute curvature... ' )
+	sys.stdout.write( 'Compute normal curvature... ' )
 	sys.stdout.flush()
-	input_mesh.colors = Colormap( args.cm ).VectorArrayToColor( GetNormalCurvature( input_mesh ) )
+	curvature = GetNormalCurvature( input_mesh )
+	Histogram( np.sqrt( (curvature**2).sum(axis=1) ) )
+	input_mesh.colors = Colormap( args.cm ).VectorArrayToColor( curvature )
 	print( 'done.' )
 
 # Apply uniform laplacian smoothing
