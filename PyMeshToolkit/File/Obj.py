@@ -10,16 +10,13 @@
 # External dependencies
 #
 import numpy as np
-from PyMeshToolkit.Core.Mesh import Mesh
+import PyMeshToolkit
 
 
 #
 # Import a mesh from a OBJ / SMF file
 #
 def ReadObj( filename ) :
-#
-# TODO: Bindings !
-#
 
 	# Initialisation
 	vertices = []
@@ -40,32 +37,31 @@ def ReadObj( filename ) :
 
 		# Vertex
 		if values[0] == 'v' :
-			vertices.append( map( float, values[1:4] ) )
+			vertices.append( list( map( float, values[1:4] ) ) )
 
 		# Face (index starts at 1)
 		elif values[0] == 'f' :
-			faces.append( map( int, [ (v.split('/'))[0] for v in values[1:4] ] ) )
+			faces.append( list( map( int, [ (v.split('/'))[0] for v in values[1:4] ] ) ) )
 
 		# Normal
 		elif values[0] == 'vn' :
-			normals.append( map( float, values[1:4] ) )
+			normals.append( list( map( float, values[1:4] ) ) )
 
 		# Color
 		elif values[0] == 'c' :
-			colors.append( map( float, values[1:4] ) )
+			colors.append( list( map( float, values[1:4] ) ) )
 
 		# Texture
 		elif values[0] == 'vt' :
-			texcoords.append( map( float, values[1:3] ) )
+			texcoords.append( list( map( float, values[1:3] ) ) )
 
 		# Texture filename
 		elif values[0] == 'mtllib' :
 			material = values[1]
 		
 	# Remap face indices
-	faces = np.array(faces) - 1
+	faces = np.array( faces ) - 1
 
 	# Return the final mesh
-	return Mesh( name=filename, vertices=vertices, faces=faces, colors=colors,
-		vertex_normals=normals,	textures=texcoords, texture_name=material )
+	return PyMeshToolkit.Core.Mesh( filename, vertices, faces, colors, material, texcoords, [], normals )
 
