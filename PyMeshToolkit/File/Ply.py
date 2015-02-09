@@ -7,7 +7,7 @@
 
 
 #
-# Source code adapted from the PLY import/export scripts in Blender
+# Source code adapted from the 'io_mesh_ply' Blender addon
 # http://www.blender.org/
 #
 
@@ -124,6 +124,7 @@ class PlyProperty( object ) :
 		else :
 
 			# Property binary format
+			# TODO: Modify to use 'format'
 			fmt = '%s%i%s' % ( file_format, count, num_type )
 
 			# Read the property
@@ -267,3 +268,63 @@ def ReadPly( filename ) :
 	# Return the resulting mesh from the PLY file data
 	return PyMeshToolkit.Core.Mesh( filename, vertices, faces, colors, '', textures, [], normals )
 	
+
+#
+# Export a mesh to a PLY file
+#
+def WritePly( filename, mesh, binary = False ) :
+
+	# Open the target PLY file
+	with open( filename, 'w' ) as ply_file :
+	
+		# Write the PLY file header
+		ply_file.write( 'ply\n' )
+		if binary : ply_file.write( 'format binary_little_endian 1.0\n')
+		else : ply_file.write( 'format ascii 1.0\n')
+		ply_file.write( 'element vertex {}\n'.format( mesh.vertex_number ) )
+		ply_file.write( 'property float x\n' )
+		ply_file.write( 'property float y\n' )
+		ply_file.write( 'property float z\n' )
+		if mesh.vertex_normal_number :
+			ply_file.write( 'property float nx\n' )
+			ply_file.write( 'property float ny\n' )
+			ply_file.write( 'property float nz\n' )
+		if mesh.texture_number :
+			ply_file.write( 'property float s\n' )
+			ply_file.write( 'property float t\n' )
+		if mesh.color_number :
+			ply_file.write( 'property float red\n' )
+			ply_file.write( 'property float green\n' )
+			ply_file.write( 'property float blue\n' )
+		ply_file.write( 'element face {}\n'.format( mesh.face_number ) )
+		ply_file.write( 'property list uchar uint vertex_indices\n' )
+		ply_file.write( 'end_header\n' )
+
+		# Write the vertex element
+		for i in range( mesh.vertex_number ) :
+			ply_file.write( '{} {} {}'.format( *mesh.vertices[i] ) )
+			if mesh.vertex_normal_number :
+				ply_file.write( ' {} {} {}'.format( *mesh.vertex_normals[i] ) )
+			if mesh.texture_number :
+				ply_file.write( ' {} {}'.format( *mesh.textures[i] ) )
+			if mesh.color_number :
+				ply_file.write( ' {} {} {}'.format( *mesh.colors[i] ) )
+			ply_file.write( '\n' )
+
+		# Write the face element
+		for f in mesh.faces :
+			ply_file.write('3 {} {} {}\n'.format( *f ) )
+
+
+#
+# Test
+#
+if __name__ == "__main__" :
+	
+	import sys
+	
+	mesh = ReadPly( sys.argv[1] )
+	
+	print( mesh )
+	
+	PyMeshToolkit.File.Ply.WritePly( 'test.ply', sys.argv[2] )
