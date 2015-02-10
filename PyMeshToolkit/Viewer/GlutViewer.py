@@ -23,7 +23,7 @@ class GlutViewer( MeshViewer ) :
 	#
 	# Initialisation
 	#
-	def __init__( self, mesh, title="GlutViewer", width=1024, height=768 ) :
+	def __init__( self, mesh, title='GlutViewer', width=1024, height=768 ) :
 
 		# Initialise OpenGL / GLUT
 		glut.glutInit()
@@ -52,56 +52,56 @@ class GlutViewer( MeshViewer ) :
 	def Keyboard( self, key, mouseX, mouseY ) :
 
 		# Escape
-		if key == '\x1b' :
+		if key == b'\x1b' :
 
 			# Exit
 			sys.exit()
 
 		# A
-		elif key in [ 'a', 'A' ] :
+		elif key in [ b'a', b'A' ] :
 
 			# Antialiasing
 			self.antialiasing = not self.antialiasing
 			MeshViewer.SetAntialiasing( self, self.antialiasing )
 
 		# F
-		elif key in [ 'f', 'F' ] :
+		elif key in [ b'f', b'F' ] :
 
 			# Flat shading
 			MeshViewer.SetShader( self, 'FlatShading' )
 
 		# G
-		elif key in [ 'g', 'G' ] :
+		elif key in [ b'g', b'G' ] :
 
 			# Smooth shading
 			MeshViewer.SetShader( self, 'SmoothShading' )
 
 		# I
-		elif key in [ 'i', 'I' ] :
+		elif key in [ b'i', b'I' ] :
 
 			# Print OpenGL informations
 			self.PrintInfo()
 
 		# R
-		elif key in [ 'r', 'R' ] :
+		elif key in [ b'r', b'R' ] :
 
 			# Reset model translation and rotation
 			MeshViewer.Reset( self )
 
 		# 1
-		elif key == '1' :
+		elif key == b'1' :
 
 			# Display the mesh with solid rendering
 			self.wireframe_mode = 0
 
 		# 2
-		elif key == '2' :
+		elif key == b'2' :
 
 			# Display the mesh with wireframe rendering
 			self.wireframe_mode = 1
 
 		# 3
-		elif key == '3' :
+		elif key == b'3' :
 
 			# Display the mesh with hidden line removal rendering
 			self.wireframe_mode = 2
@@ -183,7 +183,7 @@ class GlutViewer( MeshViewer ) :
 
 		# Display OpenGL driver informations
 		print( 'OpenGL Informations...' )
-		print( '  Vendor :     ' + gl.glGetString( gl.GL_VENDOR ) )
-		print( '  Renderer :   ' + gl.glGetString( gl.GL_RENDERER ) )
-		print( '  Version :    ' + gl.glGetString( gl.GL_VERSION ) )
-		print( '  Shader :     ' + gl.glGetString( gl.GL_SHADING_LANGUAGE_VERSION ) )
+		print( '  Vendor :     {}'.format( gl.glGetString( gl.GL_VENDOR ) ) )
+		print( '  Renderer :   {}'.format( gl.glGetString( gl.GL_RENDERER ) ) )
+		print( '  Version :    {}'.format( gl.glGetString( gl.GL_VERSION ) ) )
+		print( '  Shader :     {}'.format( gl.glGetString( gl.GL_SHADING_LANGUAGE_VERSION ) ) )

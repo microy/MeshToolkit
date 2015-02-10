@@ -13,7 +13,7 @@ import platform
 import PySide as qt
 import PySide.QtGui as qtgui
 from PyMeshToolkit.Core.Repair import Check
-from PyMeshToolkit.File.Vrml import ReadVrml, WriteVrml
+from PyMeshToolkit.File.Ply import ReadPly, WritePly
 from .QtViewerUI import Ui_MainWindow
 
 
@@ -43,14 +43,14 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 	def FileOpen( self ) :
 
 		# Open file dialog
-		(filename, selected_filter) = qtgui.QFileDialog.getOpenFileName( self, 'Open a VRML file...', '',
-			'VRML files (*.vrml *.wrl *.x3d *.x3dv *.iv);;All files (*.*)' )
+		( filename, selected_filter ) = qtgui.QFileDialog.getOpenFileName( self, 'Open a PLY file...', '',
+			'PLY files (*.ply);;All files (*.*)' )
 
 		# Check filename
 		if not filename : return
 
-		# Read VRML/X3D/Inventor file
-		self.mesh = ReadVrml( unicode(filename) )
+		# Read PLY file
+		self.mesh = ReadPly( filename )
 
 		# Send the mesh to the OpenGL viewer
 		self.opengl_widget.LoadMesh( self.mesh )
@@ -64,14 +64,14 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		if not self.mesh : return
 
 		# Open file dialog
-		(filename, selected_filter) = qtgui.QFileDialog.getSaveFileName( self, 'Save to a VRML file...', '',
-			'VRML files (*.vrml *.wrl *.x3d *.x3dv *.iv);;All files (*.*)' )
+		( filename, selected_filter ) = qtgui.QFileDialog.getSaveFileName( self, 'Save to a PLY file...', '',
+			'PLY files (*.ply);;All files (*.*)' )
 
 		# Check filename
 		if not filename : return
 
-		# Save VRML/X3D/Inventor file
-		WriteVrml( self.mesh, unicode(filename) )
+		# Save PLY file
+		WritePly( self.mesh, filename )
 
 	#
 	# FileCheck

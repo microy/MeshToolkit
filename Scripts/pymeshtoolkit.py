@@ -30,7 +30,7 @@ input_mesh = None
 
 # Create a command line argument parser
 parser = argparse.ArgumentParser( description='Process 3D triangular meshes.', usage='%(prog)s [options] input_mesh' )
-parser.add_argument( 'input_mesh', nargs='?', default=None, help='Input mesh file in VRML format' )
+parser.add_argument( 'input_mesh', nargs='?', default=None, help='Input mesh file in PLY format' )
 parser.add_argument( '-i',  action='store_true', help='Print mesh informations' )
 parser.add_argument( '-b',  action='store_true', help='Color vertices on a border' )
 parser.add_argument( '-c', action='store_true', help='Check different mesh parameters' )
@@ -38,7 +38,7 @@ parser.add_argument( '-gc', action='store_true', help='Compute the surface gauss
 parser.add_argument( '-nc', action='store_true', help='Compute the surface normal curvature' )
 parser.add_argument( '-ul', nargs=2, metavar=('N', 'D'), help='Uniform laplacian smoothing with N iteration steps and D diffusion constant' )
 parser.add_argument( '-ncf', nargs=2, metavar=('N', 'D'), help='Normalized curvature flow smoothing with N iteration steps and D diffusion constant' )
-parser.add_argument( '-o', metavar='file', action='store', help='Write the resulting mesh to a VRML file' )
+parser.add_argument( '-o', metavar='file', action='store', help='Write the resulting mesh to a PLY file' )
 parser.add_argument( '-cm', default='CubeHelix', metavar='colormap', action='store', help='Colormap (default: cubehelix)' )
 parser.add_argument( '-t', action='store_true', help='Test function' )
 parser.add_argument( '-qt', action='store_true', help='Launch OpenGL viewer with Qt' )
@@ -53,7 +53,7 @@ if args.input_mesh :
 	# Read the input mesh file
 	sys.stdout.write( 'Read file ' + args.input_mesh + '... ' )
 	sys.stdout.flush()
-	input_mesh = ReadVrml( args.input_mesh )
+	input_mesh = ReadPly( args.input_mesh )
 	print( 'done.' )
 
 	# Compute surface normals
@@ -157,7 +157,7 @@ if args.o :
 
 	sys.stdout.write( 'Write file ' + args.o + '... ' )
 	sys.stdout.flush()
-	WriteVrml( input_mesh, args.o )
+	WritePly( input_mesh, args.o )
 	print( 'done.' )
 
 # Launch GlutViewer
