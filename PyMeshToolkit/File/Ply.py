@@ -278,31 +278,36 @@ def ReadPly( filename ) :
 #
 def WritePly( filename, mesh, binary = False ) :
 
+	if binary : ply_file_format = 'binary_little_endian'
+	else : ply_file_format = 'ascii'
+
 	# Open the target PLY file
 	with open( filename, 'wb' ) as ply_file :
 	
-		# Write the PLY file header
-		ply_file.write( 'ply\n' )
-		if binary : ply_file.write( 'format binary_little_endian 1.0\n')
-		else : ply_file.write( 'format ascii 1.0\n')
-		ply_file.write( 'element vertex {}\n'.format( mesh.vertex_number ) )
-		ply_file.write( 'property float x\n' )
-		ply_file.write( 'property float y\n' )
-		ply_file.write( 'property float z\n' )
+		# Define the PLY file header
+		header  = 'ply\n'
+		header += 'format {} 1.0\n'.format( ply_file_format )
+		header += 'element vertex {}\n'.format( mesh.vertex_number )
+		header += 'property float x\n'
+		header += 'property float y\n'
+		header += 'property float z\n'
 		if mesh.vertex_normal_number :
-			ply_file.write( 'property float nx\n' )
-			ply_file.write( 'property float ny\n' )
-			ply_file.write( 'property float nz\n' )
+			header += 'property float nx\n'
+			header += 'property float ny\n'
+			header += 'property float nz\n'
 		if mesh.texture_number :
-			ply_file.write( 'property float s\n' )
-			ply_file.write( 'property float t\n' )
+			header += 'property float s\n'
+			header += 'property float t\n'
 		if mesh.color_number :
-			ply_file.write( 'property uchar red\n' )
-			ply_file.write( 'property uchar green\n' )
-			ply_file.write( 'property uchar blue\n' )
-		ply_file.write( 'element face {}\n'.format( mesh.face_number ) )
-		ply_file.write( 'property list uchar int vertex_indices\n' )
-		ply_file.write( 'end_header\n' )
+			header += 'property uchar red\n'
+			header += 'property uchar green\n'
+			header += 'property uchar blue\n'
+		header += 'element face {}\n'.format( mesh.face_number )
+		header += 'property list uchar int vertex_indices\n'
+		header += 'end_header\n'
+
+		# Write the header
+		ply_file.write( header.encode( 'UTF-8' ) )
 
 		# Binary data
 		if binary :
@@ -311,22 +316,27 @@ def WritePly( filename, mesh, binary = False ) :
 		
 		# ASCII data
 		else :
+
+			# Initialise the data to write
+			data = ''
 			
-			# Write the vertex element
+			# Define the vertex element
 			for i in range( mesh.vertex_number ) :
-				ply_file.write( '{} {} {}'.format( *mesh.vertices[i] ) )
+				data += '{} {} {}'.format( *mesh.vertices[i] )
 				if mesh.vertex_normal_number :
-					ply_file.write( ' {} {} {}'.format( *mesh.vertex_normals[i] ) )
+					data += '{} {} {}'.format( *mesh.vertex_normals[i] )
 				if mesh.texture_number :
-					ply_file.write( ' {} {}'.format( *mesh.textures[i] ) )
+					data += '{} {} {}'.format( *mesh.textures[i] )
 				if mesh.color_number :
-					ply_file.write( ' {} {} {}'.format( *mesh.colors[i] ) )
-				ply_file.write( '\n' )
+					data += '{} {} {}'.format( *mesh.colors[i] )
+				data += '\n'
 
-			# Write the face element
+			# Define the face element
 			for face in mesh.faces :
-				ply_file.write('3 {} {} {}\n'.format( *face ) )
+				data += '3 {} {} {}\n'.format( *face )
 
+			# Write the data
+			ply_file.write( data.encode( 'UTF-8' ) )
 
 #
 # Test
