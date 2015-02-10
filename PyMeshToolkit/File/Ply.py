@@ -225,18 +225,18 @@ def ReadPly( filename ) :
 		if element.name == b'vertex' :
 
 			# Coordinates
-			vindices = ( element.Index(b'x'), element.Index(b'y'), element.Index(b'z') )
+			vindices = ( element.Index( b'x' ), element.Index( b'y' ), element.Index( b'z' ) )
 			
 			# Normals
-			noindices = ( element.Index(b'nx'), element.Index(b'ny'), element.Index(b'nz') )
+			noindices = ( element.Index( b'nx' ), element.Index( b'ny' ), element.Index( b'nz' ) )
 			if -1 in noindices : noindices = None
 			
 			# Textures
-			uvindices = ( element.Index(b's'), element.Index(b't') )
+			uvindices = ( element.Index( b's' ), element.Index( b't' ) )
 			if -1 in uvindices : uvindices = None
 			
 			# Colors
-			colindices = element.Index(b'red'), element.Index(b'green'), element.Index(b'blue')
+			colindices = element.Index( b'red' ), element.Index( b'green' ), element.Index( b'blue' )
 			if -1 in colindices : colindices = None
 				
 		# Face property indices
@@ -246,7 +246,7 @@ def ReadPly( filename ) :
 			findex = element.Index( b'vertex_indices' )
 
 	# Convert vertex data to numpy array for easy slicing
-	vertex_data = np.array( data[b'vertex'] )
+	vertex_data = np.array( data[ b'vertex' ] )
 
 	# Vertex array
 	vertices = vertex_data[ :, vindices[0]:vindices[2]+1 ]
@@ -254,7 +254,7 @@ def ReadPly( filename ) :
 	# Color array
 	colors = []
 	if colindices :
-		colors = vertex_data[ :, colindices[0]:colindices[2]+1 ]
+		colors = vertex_data[ :, colindices[0]:colindices[2]+1 ] / 255.0
 
 	# Texture coordinate array
 	textures = []
@@ -271,14 +271,15 @@ def ReadPly( filename ) :
 	
 	# Return the resulting mesh from the PLY file data
 	return PyMeshToolkit.Core.Mesh( filename, vertices, faces, colors, '', textures, [], normals )
-	
+
 
 #
 # Export a mesh to a PLY file
 #
-def WritePly( filename, mesh, binary = False ) :
+def WritePly( filename, mesh, binary_file = True, include_normals = False ) :
 
-	if binary : ply_file_format = 'binary_little_endian'
+	# Register the desired file format
+	if binary_file : ply_file_format = 'binary_little_endian'
 	else : ply_file_format = 'ascii'
 
 	# Open the target PLY file
@@ -288,31 +289,56 @@ def WritePly( filename, mesh, binary = False ) :
 		header  = 'ply\n'
 		header += 'format {} 1.0\n'.format( ply_file_format )
 		header += 'element vertex {}\n'.format( mesh.vertex_number )
-		header += 'property float x\n'
-		header += 'property float y\n'
-		header += 'property float z\n'
-		if mesh.vertex_normal_number :
-			header += 'property float nx\n'
-			header += 'property float ny\n'
-			header += 'property float nz\n'
+		header += 'property float32 x\n'
+		header += 'property float32 y\n'
+		header += 'property float32 z\n'
+		if include_normals and mesh.vertex_normal_number :
+			header += 'property float32 nx\n'
+			header += 'property float32 ny\n'
+			header += 'property float32 nz\n'
 		if mesh.texture_number :
-			header += 'property float s\n'
-			header += 'property float t\n'
+			header += 'property float32 s\n'
+			header += 'property float32 t\n'
 		if mesh.color_number :
-			header += 'property uchar red\n'
-			header += 'property uchar green\n'
-			header += 'property uchar blue\n'
+			header += 'property uint8 red\n'
+			header += 'property uint8 green\n'
+			header += 'property uint8 blue\n'
 		header += 'element face {}\n'.format( mesh.face_number )
-		header += 'property list uchar int vertex_indices\n'
+		header += 'property list uint8 int32 vertex_index\n'
 		header += 'end_header\n'
 
 		# Write the header
 		ply_file.write( header.encode( 'UTF-8' ) )
+		
+		# Convert colors to range [0, 255]
+		if mesh.color_number :
+			colors = np.array( mesh.colors * 255, dtype=np.uint8 )
 
 		# Binary data
-		if binary :
+		if binary_file :
 			
-			pass
+			# Write the vertex data
+			for i in range( mesh.vertex_number ) :
+				
+				# Coordinates
+				ply_file.write( st.pack( '3f', *mesh.vertices[i] ) )
+				
+				# Normal
+				if include_normals and mesh.vertex_normal_number :
+					ply_file.write( st.pack( '3f', *mesh.vertex_normals[i] ) )
+					
+				# Texture coordinates
+				if mesh.texture_number :
+					ply_file.write( st.pack( '2f', *mesh.textures[i] ) )
+					
+				# Color
+				if mesh.color_number :
+					ply_file.write( st.pack( '3B', *colors[i] ) )
+
+			# Write the face data
+			for face in mesh.faces :
+				ply_file.write( st.pack( 'B', 3 ) )
+				ply_file.write( st.pack( '3i', *face ) )
 		
 		# ASCII data
 		else :
@@ -322,13 +348,21 @@ def WritePly( filename, mesh, binary = False ) :
 			
 			# Define the vertex element
 			for i in range( mesh.vertex_number ) :
+				
+				# Coordinates
 				data += '{} {} {}'.format( *mesh.vertices[i] )
-				if mesh.vertex_normal_number :
-					data += '{} {} {}'.format( *mesh.vertex_normals[i] )
+				
+				# Normal
+				if include_normals and mesh.vertex_normal_number :
+					data += ' {} {} {}'.format( *mesh.vertex_normals[i] )
+					
+				# Texture coordinates
 				if mesh.texture_number :
-					data += '{} {} {}'.format( *mesh.textures[i] )
+					data += ' {} {} {}'.format( *mesh.textures[i] )
+					
+				# Color
 				if mesh.color_number :
-					data += '{} {} {}'.format( *mesh.colors[i] )
+					data += ' {} {} {}'.format( *colors[i] )
 				data += '\n'
 
 			# Define the face element
@@ -337,18 +371,3 @@ def WritePly( filename, mesh, binary = False ) :
 
 			# Write the data
 			ply_file.write( data.encode( 'UTF-8' ) )
-
-#
-# Test
-#
-if __name__ == "__main__" :
-	
-	import sys
-	
-	mesh = ReadPly( sys.argv[1] )
-	
-	print( mesh )
-
-	if len(sys.argv) > 2 :
-		
-		PyMeshToolkit.File.Ply.WritePly( sys.argv[2], mesh )
