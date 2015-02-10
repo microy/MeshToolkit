@@ -29,7 +29,7 @@ def LoadShaders( *shaders ) :
 
 	# Check the program
 	if not gl.glGetProgramiv( program, gl.GL_LINK_STATUS ) :
-		raise RuntimeError( 'Shader program linking failed.\n' + gl.glGetProgramInfoLog( program ) )
+		raise RuntimeError( 'Shader program linking failed.\n{}'.format( gl.glGetProgramInfoLog( program ) ) )
 
 	# Detach the shaders from the program
 	for shader in shaders :
@@ -59,7 +59,7 @@ def CompileShader( shader_source, shader_type ) :
 
 	# Check the shader
 	if not gl.glGetShaderiv( shader, gl.GL_COMPILE_STATUS ) :
-		raise RuntimeError( 'Shader compilation failed.\n' + gl.glGetShaderInfoLog( shader ) )
+		raise RuntimeError( 'Shader compilation failed.\n{}'.format( gl.glGetShaderInfoLog( shader ) ) )
 
 	# Return the shader ID
 	return shader
