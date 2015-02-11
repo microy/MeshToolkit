@@ -238,12 +238,6 @@ def ReadPly( filename ) :
 			# Colors
 			colindices = element.Index( b'red' ), element.Index( b'green' ), element.Index( b'blue' )
 			if -1 in colindices : colindices = None
-				
-		# Face property indices
-		elif element.name == b'face' :
-			
-			# Vertex indices
-			findex = element.Index( b'vertex_indices' )
 
 	# Convert vertex data to numpy array for easy slicing
 	vertex_data = np.array( data[ b'vertex' ] )
@@ -267,7 +261,7 @@ def ReadPly( filename ) :
 		normals = vertex_data[ :, noindices[0]:noindices[2]+1 ]
 
 	# Face array
-	faces = np.array( data[ b'face' ] )[ :, findex ]
+	faces = np.array( data[ b'face' ] )[ :, 0 ]
 	
 	# Return the resulting mesh from the PLY file data
 	return PyMeshToolkit.Core.Mesh( filename, vertices, faces, colors, '', textures, [], normals )
@@ -289,22 +283,22 @@ def WritePly( filename, mesh, binary_file = True, include_normals = False ) :
 		header  = 'ply\n'
 		header += 'format {} 1.0\n'.format( ply_file_format )
 		header += 'element vertex {}\n'.format( mesh.vertex_number )
-		header += 'property float32 x\n'
-		header += 'property float32 y\n'
-		header += 'property float32 z\n'
+		header += 'property float x\n'
+		header += 'property float y\n'
+		header += 'property float z\n'
 		if include_normals and mesh.vertex_normal_number :
-			header += 'property float32 nx\n'
-			header += 'property float32 ny\n'
-			header += 'property float32 nz\n'
+			header += 'property float nx\n'
+			header += 'property float ny\n'
+			header += 'property float nz\n'
 		if mesh.texture_number :
-			header += 'property float32 s\n'
-			header += 'property float32 t\n'
+			header += 'property float s\n'
+			header += 'property float t\n'
 		if mesh.color_number :
-			header += 'property uint8 red\n'
-			header += 'property uint8 green\n'
-			header += 'property uint8 blue\n'
+			header += 'property uchar red\n'
+			header += 'property uchar green\n'
+			header += 'property uchar blue\n'
 		header += 'element face {}\n'.format( mesh.face_number )
-		header += 'property list uint8 int32 vertex_index\n'
+		header += 'property list uchar int vertex_indices\n'
 		header += 'end_header\n'
 
 		# Write the header
