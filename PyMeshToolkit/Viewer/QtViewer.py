@@ -25,7 +25,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 	#
 	# Initialisation
 	#
-	def __init__( self, parent=None, mesh=None ) :
+	def __init__( self, parent = None, mesh = None ) :
 
 		# Initialise the main window
 		super( QtViewer, self ).__init__( parent ) 
@@ -38,7 +38,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.init_mesh = mesh
 
 	#
-	# FileOpen
+	# File -> Open
 	#
 	def FileOpen( self ) :
 
@@ -56,7 +56,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.LoadMesh( self.mesh )
 
 	#
-	# FileSave
+	# File -> Save
 	#
 	def FileSave( self ) :
 
@@ -74,7 +74,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		WritePly( self.mesh, filename )
 
 	#
-	# FileCheck
+	# File -> Check
 	#
 	def FileCheck( self ) :
 
@@ -85,7 +85,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		Check( self.mesh )
 
 	#
-	# FileClose
+	# File -> Close
 	#
 	def FileClose( self ) :
 
@@ -95,7 +95,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 	#
-	# ViewFlat
+	# View -> Flat
 	#
 	def ViewFlat( self ) :
 
@@ -106,7 +106,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 	#
-	# ViewSmooth
+	# View -> Smooth
 	#
 	def ViewSmooth( self ) :
 
@@ -117,7 +117,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 	#
-	# ViewSolid
+	# View -> Solid
 	#
 	def ViewSolid( self ) :
 
@@ -129,7 +129,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 	#
-	# ViewWireframe
+	# View -> Wireframe
 	#
 	def ViewWireframe( self ) :
 
@@ -141,7 +141,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 	#
-	# ViewHiddenlines
+	# View -> Hidden lines
 	#
 	def ViewHiddenlines( self ) :
 
@@ -153,7 +153,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 	#
-	# ViewAntialiasing
+	# View -> Antialiasing
 	#
 	def ViewAntialiasing( self ) :
 
@@ -163,7 +163,7 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 	#
-	# ViewReset
+	# View -> Reset
 	#
 	def ViewReset( self ) :
 
@@ -172,27 +172,27 @@ class QtViewer( qtgui.QMainWindow, Ui_MainWindow ) :
 		self.opengl_widget.update()
 
 	#
-	# HelpAbout
+	# Help -> About
 	#
 	def HelpAbout( self ) :
 
 		qtgui.QMessageBox.about( self, 'About QtViewer',
 		'''<b>PyMeshToolkit QtViewer</b>
-        <p>Copyright (c) 2013-2014 Michael Roy.</p>
+        <p>Copyright (c) 2013-2015 Michael Roy.</p>
         <p>All rights reserved in accordance with the MIT License.</p>
         <i><p>Python {}</p><p>PySide version {}</p><p>Qt version {} on {}</p></i>'''.format(
         platform.python_version(), qt.__version__, qt.QtCore.__version__,
         platform.system()))
 
 	#
-	# HelpAboutQt
+	# Help -> About Qt
 	#
 	def HelpAboutQt( self ) :
 		
 		qtgui.QMessageBox.aboutQt( self, 'About Qt' )
 		
 	#
-	# HelpAboutOpenGL
+	# Help -> About OpenGL
 	#
 	def HelpAboutOpenGL( self ) :
 		

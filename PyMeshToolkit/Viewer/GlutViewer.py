@@ -183,7 +183,7 @@ class GlutViewer( MeshViewer ) :
 
 		# Display OpenGL driver informations
 		print( 'OpenGL Informations...' )
-		print( '  Vendor :     {}'.format( gl.glGetString( gl.GL_VENDOR ) ) )
-		print( '  Renderer :   {}'.format( gl.glGetString( gl.GL_RENDERER ) ) )
-		print( '  Version :    {}'.format( gl.glGetString( gl.GL_VERSION ) ) )
-		print( '  Shader :     {}'.format( gl.glGetString( gl.GL_SHADING_LANGUAGE_VERSION ) ) )
+		print( '  Vendor :    {}'.format( gl.glGetString( gl.GL_VENDOR ).decode( 'UTF-8' ) ) )
+		print( '  Renderer :  {}'.format( gl.glGetString( gl.GL_RENDERER ).decode( 'UTF-8' ) ) )
+		print( '  Version :   {}'.format( gl.glGetString( gl.GL_VERSION ).decode( 'UTF-8' ) ) )
+		print( '  Shader :    {}'.format( gl.glGetString( gl.GL_SHADING_LANGUAGE_VERSION ).decode( 'UTF-8' ) ) )
