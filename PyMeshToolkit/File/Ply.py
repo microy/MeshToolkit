@@ -270,7 +270,7 @@ def ReadPly( filename ) :
 #
 # Export a mesh to a PLY file
 #
-def WritePly( filename, mesh, binary_file = True, include_normals = False ) :
+def WritePly( mesh, filename, binary_file = True, include_normals = False ) :
 
 	# Register the desired file format
 	if binary_file : ply_file_format = 'binary_little_endian'
