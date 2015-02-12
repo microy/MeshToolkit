@@ -71,9 +71,10 @@ if args.input_mesh :
 # Launch standalone QtViewer
 elif args.qt :
 
+	import PySide.QtGui as qtgui
 	sys.stdout.write( 'Launch Qt viewer... ' )
 	sys.stdout.flush()
-	app = QtGui.QApplication( sys.argv )
+	app = qtgui.QApplication( sys.argv )
 	window = QtViewer()
 	window.show()
 	print( 'done.' )
