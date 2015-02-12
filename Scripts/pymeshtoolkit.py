@@ -71,14 +71,8 @@ if args.input_mesh :
 # Launch standalone QtViewer
 elif args.qt :
 
-	import PySide.QtGui as qtgui
-	sys.stdout.write( 'Launch Qt viewer... ' )
-	sys.stdout.flush()
-	app = qtgui.QApplication( sys.argv )
-	window = QtViewer()
-	window.show()
-	print( 'done.' )
-	sys.exit( app.exec_() )
+	print( 'Launch Qt viewer... ' )
+	QtViewer()
 	
 # No input file
 else :
@@ -173,11 +167,5 @@ if args.glut :
 # Launch QtViewer
 if args.qt :
 
-	import PySide.QtGui as qtgui
-	sys.stdout.write( 'Launch Qt viewer... ' )
-	sys.stdout.flush()
-	app = qtgui.QApplication( sys.argv )
-	window = QtViewer( mesh=input_mesh )
-	window.show()
-	print( 'done.' )
-	sys.exit( app.exec_() )
+	print( 'Launch Qt viewer... ' )
+	QtViewer( mesh=input_mesh )

@@ -10,6 +10,7 @@
 # External dependencies
 #
 import platform
+import sys
 import PySide as qt
 import PySide.QtCore as qtcore
 import PySide.QtGui as qtgui
@@ -20,10 +21,31 @@ from PyMeshToolkit.File.Ply import ReadPly, WritePly
 
 
 #
+# Main application to display a mesh
+#
+class QtViewer( qtgui.QApplication ) :
+
+	#
+	# Initialisation
+	#
+	def __init__( self, mesh = None ) :
+
+		# Initialize parent class
+		super( QtViewer, self ).__init__( sys.argv )
+		
+		# Show the widget used to display the mesh
+		self.qtopenglwidget = QtOpenGLWidget( mesh = mesh )
+		self.qtopenglwidget.show()
+		
+		# Enter Qt main loop
+		self.exec_()
+
+
+#
 # Customize the Qt OpenGL widget
 # to get our mesh viewer
 #
-class QtViewer( MeshViewer, qtgl.QGLWidget ) :
+class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 
 	#
 	# Initialisation
@@ -31,7 +53,7 @@ class QtViewer( MeshViewer, qtgl.QGLWidget ) :
 	def __init__( self, parent = None, mesh = None ) :
 		
 		# Initialise QGLWidget with multisampling enabled and OpenGL 3 core only
-		qtgl.QGLWidget.__init__( self, qtgl.QGLFormat( qtgl.QGL.SampleBuffers | qtgl.QGL.NoDeprecatedFunctions ), parent )
+		super( QtOpenGLWidget, self ).__init__( qtgl.QGLFormat( qtgl.QGL.SampleBuffers | qtgl.QGL.NoDeprecatedFunctions ), parent )
 
 		# Track mouse events
 		self.setMouseTracking( True )
@@ -54,7 +76,7 @@ class QtViewer( MeshViewer, qtgl.QGLWidget ) :
 	def initializeGL( self ) :
 
 		# OpenGL initialization
-		self.Initialise( self.width(), self.height() )
+		self.InitialiseOpenGL( self.width(), self.height() )
 		
 		# Load the initial mesh
 		if self.mesh : self.LoadMesh( self.mesh )
@@ -134,7 +156,6 @@ class QtViewer( MeshViewer, qtgl.QGLWidget ) :
 		if event.key() == qtcore.Qt.Key_Escape :
 			
 			# Exit
-			import sys
 			sys.exit()
 			
 		# A
