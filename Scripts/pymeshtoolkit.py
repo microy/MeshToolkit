@@ -51,22 +51,16 @@ args = parser.parse_args()
 if args.input_mesh :
 
 	# Read the input mesh file
-	sys.stdout.write( 'Read file ' + args.input_mesh + '... ' )
-	sys.stdout.flush()
+	print( 'Read file ' + args.input_mesh + '... ' )
 	input_mesh = ReadPly( args.input_mesh )
-	print( 'done.' )
 
 	# Compute surface normals
-	sys.stdout.write( 'Compute normals... ' )
-	sys.stdout.flush()
+	print( 'Compute normals... ' )
 	input_mesh.UpdateNormals()
-	print( 'done.' )
 
 	# Register neighborhood informations
-	sys.stdout.write( 'Register neighbors... ' )
-	sys.stdout.flush()
+	print( 'Register neighbors... ' )
 	input_mesh.UpdateNeighbors()
-	print( 'done.' )
 	
 # Launch standalone QtViewer
 elif args.qt :
@@ -91,55 +85,42 @@ if args.i :
 # Check some mesh parameters
 if args.c :
 
-	sys.stdout.write( 'Check mesh... ' )
-	sys.stdout.flush()
-	log_message = Check( input_mesh )
-	if log_message : print( 'Failed\n' + log_message )
-	else : print( 'done.' )
+	print( 'Check mesh... ' )
+	print( Check( input_mesh ) )
 
 # Color vertices on a border
 if args.b :
 
-	sys.stdout.write( 'Color border vertices... ' )
-	sys.stdout.flush()
+	print( 'Color border vertices... ' )
 	input_mesh.colors = Colormap( args.cm ).ValueArrayToColor( GetBorderVertices( input_mesh ) )
-	print( 'done.' )
 
 # Compute gaussian curvature
 if args.gc :
 
-	sys.stdout.write( 'Compute gaussian curvature... ' )
-	sys.stdout.flush()
+	print( 'Compute gaussian curvature... ' )
 	curvature = GetGaussianCurvature( input_mesh )
 	Histogram( curvature )
 	input_mesh.colors = Colormap( args.cm ).ValueArrayToColor( curvature )
-	print( 'done.' )
 
 # Compute normal curvature
 if args.nc :
 
-	sys.stdout.write( 'Compute normal curvature... ' )
-	sys.stdout.flush()
+	print( 'Compute normal curvature... ' )
 	curvature = GetNormalCurvature( input_mesh )
 	Histogram( np.sqrt( (curvature**2).sum(axis=1) ) )
 	input_mesh.colors = Colormap( args.cm ).VectorArrayToColor( curvature )
-	print( 'done.' )
 
 # Apply uniform laplacian smoothing
 if args.ul :
 	
-	sys.stdout.write( 'Uniform laplacian smoothing... ' )
-	sys.stdout.flush()
+	print( 'Uniform laplacian smoothing... ' )
 	UniformLaplacianSmoothing( input_mesh, int( args.ul[0] ), float( args.ul[1] ) )
-	print( 'done.' )
 
 # Apply normalized curvature flow smoothing
 if args.ncf :
 	
-	sys.stdout.write( 'Normalized curvature flow smoothing... ' )
-	sys.stdout.flush()
+	print( 'Normalized curvature flow smoothing... ' )
 	NormalizedCurvatureFlowSmoothing( input_mesh, int( args.ncf[0] ), float( args.ncf[1] ) )
-	print( 'done.' )
 
 # Test
 if args.t :
@@ -150,19 +131,14 @@ if args.t :
 # Write resulting mesh
 if args.o :
 
-	sys.stdout.write( 'Write file ' + args.o + '... ' )
-	sys.stdout.flush()
+	print( 'Write file ' + args.o + '... ' )
 	WritePly( input_mesh, args.o )
-	print( 'done.' )
 
 # Launch GlutViewer
 if args.glut :
 
-	sys.stdout.write( 'Launch GLUT viewer... ' )
-	sys.stdout.flush()
-	v = GlutViewer( input_mesh )
-	print( 'done.' )
-	v.Run()
+	print( 'Launch GLUT viewer... ' )
+	GlutViewer( input_mesh ).Run()
 
 # Launch QtViewer
 if args.qt :
