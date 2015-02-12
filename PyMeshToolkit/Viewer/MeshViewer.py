@@ -24,7 +24,7 @@ class MeshViewer( Trackball ) :
 	#
 	# Initialisation of OpenGL
 	#
-	def Initialise( self, width, height ) :
+	def InitialiseOpenGL( self, width, height ) :
 
 		# Initialise the trackball
 		Trackball.Initialise( self, width, height )
