@@ -111,15 +111,3 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 
 		# Refresh display
 		self.update()
-
-	#
-	# OpenGLInfo
-	#
-	def OpenGLInfo( self ) :
-
-		# Return OpenGL driver informations
-		gl_vendor = gl.glGetString( gl.GL_VENDOR ).decode( 'UTF-8' )
-		gl_renderer = gl.glGetString( gl.GL_RENDERER ).decode( 'UTF-8' )
-		gl_version = gl.glGetString( gl.GL_VERSION ).decode( 'UTF-8' )
-		gl_shader = gl.glGetString( gl.GL_SHADING_LANGUAGE_VERSION ).decode( 'UTF-8' )
-		return ( gl_vendor, gl_renderer, gl_version, gl_shader )

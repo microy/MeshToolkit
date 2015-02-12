@@ -378,10 +378,5 @@ class QtViewer( qtgui.QMainWindow ) :
 	#
 	def HelpAboutOpenGL( self ) :
 		
-		( gl_vendor, gl_renderer, gl_version, gl_shader ) = self.opengl_widget.OpenGLInfo()
-		
-		qtgui.QMessageBox.about( self, 'About OpenGL', '''<p><b>Vendor :</b> {}</p>
-			<p><b>Renderer :</b> {}</p>
-			<p><b>Version :</b> {}</p>
-			<p><b>Shader :</b> {}</p>'''.format( gl_vendor, gl_renderer, gl_version, gl_shader ) )
+		self.opengl_widget.PrintOpenGLInfo()
 

@@ -80,7 +80,7 @@ class GlutViewer( MeshViewer ) :
 		elif key in [ b'i', b'I' ] :
 
 			# Print OpenGL informations
-			self.PrintInfo()
+			MeshViewer.PrintOpenGLInfo()
 
 		# R
 		elif key in [ b'r', b'R' ] :
@@ -175,15 +175,3 @@ class GlutViewer( MeshViewer ) :
 
 		# Start up the main loop
 		glut.glutMainLoop()
-
-	#
-	# PrintInfo
-	#
-	def PrintInfo( self ) :
-
-		# Display OpenGL driver informations
-		print( 'OpenGL Informations...' )
-		print( '  Vendor :    {}'.format( gl.glGetString( gl.GL_VENDOR ).decode( 'UTF-8' ) ) )
-		print( '  Renderer :  {}'.format( gl.glGetString( gl.GL_RENDERER ).decode( 'UTF-8' ) ) )
-		print( '  Version :   {}'.format( gl.glGetString( gl.GL_VERSION ).decode( 'UTF-8' ) ) )
-		print( '  Shader :    {}'.format( gl.glGetString( gl.GL_SHADING_LANGUAGE_VERSION ).decode( 'UTF-8' ) ) )
