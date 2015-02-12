@@ -9,7 +9,9 @@
 #
 # External dependencies
 #
+import platform
 import sys
+import OpenGL
 import OpenGL.GL as gl
 import OpenGL.GLUT as glut
 from PyMeshToolkit.Viewer.MeshViewer import MeshViewer
@@ -42,8 +44,8 @@ class GlutViewer( MeshViewer ) :
 		glut.glutReshapeFunc( self.Resize )
 
 		# OpenGL initialization
-		MeshViewer.Initialise( self, width, height )
-		MeshViewer.LoadMesh( self, mesh )
+		self.InitialiseOpenGL( width, height )
+		self.LoadMesh( mesh )
 		self.antialiasing = True
 
 	#
@@ -62,31 +64,36 @@ class GlutViewer( MeshViewer ) :
 
 			# Antialiasing
 			self.antialiasing = not self.antialiasing
-			MeshViewer.SetAntialiasing( self, self.antialiasing )
+			self.SetAntialiasing( self.antialiasing )
 
 		# F
 		elif key in [ b'f', b'F' ] :
 
 			# Flat shading
-			MeshViewer.SetShader( self, 'FlatShading' )
+			self.SetShader( 'FlatShading' )
 
 		# G
 		elif key in [ b'g', b'G' ] :
 
 			# Smooth shading
-			MeshViewer.SetShader( self, 'SmoothShading' )
+			self.SetShader( 'SmoothShading' )
 
 		# I
 		elif key in [ b'i', b'I' ] :
 
+			# Print system informations
+			print( 'System Informations...' )
+			print( '  Python :    {}'.format( platform.python_version() ) )
+			print( '  PyOpenGL :  {}'.format( OpenGL.__version__ ) )
+
 			# Print OpenGL informations
-			MeshViewer.PrintOpenGLInfo()
+			self.PrintOpenGLInfo()
 
 		# R
 		elif key in [ b'r', b'R' ] :
 
 			# Reset model translation and rotation
-			MeshViewer.Reset( self )
+			self.Reset()
 
 		# 1
 		elif key == b'1' :
@@ -118,13 +125,13 @@ class GlutViewer( MeshViewer ) :
 			if button == glut.GLUT_LEFT_BUTTON :
 
 				# Trackball rotation
-				MeshViewer.MousePress( self, [ x, y ], 1 )
+				self.MousePress( [ x, y ], 1 )
 
 			# Right button
 			elif button == glut.GLUT_RIGHT_BUTTON :
 
 				# Trackball XY translation
-				MeshViewer.MousePress( self, [ x, y ], 2 )
+				self.MousePress( [ x, y ], 2 )
 		
 		# Button up
 		elif state == glut.GLUT_UP :
@@ -133,19 +140,19 @@ class GlutViewer( MeshViewer ) :
 			if button == 3 :
 
 				# Trackball Z translation 
-				MeshViewer.MouseWheel( self, 1 )
+				self.MouseWheel( 1 )
 
 			# Wheel down
 			elif button == 4 :
 				
 				# Trackball Z translation 
-				MeshViewer.MouseWheel( self, -1 )
+				self.MouseWheel( -1 )
 				
 			# Mouse button released
 			else :
 				
 				# Stop motion
-				MeshViewer.MouseRelease( self )
+				self.MouseRelease()
 
 	#
 	# Display
@@ -153,7 +160,7 @@ class GlutViewer( MeshViewer ) :
 	def Display( self ) :
 
 		# Display the mesh
-		MeshViewer.Display( self )
+		super( GlutViewer, self ).Display()
 
 		# Swap buffers
 		glut.glutSwapBuffers()
