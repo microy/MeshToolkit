@@ -14,13 +14,13 @@ import sys
 import OpenGL
 import OpenGL.GL as gl
 import OpenGL.GLUT as glut
-from PyMeshToolkit.Viewer.MeshViewer import MeshViewer
+import PyMeshToolkit
 
 
 #
 # Create an OpenGL frame with GLUT
 #
-class GlutViewer( MeshViewer ) :
+class GlutViewer( object ) :
 
 	#
 	# Initialisation
@@ -34,19 +34,20 @@ class GlutViewer( MeshViewer ) :
 		glut.glutInitWindowPosition( 100, 100 )
 		glut.glutCreateWindow( title )
 
+		# Mesh viewer
+		self.meshviewer = PyMeshToolkit.Viewer.MeshViewer()
+		self.meshviewer.InitialiseOpenGL( width, height )
+		self.meshviewer.LoadMesh( mesh )
+		self.antialiasing = True
+
 		# GLUT function binding
-		glut.glutCloseFunc( self.Close )
+		glut.glutCloseFunc( self.meshviewer.Close )
 		glut.glutDisplayFunc( self.Display )
 		glut.glutIdleFunc( self.Idle )
 		glut.glutKeyboardFunc( self.Keyboard )
 		glut.glutMouseFunc( self.Mouse )
-		glut.glutMotionFunc( self.MouseMove )
-		glut.glutReshapeFunc( self.Resize )
-
-		# OpenGL initialization
-		self.InitialiseOpenGL( width, height )
-		self.LoadMesh( mesh )
-		self.antialiasing = True
+		glut.glutMotionFunc( self.meshviewer.trackball.MouseMove )
+		glut.glutReshapeFunc( self.meshviewer.Resize )
 
 	#
 	# Keyboard
@@ -63,20 +64,19 @@ class GlutViewer( MeshViewer ) :
 		elif key in [ b'a', b'A' ] :
 
 			# Antialiasing
-			self.antialiasing = not self.antialiasing
-			self.SetAntialiasing( self.antialiasing )
+			self.meshviewer.ToggleAntialiasing()
 
 		# F
 		elif key in [ b'f', b'F' ] :
 
 			# Flat shading
-			self.SetShader( 'FlatShading' )
+			self.meshviewer.SetShader( 'Flat' )
 
 		# G
 		elif key in [ b'g', b'G' ] :
 
 			# Smooth shading
-			self.SetShader( 'SmoothShading' )
+			self.meshviewer.SetShader( 'Smooth' )
 
 		# I
 		elif key in [ b'i', b'I' ] :
@@ -87,31 +87,31 @@ class GlutViewer( MeshViewer ) :
 			print( '  PyOpenGL :  {}'.format( OpenGL.__version__ ) )
 
 			# Print OpenGL informations
-			self.PrintOpenGLInfo()
+			self.meshviewer.PrintOpenGLInfo()
 
 		# R
 		elif key in [ b'r', b'R' ] :
 
 			# Reset model translation and rotation
-			self.Reset()
+			self.meshviewer.trackball.Reset()
 
 		# 1
 		elif key == b'1' :
 
 			# Display the mesh with solid rendering
-			self.wireframe_mode = 0
+			self.meshviewer.wireframe_mode = 0
 
 		# 2
 		elif key == b'2' :
 
 			# Display the mesh with wireframe rendering
-			self.wireframe_mode = 1
+			self.meshviewer.wireframe_mode = 1
 
 		# 3
 		elif key == b'3' :
 
 			# Display the mesh with hidden line removal rendering
-			self.wireframe_mode = 2
+			self.meshviewer.wireframe_mode = 2
 
 	#
 	# Mouse
@@ -125,13 +125,13 @@ class GlutViewer( MeshViewer ) :
 			if button == glut.GLUT_LEFT_BUTTON :
 
 				# Trackball rotation
-				self.MousePress( [ x, y ], 1 )
+				self.meshviewer.trackball.MousePress( [ x, y ], 1 )
 
 			# Right button
 			elif button == glut.GLUT_RIGHT_BUTTON :
 
 				# Trackball XY translation
-				self.MousePress( [ x, y ], 2 )
+				self.meshviewer.trackball.MousePress( [ x, y ], 2 )
 		
 		# Button up
 		elif state == glut.GLUT_UP :
@@ -140,19 +140,19 @@ class GlutViewer( MeshViewer ) :
 			if button == 3 :
 
 				# Trackball Z translation 
-				self.MouseWheel( 1 )
+				self.meshviewer.trackball.MouseWheel( 1 )
 
 			# Wheel down
 			elif button == 4 :
 				
 				# Trackball Z translation 
-				self.MouseWheel( -1 )
+				self.meshviewer.trackball.MouseWheel( -1 )
 				
 			# Mouse button released
 			else :
 				
 				# Stop motion
-				self.MouseRelease()
+				self.meshviewer.trackball.MouseRelease()
 
 	#
 	# Display
@@ -160,7 +160,7 @@ class GlutViewer( MeshViewer ) :
 	def Display( self ) :
 
 		# Display the mesh
-		super( GlutViewer, self ).Display()
+		self.meshviewer.Display()
 
 		# Swap buffers
 		glut.glutSwapBuffers()

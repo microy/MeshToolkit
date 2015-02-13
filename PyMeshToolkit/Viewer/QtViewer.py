@@ -15,7 +15,7 @@ import PySide as qt
 import PySide.QtCore as qtcore
 import PySide.QtGui as qtgui
 import PySide.QtOpenGL as qtgl
-from PyMeshToolkit.Viewer.MeshViewer import MeshViewer
+import PyMeshToolkit
 from PyMeshToolkit.Core.Repair import Check
 from PyMeshToolkit.File.Ply import ReadPly, WritePly
 
@@ -45,7 +45,7 @@ class QtViewer( qtgui.QApplication ) :
 # Customize the Qt OpenGL widget
 # to get our mesh viewer
 #
-class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
+class QtOpenGLWidget( qtgl.QGLWidget ) :
 
 	#
 	# Initialisation
@@ -66,20 +66,20 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 
 		# Mesh loaded at the initialisation
 		self.mesh = mesh
-		
-		# Antialiasing parameter
-		self.antialiasing = True
 
 	#
 	# initializeGL
 	#
 	def initializeGL( self ) :
 
+		# Create the mesh viewer
+		self.meshviewer = PyMeshToolkit.Viewer.MeshViewer()
+		
 		# OpenGL initialization
-		self.InitialiseOpenGL( self.width(), self.height() )
+		self.meshviewer.InitialiseOpenGL( self.width(), self.height() )
 		
 		# Load the initial mesh
-		if self.mesh : self.LoadMesh( self.mesh )
+		if self.mesh : self.meshviewer.LoadMesh( self.mesh )
 
 	#
 	# paintGL
@@ -87,7 +87,7 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 	def paintGL( self ) :
 
 		# Display the mesh
-		self.Display()
+		self.meshviewer.Display()
 
 	#
 	# resizeGL
@@ -95,7 +95,7 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 	def resizeGL( self, width, height ) :
 
 		# Resize the mesh viewer
-		self.Resize( width, height )
+		self.meshviewer.Resize( width, height )
 
 	#
 	# mousePressEvent
@@ -112,7 +112,7 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 		else : return
 
 		# Update the trackball
-		self.MousePress( [ mouseEvent.x(), mouseEvent.y() ], button )
+		self.meshviewer.trackball.MousePress( [ mouseEvent.x(), mouseEvent.y() ], button )
 
 	#
 	# mouseReleaseEvent
@@ -120,7 +120,7 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 	def mouseReleaseEvent( self, mouseEvent ) :
 
 		# Update the trackball
-		self.MouseRelease()
+		self.meshviewer.trackball.MouseRelease()
 
 	#
 	# mouseMoveEvent
@@ -128,7 +128,7 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 	def mouseMoveEvent( self, mouseEvent ) :
 
 		# Update the trackball
-		if self.MouseMove( mouseEvent.x(), mouseEvent.y() ) :
+		if self.meshviewer.trackball.MouseMove( mouseEvent.x(), mouseEvent.y() ) :
 
 			# Refresh display
 			self.update()
@@ -142,7 +142,7 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 		delta = event.delta()
 
 		# Update the trackball
-		self.MouseWheel( delta and delta // abs(delta) )
+		self.meshviewer.trackball.MouseWheel( delta and delta // abs(delta) )
 
 		# Refresh display
 		self.update()
@@ -162,20 +162,19 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 		elif event.key() == qtcore.Qt.Key_A :
 
 			# Antialiasing
-			self.antialiasing = not self.antialiasing
-			self.SetAntialiasing( self.antialiasing )
+			self.meshviewer.ToggleAntialiasing()
 
 		# F
 		elif event.key() == qtcore.Qt.Key_F :
 
 			# Flat shading
-			self.SetShader( 'FlatShading' )
+			self.meshviewer.SetShader( 'Flat' )
 
 		# G
 		elif event.key() == qtcore.Qt.Key_G :
 
 			# Smooth shading
-			self.SetShader( 'SmoothShading' )
+			self.meshviewer.SetShader( 'Smooth' )
 
 		# I
 		elif event.key() == qtcore.Qt.Key_I :
@@ -187,7 +186,7 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 			print( '  PySide :    {}'.format( qt.__version__ ) )
 
 			# Print OpenGL informations
-			self.PrintOpenGLInfo()
+			self.meshviewer.PrintOpenGLInfo()
 			
 		# O
 		elif event.key() == qtcore.Qt.Key_O :
@@ -203,13 +202,13 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 			self.mesh = ReadPly( filename )
 
 			# Send the mesh to the OpenGL viewer
-			self.LoadMesh( self.mesh )
+			self.meshviewer.LoadMesh( self.mesh )
 
 		# R
 		elif event.key() == qtcore.Qt.Key_R :
 
 			# Reset model translation and rotation
-			self.Reset()
+			self.meshviewer.trackball.Reset()
 
 		# S
 		elif event.key() == qtcore.Qt.Key_S :
@@ -231,7 +230,7 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 		elif event.key() == qtcore.Qt.Key_W :
 
 			# Close the mesh
-			self.Close()
+			self.meshviewer.Close()
 			self.mesh = None
 
 		# X
@@ -247,19 +246,19 @@ class QtOpenGLWidget( MeshViewer, qtgl.QGLWidget ) :
 		elif event.key() == qtcore.Qt.Key_1 :
 
 			# Display the mesh with solid rendering
-			self.wireframe_mode = 0
+			self.meshviewer.wireframe_mode = 0
 
 		# 2
 		elif event.key() == qtcore.Qt.Key_2 :
 
 			# Display the mesh with wireframe rendering
-			self.wireframe_mode = 1
+			self.meshviewer.wireframe_mode = 1
 
 		# 3
 		elif event.key() == qtcore.Qt.Key_3 :
 
 			# Display the mesh with hidden line removal rendering
-			self.wireframe_mode = 2
+			self.meshviewer.wireframe_mode = 2
 			
 		# Unmanaged key
 		else : return

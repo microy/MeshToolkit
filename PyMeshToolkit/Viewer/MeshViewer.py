@@ -12,6 +12,7 @@
 import math
 import numpy as np
 import OpenGL.GL as gl
+import PyMeshToolkit
 from PyMeshToolkit.Viewer.Trackball import Trackball
 from PyMeshToolkit.Viewer.Shader import FlatShader, SmoothShader
 
@@ -19,7 +20,7 @@ from PyMeshToolkit.Viewer.Shader import FlatShader, SmoothShader
 #
 # Display a mesh with OpenGL
 #
-class MeshViewer( Trackball ) :
+class MeshViewer( object ) :
 
 	#
 	# Initialisation of OpenGL
@@ -27,7 +28,8 @@ class MeshViewer( Trackball ) :
 	def InitialiseOpenGL( self, width, height ) :
 
 		# Initialise the trackball
-		Trackball.Initialise( self, width, height )
+		self.trackball = PyMeshToolkit.Viewer.Trackball()
+		self.trackball.Initialise( width, height )
 
 		# Default background color
 		gl.glClearColor( 1, 1, 1, 1 )
@@ -48,6 +50,12 @@ class MeshViewer( Trackball ) :
 		# Initialise the projection transformation matrix
 		self.SetProjectionMatrix( width, height )
 
+		# Initialise Model-View transformation matrix
+		self.modelview_matrix = np.identity( 4, dtype=np.float32 )
+
+		# Position the scene (camera)
+		self.modelview_matrix[3,2] = -30.0
+
 		# Load the shaders
 		self.flat_shader = FlatShader()
 		self.smooth_shader = SmoothShader()
@@ -57,6 +65,7 @@ class MeshViewer( Trackball ) :
 		self.wireframe_mode = 0
 		self.element_number = 0
 		self.color_enabled = False
+		self.antialiasing = True
 
 	#
 	# Load the mesh for display
@@ -121,7 +130,7 @@ class MeshViewer( Trackball ) :
 		self.element_number = len(faces) * 3
 
 		# Reset the trackball
-		Trackball.Reset( self )
+		self.trackball.Reset()
 
 	#
 	# Close the mesh
@@ -150,16 +159,17 @@ class MeshViewer( Trackball ) :
 	def SetShader( self, shader ) :
 
 		# Setup the shader program
-		if shader == 'SmoothShading' : self.shader = self.smooth_shader
-		elif shader == 'FlatShading' : self.shader = self.flat_shader
+		if shader == 'Smooth' : self.shader = self.smooth_shader
+		elif shader == 'Flat' : self.shader = self.flat_shader
 
 	#
 	# Set antialiasing
 	#
-	def SetAntialiasing( self, enabled ) :
+	def ToggleAntialiasing( self ) :
 
 		# Enable / Disable antialiasing
-		if enabled : gl.glEnable( gl.GL_MULTISAMPLE )
+		self.antialiasing = not self.antialiasing
+		if self.antialiasing : gl.glEnable( gl.GL_MULTISAMPLE )
 		else : gl.glDisable( gl.GL_MULTISAMPLE )
 
 	#
@@ -215,18 +225,14 @@ class MeshViewer( Trackball ) :
 		# Use the shader program
 		gl.glUseProgram( self.shader )
 
-		# Initialise Model-View transformation matrix
-		modelview_matrix = np.identity( 4, dtype=np.float32 )
+		# Apply trackball transformation to the initial model-view matrix
+		modelview_matrix = np.dot( self.trackball.transformation, self.modelview_matrix )
 
-		# Position the scene (camera)
-		modelview_matrix[3,2] = -30.0
-
-		# Apply trackball transformation
-		modelview_matrix = np.dot( self.transformation, modelview_matrix )
-
-		# Send the transformation matrices to the shader
+		# Send the transformation matrix to the shader (as the normal matrix for shading)
 		gl.glUniformMatrix3fv( gl.glGetUniformLocation( self.shader, "Normal_Matrix" ),
-			1, gl.GL_FALSE, np.array( self.transformation[ :3, :3 ] ) )
+			1, gl.GL_FALSE, np.array( self.trackball.transformation[ :3, :3 ] ) )
+			
+		# Senf the MVP matrix to the shader
 		gl.glUniformMatrix4fv( gl.glGetUniformLocation( self.shader, "MVP_Matrix" ),
 			1, gl.GL_FALSE, np.dot( modelview_matrix, self.projection_matrix ) )
 
@@ -258,7 +264,7 @@ class MeshViewer( Trackball ) :
 		gl.glViewport( 0, 0, width, height )
 
 		# Resize the trackball
-		Trackball.Resize( self, width, height )
+		self.trackball.Resize( width, height )
 
 		# Compute perspective projection matrix
 		self.SetProjectionMatrix( width, height )
