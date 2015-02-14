@@ -98,7 +98,7 @@ if args.b :
 if args.gc :
 
 	print( 'Compute gaussian curvature... ' )
-	curvature = GetGaussianCurvature( input_mesh )
+	curvature = GetGaussianCurvatureReference( input_mesh )
 	Histogram( curvature )
 	input_mesh.colors = Colormap( args.cm ).ValueArrayToColor( curvature )
 

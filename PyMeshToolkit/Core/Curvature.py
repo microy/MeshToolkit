@@ -29,8 +29,8 @@ import numpy as np
 def GetNormalCurvatureReference( mesh ) :
 
 	# Initialisation
-	normal_curvature = zeros( mesh.vertices.shape )
-#	mixed_area = GetMixedArea( mesh )
+	normal_curvature = np.zeros( mesh.vertices.shape )
+	mixed_area = GetMixedArea( mesh )
 
 	# Loop through the faces
 	for a, b, c in mesh.faces :
@@ -39,9 +39,9 @@ def GetNormalCurvatureReference( mesh ) :
 		va, vb, vc = mesh.vertices[[a, b, c]]
 
 		# Compute cotangent of each angle
-		cota = Cotangent( vb-va, vc-va )
-		cotb = Cotangent( va-vb, vc-vb )
-		cotc = Cotangent( va-vc, vb-vc )
+		cota = Cotangent3( va, vb, vc )
+		cotb = Cotangent3( vb, va, vc )
+		cotc = Cotangent3( vc, va, vb )
 
 		# Add vectors to vertex normal curvature
 		normal_curvature[a] += (va-vc) * cotb + (va-vb) * cotc
@@ -49,11 +49,10 @@ def GetNormalCurvatureReference( mesh ) :
 		normal_curvature[c] += (vc-va) * cotb + (vc-vb) * cota
 
 	# Weight the normal curvature vectors by the mixed area
-#	normal_curvature /= 2.0 * mixed_area.reshape( (len(mesh.vertices),1) )
+	normal_curvature /= 2.0 * mixed_area.reshape( (len(mesh.vertices),1) )
 	
 	# Remove border vertices
-	for i in range(len( mesh.vertices ) ) :
-		if mesh.IsBorderVertex( i ) : normal_curvature[i] = 0.0
+	normal_curvature[ mesh.GetBorderVertices() ] = 0.0
 		
 	# Return the normal curvature vector array
 	return normal_curvature
@@ -65,13 +64,13 @@ def GetNormalCurvatureReference( mesh ) :
 def GetMixedArea( mesh ) :
 
 	# Initialisation
-	mixed_area = zeros( len(mesh.vertices) )
+	mixed_area = np.zeros( len(mesh.vertices) )
 
 	# Create an indexed view of the triangles
-	tris = self.vertices[ self.faces ]
+	tris = mesh.vertices[ mesh.faces ]
 
 	# Compute triangle area
-	face_area = sqrt( (cross( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ) ** 2).sum(axis=1) ) / 2.0
+	face_area = np.sqrt( (np.cross( tris[::,1] - tris[::,0], tris[::,2] - tris[::,0] ) ** 2).sum(axis=1) ) / 2.0
 	
 	# Loop through the faces
 	for a, b, c in mesh.faces :
@@ -80,27 +79,27 @@ def GetMixedArea( mesh ) :
 		va, vb, vc = mesh.vertices[[a, b, c]]
 
 		# Compute cotangent of each angle
-		cota = Cotangent( vb-va, vc-va )
-		cotb = Cotangent( va-vb, vc-vb )
-		cotc = Cotangent( va-vc, vb-vc )
+		cota = Cotangent3( va, vb, vc )
+		cotb = Cotangent3( vb, va, vc )
+		cotc = Cotangent3( vc, va, vb )
 
 		# Compute triangle area
-		face_area = sqrt((cross((vb-va),(vc-va))**2).sum()) / 2.0
+		face_area = np.sqrt((np.cross((vb-va),(vc-va))**2).sum()) / 2.0
 
 		# Obtuse triangle cases (Voronoi inappropriate)
-		if dot( vb-va, vc-va ) <  0 :
+		if np.dot( vb-va, vc-va ) <  0 :
 			
 			mixed_area[a] += face_area / 2.0
 			mixed_area[b] += face_area / 4.0
 			mixed_area[c] += face_area / 4.0
 			
-		elif dot( va-vb, vc-vb ) <  0 :
+		elif np.dot( va-vb, vc-vb ) <  0 :
 			
 			mixed_area[a] += face_area / 4.0
 			mixed_area[b] += face_area / 2.0
 			mixed_area[c] += face_area / 4.0
 			
-		elif dot( va-vc, vb-vc ) <  0 :
+		elif np.dot( va-vc, vb-vc ) <  0 :
 			
 			mixed_area[a] += face_area / 4.0
 			mixed_area[b] += face_area / 4.0
@@ -205,7 +204,7 @@ def GetNormalCurvature( mesh ) :
 #
 # Compute vertex gaussian curvature
 #
-def GetGaussianCurvature( mesh ) :
+def GetGaussianCurvatureReference( mesh ) :
 
 	# Resize gaussian curvature array
 	gaussian_curvature = np.zeros( mesh.vertex_number )
