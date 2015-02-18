@@ -1,5 +1,5 @@
-from .Obj import *
-from .Ply import *
-from .Vrml import *
-from .X3d import *
+from PyMeshToolkit.File.Obj import *
+from PyMeshToolkit.File.Ply import ReadPly, WritePly
+from PyMeshToolkit.File.Vrml import *
+from PyMeshToolkit.File.X3d import *
 

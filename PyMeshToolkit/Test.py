@@ -23,9 +23,12 @@ testmesh = None
 # Test function
 #
 
-def Test( mesh ) :
+def Test( mesh = None ) :
 	
-	GenerateSaddleSurface()
+	mesh = PyMeshToolkit.Tool.Primitive.GenerateSaddleSurface()
+	
+	# Return the newly constructed triangular mesh
+	PyMeshToolkit.File.Ply.WritePly( mesh, 'saddle.ply' )
 
 	#~ global testmesh
 	#~ testmesh = mesh

@@ -68,6 +68,12 @@ elif args.qt :
 	print( 'Launch Qt viewer... ' )
 	QtViewer()
 	
+# Launch standalone Test
+elif args.t :
+
+	print( 'Test... ' )
+	Test()
+
 # No input file
 else :
 	
@@ -123,7 +129,7 @@ if args.ncf :
 	NormalizedCurvatureFlowSmoothing( input_mesh, int( args.ncf[0] ), float( args.ncf[1] ) )
 
 # Test
-if args.t :
+if args.t and args.input_mesh :
 
 	print( 'Test... ' )
 	Test( input_mesh )

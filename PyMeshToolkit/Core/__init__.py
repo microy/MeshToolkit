@@ -1,7 +1,5 @@
-from .Colormap import *
-from .Curvature import *
-from .Mesh import *
-from .Repair import *
-from .Smoothing import *
-from .Test import *
+from PyMeshToolkit.Core.Curvature import *
+from PyMeshToolkit.Core.Mesh import *
+from PyMeshToolkit.Core.Repair import *
+from PyMeshToolkit.Core.Smoothing import *
 

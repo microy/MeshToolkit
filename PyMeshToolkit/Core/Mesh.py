@@ -237,3 +237,97 @@ class Mesh( object ) :
 
 		# Return result
 		return ( center, radius )
+
+	#
+	# Create a mesh from a regular grid
+	#
+	def CreateFromGrid( self, X, Y, Z ) :
+		
+		# Import the vertices
+	#	X, Y = np.meshgrid( surface['X'], surface['Y'] )
+		self.vertices = np.array( (X.flatten(), Y.flatten(), Z.flatten()) ).T
+		
+		# Get the size of the grid
+		nb_lines = len( X )
+		nb_cols = len( Y )
+		
+		#
+		# Optimized implementation
+		#
+
+		# Array of vertex indices
+		vindex = np.array( range( nb_lines * nb_cols ) ).reshape( nb_lines, nb_cols )
+		
+		# Find the diagonal that minimizes the Z difference
+		left_diagonal = np.absolute( Z[1:,1:] - Z[:-1,:-1] ) > np.absolute( Z[1:,:-1] - Z[:-1,1:] )
+		
+		# Flatten the array
+		left_diagonal = left_diagonal.flatten()
+		
+		# Double the values (1 square -> 2 triangles)
+		left_diagonal = np.dstack( (left_diagonal, left_diagonal) ).flatten()
+
+		#
+		# Right diagonal
+		#
+		
+		# Initialize the face array
+		self.faces = np.empty( ( 2 * (nb_lines - 1) * (nb_cols - 1), 3 ), dtype=np.int )
+
+		# Create lower triangle faces
+		self.faces[ ::2, 0 ] = vindex[:nb_lines - 1, :nb_cols - 1].flatten()
+		self.faces[ ::2, 1 ] = vindex[:nb_lines - 1, 1:nb_cols].flatten()
+		self.faces[ ::2, 2 ] = vindex[1:nb_lines, 1:nb_cols].flatten()
+
+		# Create upper triangle faces
+		self.faces[ 1::2, 0 ] = vindex[:nb_lines - 1, :nb_cols - 1].flatten()
+		self.faces[ 1::2, 1 ] = vindex[1:nb_lines, 1:nb_cols].flatten()
+		self.faces[ 1::2, 2 ] = vindex[1:nb_lines, :nb_cols - 1].flatten()
+
+		#
+		# Left diagonal
+		#
+		
+		# Initialize the face array
+		left_faces = np.empty( ( 2 * (nb_lines - 1) * (nb_cols - 1), 3 ), dtype=np.int )
+
+		# Create lower triangle faces
+		left_faces[ ::2, 0 ] = vindex[:nb_lines - 1, :nb_cols - 1].flatten()
+		left_faces[ ::2, 1 ] = vindex[:nb_lines - 1, 1:nb_cols].flatten()
+		left_faces[ ::2, 2 ] = vindex[1:nb_lines, :nb_cols - 1].flatten()
+
+		# Create upper triangle faces
+		left_faces[ 1::2, 0 ] = vindex[:nb_lines - 1, 1:nb_cols].flatten()
+		left_faces[ 1::2, 1 ] = vindex[1:nb_lines, 1:nb_cols].flatten()
+		left_faces[ 1::2, 2 ] = vindex[1:nb_lines, :nb_cols - 1].flatten()
+
+		#
+		# Merge right and left diagonal faces
+		#
+		self.faces[ left_diagonal ] = left_faces[ left_diagonal ]
+		
+		#
+		# Default implementation
+		#
+
+		# Find the diagonal that minimizes the Z difference
+	#	left_diagonal = np.absolute( Z[1:,1:] - Z[:-1,:-1] ) > np.absolute( Z[1:,:-1] - Z[:-1,1:] )
+
+		# Create the faces
+	#	faces = []
+	#	for j in range( nb_lines - 1 ) :
+	#		for i in range( nb_cols - 1 ) :
+	#			if left_diagonal[j,i] :
+	#				face1 = [j*nb_cols+i, j*nb_cols+i+1, (j+1)*nb_cols+i]
+	#				face2 = [j*nb_cols+i+1, (j+1)*nb_cols+i+1, (j+1)*nb_cols+i]
+	#			else :
+	#				face1 = [j*nb_cols+i, j*nb_cols+i+1, (j+1)*nb_cols+i+1]
+	#				face2 = [j*nb_cols+i, (j+1)*nb_cols+i+1, (j+1)*nb_cols+i]
+	#			faces.append( face1 )
+	#			faces.append( face2 )
+
+		# Compute the normal vectors
+		self.UpdateNormals()
+		
+		# Return the newly create mesh
+		return self
