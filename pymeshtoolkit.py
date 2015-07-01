@@ -105,7 +105,7 @@ if args.gc :
 
 	print( 'Compute gaussian curvature... ' )
 	curvature = GetGaussianCurvatureReference( input_mesh )
-	Histogram( curvature )
+#	Histogram( curvature )
 	input_mesh.colors = Colormap( args.cm ).ValueArrayToColor( curvature )
 
 # Compute normal curvature
@@ -113,7 +113,7 @@ if args.nc :
 
 	print( 'Compute normal curvature... ' )
 	curvature = GetNormalCurvature( input_mesh )
-	Histogram( np.sqrt( (curvature**2).sum(axis=1) ) )
+#	Histogram( np.sqrt( (curvature**2).sum(axis=1) ) )
 	input_mesh.colors = Colormap( args.cm ).VectorArrayToColor( curvature )
 
 # Apply uniform laplacian smoothing
