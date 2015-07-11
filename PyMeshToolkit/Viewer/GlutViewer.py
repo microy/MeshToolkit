@@ -25,14 +25,14 @@ class GlutViewer( object ) :
 	#
 	# Initialisation
 	#
-	def __init__( self, mesh, title='GlutViewer', width=1024, height=768 ) :
+	def __init__( self, mesh, width=1024, height=768 ) :
 
 		# Initialise OpenGL / GLUT
 		glut.glutInit()
 		glut.glutInitDisplayMode( glut.GLUT_DOUBLE | glut.GLUT_RGBA | glut.GLUT_DEPTH | glut.GLUT_MULTISAMPLE )
 		glut.glutInitWindowSize( width, height )
 		glut.glutInitWindowPosition( 100, 100 )
-		glut.glutCreateWindow( title )
+		glut.glutCreateWindow( mesh.name )
 
 		# Mesh viewer
 		self.meshviewer = PyMeshToolkit.Viewer.MeshViewer()
