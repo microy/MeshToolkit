@@ -8,6 +8,7 @@
 #	done
 #done
 
-for scale in 1 2 4 8; do
-		./pymeshtoolkit.py -glut "scale/pa-x$scale-nc.ply" &
+for scale in 1 2 3 4 5 6 7 8 9 10; do
+		./pymeshtoolkit.py -glut "scale/pa-x$scale.ply"
+		./pymeshtoolkit.py -glut "scale/pa-x$scale-nc.ply"
 done
