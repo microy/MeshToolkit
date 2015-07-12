@@ -58,9 +58,6 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 		# Track mouse events
 		self.setMouseTracking( True )
 		
-		# Set the window title
-		self.setWindowTitle( 'QtViewer' )
-		
 		# Change the widget position and size
 		self.setGeometry( 100, 100, 1024, 768 )
 
@@ -78,8 +75,14 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 		# OpenGL initialization
 		self.meshviewer.InitialiseOpenGL( self.width(), self.height() )
 		
-		# Load the initial mesh
-		if self.mesh : self.meshviewer.LoadMesh( self.mesh )
+		# Mesh during initialization ?
+		if self.mesh :
+			
+			# Load the mesh
+			self.meshviewer.LoadMesh( self.mesh )
+			
+			# Set the window title
+			self.setWindowTitle( self.mesh.name )
 
 	#
 	# paintGL
@@ -203,6 +206,9 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 
 			# Send the mesh to the OpenGL viewer
 			self.meshviewer.LoadMesh( self.mesh )
+			
+			# Set the window title
+			self.setWindowTitle( self.mesh.name )
 
 		# R
 		elif event.key() == qtcore.Qt.Key_R :
@@ -232,6 +238,9 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 			# Close the mesh
 			self.meshviewer.Close()
 			self.mesh = None
+
+			# Set the window title
+			self.setWindowTitle( '' )
 
 		# X
 		elif event.key() == qtcore.Qt.Key_X :
