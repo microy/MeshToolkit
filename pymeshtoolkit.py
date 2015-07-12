@@ -85,7 +85,6 @@ else :
 # Print mesh informations
 if args.i :
 
-	print( 'Mesh informations...' )
 	print( input_mesh )
 
 # Check some mesh parameters

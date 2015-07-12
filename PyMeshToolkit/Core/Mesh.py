@@ -53,7 +53,8 @@ class Mesh( object ) :
 	#
 	def __str__( self ) :
 		
-		info   = '  Name :               {}\n'.format( self.name )
+		info   = 'Mesh Informations...\n'
+		info  += '  Name :               {}\n'.format( self.name )
 		info  += '  Vertices :           {}\n'.format( self.vertex_number )
 		info  += '  Faces :              {}'.format( self.face_number )
 		if len(self.colors) :
