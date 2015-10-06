@@ -38,7 +38,7 @@ class QtViewer( qtgui.QApplication ) :
 		self.qtopenglwidget.show()
 		
 		# Enter Qt main loop
-		self.exec_()
+		sys.exit( self.exec_() )
 
 
 #
@@ -159,7 +159,7 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 		if event.key() == qtcore.Qt.Key_Escape :
 			
 			# Exit
-			sys.exit()
+			self.close()
 			
 		# A
 		elif event.key() == qtcore.Qt.Key_A :
