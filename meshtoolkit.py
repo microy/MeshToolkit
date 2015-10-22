@@ -3,7 +3,7 @@
 
 
 #
-# Application to demonstrate the use of the PyMeshToolkit library
+# Application to demonstrate the use of the MeshToolkit library
 #
 
 
@@ -13,7 +13,7 @@
 import argparse
 import sys
 import numpy as np
-from PyMeshToolkit import *
+from MeshToolkit import *
 
 
 # Initialisation

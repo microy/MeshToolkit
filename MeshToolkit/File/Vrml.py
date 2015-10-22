@@ -10,7 +10,7 @@
 # External dependencies
 #
 import os
-import PyMeshToolkit
+import MeshToolkit
 
 
 #
@@ -247,7 +247,7 @@ def ReadVrml( filename ) :
 	if (normal_binding != 'PER_VERTEX') or (len(normals) != len(vertices)) : normals=[]
 
 	# Return the final mesh
-	return PyMeshToolkit.Core.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, material, texcoords, [], normals )
+	return MeshToolkit.Core.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, material, texcoords, [], normals )
 
 
 #

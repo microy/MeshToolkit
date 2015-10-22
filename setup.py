@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*- 
 
 #
-# Setup for the PyMeshToolkit package
+# Setup for the MeshToolkit package
 #
 
 # External dependencies
@@ -11,14 +11,14 @@ from setuptools import setup
 # Setup configuration
 setup(
 
-    name = "PyMeshToolkit",
-    version = "0.1",
-    packages = ['PyMeshToolkit'],
-    scripts = ['pymeshtoolkit.py'],
+    name = "MeshToolkit",
+    version = "0.2",
+    packages = ['MeshToolkit'],
+    scripts = ['meshtoolkit.py'],
     author = "Michaël Roy",
     author_email = "microygh@gmail.com",
     description = "Python 3D Mesh Toolkit",
     license = "MIT",
-    url = "https://github.com/microy/PyMeshToolkit"
+    url = "https://github.com/microy/MeshToolkit"
 
 )

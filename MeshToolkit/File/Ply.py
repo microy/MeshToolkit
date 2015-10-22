@@ -19,7 +19,7 @@ import os
 import re
 import struct as st
 import numpy as np
-import PyMeshToolkit
+import MeshToolkit
 
 
 #
@@ -265,7 +265,7 @@ def ReadPly( filename ) :
 	faces = np.array( data[ b'face' ] )[ :, 0 ]
 	
 	# Return the resulting mesh from the PLY file data
-	return PyMeshToolkit.Core.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, '', textures, [], normals )
+	return MeshToolkit.Core.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, '', textures, [], normals )
 
 
 #

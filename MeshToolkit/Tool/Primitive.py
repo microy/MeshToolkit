@@ -9,7 +9,7 @@
 # External dependencies
 #
 import numpy as np
-import PyMeshToolkit
+import MeshToolkit
 
 
 #
@@ -24,4 +24,4 @@ def GenerateSaddleSurface( xsize = 200, ysize = 200 ) :
 	Z = ( X ** 2 - Y ** 2 ) * 0.5
 	
 	# Return a triangular mesh from the grid above
-	return PyMeshToolkit.Core.Mesh( 'Saddle' ).CreateFromGrid( X, Y, Z )
+	return MeshToolkit.Core.Mesh( 'Saddle' ).CreateFromGrid( X, Y, Z )

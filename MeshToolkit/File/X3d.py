@@ -11,7 +11,7 @@
 #
 from xml.etree.ElementTree import parse
 import numpy as np
-import PyMeshToolkit
+import MeshToolkit
 
 #
 # Import a triangular mesh from a X3D file
@@ -33,7 +33,7 @@ def ReadX3d( filename ) :
 		vertices = np.fromstring( vertex.get( 'point' ), sep=' ' ).reshape( -1, 3 )
 		
 	# Return the final mesh
-	return PyMeshToolkit.Core.Mesh( name=filename, vertices=vertices, faces=faces )
+	return MeshToolkit.Core.Mesh( name=filename, vertices=vertices, faces=faces )
 
 
 #

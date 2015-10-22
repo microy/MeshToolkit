@@ -11,8 +11,8 @@
 import timeit
 import numpy as np
 from numpy import allclose, invert, copy
-import PyMeshToolkit
-from PyMeshToolkit import *
+import MeshToolkit
+from MeshToolkit import *
 
 
 # Global variables
@@ -25,30 +25,30 @@ testmesh = None
 
 def Test( mesh = None ) :
 	
-	mesh = PyMeshToolkit.Tool.Primitive.GenerateSaddleSurface()
+	mesh = MeshToolkit.Tool.Primitive.GenerateSaddleSurface()
 	
 	# Return the newly constructed triangular mesh
-	PyMeshToolkit.File.Ply.WritePly( mesh, 'saddle.ply' )
+	MeshToolkit.File.Ply.WritePly( mesh, 'saddle.ply' )
 
 	#~ global testmesh
 	#~ testmesh = mesh
 	#~ 
 	#~ r1 = Test1()
 	#~ r2 = Test2()
-	#~ print( "Test 1 : {}".format( timeit.timeit("Test1()", setup="from PyMeshToolkit.Core.Test import Test1", number=1) ) )
-	#~ print( "Test 2 : {}".format( timeit.timeit("Test2()", setup="from PyMeshToolkit.Core.Test import Test2", number=1) ) )
+	#~ print( "Test 1 : {}".format( timeit.timeit("Test1()", setup="from MeshToolkit.Core.Test import Test1", number=1) ) )
+	#~ print( "Test 2 : {}".format( timeit.timeit("Test2()", setup="from MeshToolkit.Core.Test import Test2", number=1) ) )
 	#~ print( allclose( r1, r2 ) )
 
 	
 def Test1() :
 
-	return PyMeshToolkit.Core.GetNormalCurvature( testmesh )
+	return MeshToolkit.Core.GetNormalCurvature( testmesh )
 	
 	
 
 def Test2() :
 
-	return PyMeshToolkit.Core.GetNormalCurvatureReference( testmesh )
+	return MeshToolkit.Core.GetNormalCurvatureReference( testmesh )
 	
 
 def GenerateSaddleSurface( xsize = 200, ysize = 200 ) :
@@ -76,7 +76,7 @@ def GenerateSaddleSurface( xsize = 200, ysize = 200 ) :
 			faces.append( face1 )
 			faces.append( face2 )
 			
-	mesh = PyMeshToolkit.Core.Mesh( 'Saddle', vertices, faces )
+	mesh = MeshToolkit.Core.Mesh( 'Saddle', vertices, faces )
 
 	# Return the newly constructed triangular mesh
-	PyMeshToolkit.File.Ply.WritePly( mesh, 'saddle.ply' )
+	MeshToolkit.File.Ply.WritePly( mesh, 'saddle.ply' )

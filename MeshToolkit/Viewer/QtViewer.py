@@ -15,9 +15,9 @@ import PySide as qt
 import PySide.QtCore as qtcore
 import PySide.QtGui as qtgui
 import PySide.QtOpenGL as qtgl
-import PyMeshToolkit
-from PyMeshToolkit.Core.Repair import Check
-from PyMeshToolkit.File.Ply import ReadPly, WritePly
+import MeshToolkit
+from MeshToolkit.Core.Repair import Check
+from MeshToolkit.File.Ply import ReadPly, WritePly
 
 
 #
@@ -70,7 +70,7 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 	def initializeGL( self ) :
 
 		# Create the mesh viewer
-		self.meshviewer = PyMeshToolkit.Viewer.MeshViewer()
+		self.meshviewer = MeshToolkit.Viewer.MeshViewer()
 		
 		# OpenGL initialization
 		self.meshviewer.InitialiseOpenGL( self.width(), self.height() )

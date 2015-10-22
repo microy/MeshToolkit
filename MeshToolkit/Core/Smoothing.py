@@ -10,7 +10,7 @@
 # External dependencies
 #
 import numpy as np
-from PyMeshToolkit.Core.Curvature import Cotangent
+from MeshToolkit.Core.Curvature import Cotangent
 
 
 #

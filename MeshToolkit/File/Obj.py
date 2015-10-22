@@ -11,7 +11,7 @@
 #
 import os
 import numpy as np
-import PyMeshToolkit
+import MeshToolkit
 
 
 #
@@ -64,5 +64,5 @@ def ReadObj( filename ) :
 	faces = np.array( faces ) - 1
 
 	# Return the final mesh
-	return PyMeshToolkit.Core.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, material, texcoords, [], normals )
+	return MeshToolkit.Core.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, material, texcoords, [], normals )
 

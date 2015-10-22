@@ -12,9 +12,9 @@
 import math
 import numpy as np
 import OpenGL.GL as gl
-import PyMeshToolkit
-from PyMeshToolkit.Viewer.Trackball import Trackball
-from PyMeshToolkit.Viewer.Shader import FlatShader, SmoothShader
+import MeshToolkit
+from MeshToolkit.Viewer.Trackball import Trackball
+from MeshToolkit.Viewer.Shader import FlatShader, SmoothShader
 
 
 #
@@ -28,7 +28,7 @@ class MeshViewer( object ) :
 	def InitialiseOpenGL( self, width, height ) :
 
 		# Initialise the trackball
-		self.trackball = PyMeshToolkit.Viewer.Trackball()
+		self.trackball = MeshToolkit.Viewer.Trackball()
 		self.trackball.Initialise( width, height )
 
 		# Default background color
