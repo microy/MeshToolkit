@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 
 #
@@ -13,7 +13,7 @@
 import argparse
 import sys
 import numpy as np
-from MeshToolkit import *
+import MeshToolkit as mtk
 
 
 # Initialisation
@@ -43,7 +43,7 @@ if args.input_mesh :
 
 	# Read the input mesh file
 	print( 'Read file ' + args.input_mesh + '... ' )
-	input_mesh = ReadPly( args.input_mesh )
+	input_mesh = mtk.ReadPly( args.input_mesh )
 
 	# Compute surface normals
 	print( 'Compute normals... ' )
@@ -52,22 +52,22 @@ if args.input_mesh :
 	# Register neighborhood informations
 	print( 'Register neighbors... ' )
 	input_mesh.UpdateNeighbors()
-	
+
 # Launch standalone QtViewer
 elif args.qt :
 
 	print( 'Launch Qt viewer... ' )
-	QtViewer()
-	
+	mtk.QtViewer()
+
 # Launch standalone Test
 elif args.t :
 
 	print( 'Test... ' )
-	Test()
+	mtk.Test()
 
 # No input file
 else :
-	
+
 	# Print help message
 	print( '\nNo input mesh file given...\n' )
 	parser.print_help()
@@ -82,63 +82,63 @@ if args.i :
 if args.c :
 
 	print( 'Check mesh... ' )
-	print( Check( input_mesh ) )
+	print( mtk.Check( input_mesh ) )
 
 # Color vertices on a border
 if args.b :
 
 	print( 'Color border vertices... ' )
-	input_mesh.colors = Colormap( args.cm ).ValueArrayToColor( GetBorderVertices( input_mesh ) )
+	input_mesh.colors = mtk.Colormap( args.cm ).ValueArrayToColor( input_mesh.GetBorderVertices() )
 
 # Compute gaussian curvature
 if args.gc :
 
 	print( 'Compute gaussian curvature... ' )
-	curvature = GetGaussianCurvatureReference( input_mesh )
-	Histogram( curvature )
-	input_mesh.colors = Colormap( args.cm ).ValueArrayToColor( curvature )
+	curvature = mtk.GetGaussianCurvatureReference( input_mesh )
+	mtk.Histogram( curvature )
+	input_mesh.colors = mtk.Colormap( args.cm ).ValueArrayToColor( curvature )
 
 # Compute normal curvature
 if args.nc :
 
 	print( 'Compute normal curvature... ' )
-	curvature = GetNormalCurvature( input_mesh )
-	Statistics( np.sqrt( (curvature**2).sum(axis=1) ) )
-	Histogram( np.sqrt( (curvature**2).sum(axis=1) ) )
-	input_mesh.colors = Colormap( args.cm ).VectorArrayToColor( curvature )
+	curvature = mtk.GetNormalCurvature( input_mesh )
+	mtk.Statistics( np.sqrt( (curvature**2).sum(axis=1) ) )
+	mtk.Histogram( np.sqrt( (curvature**2).sum(axis=1) ) )
+	input_mesh.colors = mtk.Colormap( args.cm ).VectorArrayToColor( curvature )
 
 # Apply uniform laplacian smoothing
 if args.ul :
-	
+
 	print( 'Uniform laplacian smoothing... ' )
-	UniformLaplacianSmoothing( input_mesh, int( args.ul[0] ), float( args.ul[1] ) )
+	mtk.UniformLaplacianSmoothing( input_mesh, int( args.ul[0] ), float( args.ul[1] ) )
 
 # Apply normalized curvature flow smoothing
 if args.ncf :
-	
+
 	print( 'Normalized curvature flow smoothing... ' )
-	NormalizedCurvatureFlowSmoothing( input_mesh, int( args.ncf[0] ), float( args.ncf[1] ) )
+	mtk.NormalizedCurvatureFlowSmoothing( input_mesh, int( args.ncf[0] ), float( args.ncf[1] ) )
 
 # Test
 if args.t and args.input_mesh :
 
 	print( 'Test... ' )
-	Test( input_mesh )
+	mtk.Test( input_mesh )
 
 # Write resulting mesh
 if args.o :
 
 	print( 'Write file ' + args.o + '... ' )
-	WritePly( input_mesh, args.o )
+	mtk.WritePly( input_mesh, args.o )
 
 # Launch GlutViewer
 if args.glut :
 
 	print( 'Launch GLUT viewer... ' )
-	GlutViewer( input_mesh ).Run()
+	mtk.GlutViewer( input_mesh ).Run()
 
 # Launch QtViewer
 if args.qt :
 
 	print( 'Launch Qt viewer... ' )
-	QtViewer( mesh=input_mesh )
+	mtk.QtViewer( mesh=input_mesh )
