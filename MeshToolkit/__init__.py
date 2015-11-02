@@ -1,5 +1,11 @@
-from MeshToolkit.Core import *
-from MeshToolkit.File import *
-from MeshToolkit.Tool import *
-from MeshToolkit.Viewer import *
-from MeshToolkit.Test import *
+from . import Core
+from .Core import *
+from . import File
+from .File import *
+from . import Tool
+from .Tool import *
+from . import Viewer
+from .Viewer import *
+from . import Test
+from .Test import *
+

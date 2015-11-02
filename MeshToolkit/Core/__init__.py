@@ -1,5 +1,8 @@
-from MeshToolkit.Core.Curvature import *
-from MeshToolkit.Core.Mesh import *
-from MeshToolkit.Core.Repair import *
-from MeshToolkit.Core.Smoothing import *
-
+from . import Curvature
+from .Curvature import *
+from . import Mesh
+from .Mesh import *
+from . import Repair
+from .Repair import *
+from . import Smoothing
+from .Smoothing import *

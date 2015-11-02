@@ -1,5 +1,8 @@
-from MeshToolkit.File.Obj import *
-from MeshToolkit.File.Ply import ReadPly, WritePly
-from MeshToolkit.File.Vrml import *
-from MeshToolkit.File.X3d import *
-
+from . import Obj
+from .Obj import *
+from . import Ply
+from .Ply import *
+from . import Vrml
+from .Vrml import *
+from . import X3d
+from .X3d import *
