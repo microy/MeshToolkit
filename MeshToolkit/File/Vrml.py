@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 
 #
@@ -10,7 +10,7 @@
 # External dependencies
 #
 import os
-import MeshToolkit
+import MeshToolkit as mtk
 
 
 #
@@ -43,7 +43,7 @@ def ReadVrml( filename ) :
 	# Check the header
 	header = vrmlfile.readline().split()
 	if header[0] not in [ '#VRML', '#X3D', '#Inventor' ] :
-		
+
 		# Unknown file header
 		vrmlfile.close()
 		raise RuntimeError( 'Wrong file format !' )
@@ -124,7 +124,7 @@ def ReadVrml( filename ) :
 
 					# Complete coordinate ?
 					if ixyz == 1 :
-						texcoords.append( vec2d[:] ) 
+						texcoords.append( vec2d[:] )
 						ixyz = 0
 					else :
 						ixyz += 1
@@ -235,7 +235,7 @@ def ReadVrml( filename ) :
 			elif nodes[level] == 'NormalBinding' :
 				if previous_word == 'value' :
 					normal_binding = word
-			
+
 			# Save current word
 			previous_word = word
 
@@ -247,7 +247,7 @@ def ReadVrml( filename ) :
 	if (normal_binding != 'PER_VERTEX') or (len(normals) != len(vertices)) : normals=[]
 
 	# Return the final mesh
-	return MeshToolkit.Core.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, material, texcoords, [], normals )
+	return mtk.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, material, texcoords, [], normals )
 
 
 #
@@ -344,6 +344,3 @@ def WriteVrml( mesh, filename ) :
 
 	# Close the file
 	vrmlfile.close()
-
-
-

@@ -14,9 +14,7 @@ import PySide as qt
 import PySide.QtCore as qtcore
 import PySide.QtGui as qtgui
 import PySide.QtOpenGL as qtgl
-import MeshToolkit
-from MeshToolkit.Core.Repair import Check
-from MeshToolkit.File.Ply import ReadPly, WritePly
+import MeshToolkit as mtk
 
 
 #
@@ -69,7 +67,7 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 	def initializeGL( self ) :
 
 		# Create the mesh viewer
-		self.meshviewer = MeshToolkit.Viewer.MeshViewer()
+		self.meshviewer = mtk.MeshViewer()
 
 		# OpenGL initialization
 		self.meshviewer.InitialiseOpenGL( self.width(), self.height() )
@@ -189,7 +187,7 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 			if not filename : return
 
 			# Read PLY file
-			self.mesh = ReadPly( filename )
+			self.mesh = mtk.ReadPly( filename )
 
 			# Send the mesh to the OpenGL viewer
 			self.meshviewer.LoadMesh( self.mesh )
@@ -217,7 +215,7 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 			if not filename : return
 
 			# Save PLY file
-			WritePly( self.mesh, filename )
+			mtk.WritePly( self.mesh, filename )
 
 		# W
 		elif event.key() == qtcore.Qt.Key_W :
@@ -236,7 +234,7 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 			if not self.mesh : return
 
 			# Check different parameters of the mesh
-			Check( self.mesh )
+			mtk.Check( self.mesh )
 
 		# 1
 		elif event.key() == qtcore.Qt.Key_1 :

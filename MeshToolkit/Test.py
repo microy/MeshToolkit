@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 #
 # Test playground
@@ -11,8 +11,7 @@
 import timeit
 import numpy as np
 from numpy import allclose, invert, copy
-import MeshToolkit
-from MeshToolkit import *
+import MeshToolkit as mtk
 
 
 # Global variables
@@ -24,42 +23,44 @@ testmesh = None
 #
 
 def Test( mesh = None ) :
-	
-	mesh = MeshToolkit.Tool.Primitive.GenerateSaddleSurface()
-	
+
+	mesh = mtk.GenerateSaddleSurface()
+
+	print( mesh )
+
 	# Return the newly constructed triangular mesh
-	MeshToolkit.File.Ply.WritePly( mesh, 'saddle.ply' )
+	mtk.WritePly( mesh, 'saddle.ply' )
 
 	#~ global testmesh
 	#~ testmesh = mesh
-	#~ 
+	#~
 	#~ r1 = Test1()
 	#~ r2 = Test2()
 	#~ print( "Test 1 : {}".format( timeit.timeit("Test1()", setup="from MeshToolkit.Core.Test import Test1", number=1) ) )
 	#~ print( "Test 2 : {}".format( timeit.timeit("Test2()", setup="from MeshToolkit.Core.Test import Test2", number=1) ) )
 	#~ print( allclose( r1, r2 ) )
 
-	
+
 def Test1() :
 
-	return MeshToolkit.Core.GetNormalCurvature( testmesh )
-	
-	
+	return mtk.GetNormalCurvature( testmesh )
+
+
 
 def Test2() :
 
-	return MeshToolkit.Core.GetNormalCurvatureReference( testmesh )
-	
+	return mtk.GetNormalCurvatureReference( testmesh )
 
-def GenerateSaddleSurface( xsize = 200, ysize = 200 ) :
-	
+
+def TestGenerateSaddleSurface( xsize = 200, ysize = 200 ) :
+
 	# Compute vertex coordinates
 	X, Y = np.meshgrid( np.linspace( -2, 2, xsize ), np.linspace( -2, 2, ysize ) )
 	Z = ( X ** 2 - Y ** 2 ) * 0.5
-	
+
 	# Create the vertex array
 	vertices = np.array( (X.flatten(), Y.flatten(), Z.flatten()) ).T
-	
+
 	# Find the diagonal that minimizes the Z difference
 	right_diagonal = np.absolute( Z[1:,1:] - Z[:-1,:-1] ) < np.absolute( Z[1:,:-1] - Z[:-1,1:] )
 
@@ -75,8 +76,8 @@ def GenerateSaddleSurface( xsize = 200, ysize = 200 ) :
 				face2 = np.array( [j*xsize+i+1, (j+1)*xsize+i+1, (j+1)*xsize+i] )
 			faces.append( face1 )
 			faces.append( face2 )
-			
-	mesh = MeshToolkit.Core.Mesh( 'Saddle', vertices, faces )
+
+	mesh = mtk.Mesh( 'Saddle', vertices, faces )
 
 	# Return the newly constructed triangular mesh
-	MeshToolkit.File.Ply.WritePly( mesh, 'saddle.ply' )
+	mtk.WritePly( mesh, 'saddle.ply' )

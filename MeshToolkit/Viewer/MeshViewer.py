@@ -12,9 +12,7 @@
 import math
 import numpy as np
 import OpenGL.GL as gl
-import MeshToolkit
-from MeshToolkit.Viewer.Trackball import Trackball
-from MeshToolkit.Viewer.Shader import FlatShader, SmoothShader
+import MeshToolkit as mtk
 
 
 #
@@ -28,7 +26,7 @@ class MeshViewer( object ) :
 	def InitialiseOpenGL( self, width, height ) :
 
 		# Initialise the trackball
-		self.trackball = MeshToolkit.Viewer.Trackball()
+		self.trackball = mtk.Trackball()
 		self.trackball.Initialise( width, height )
 
 		# Default background color
@@ -57,8 +55,8 @@ class MeshViewer( object ) :
 		self.modelview_matrix[3,2] = -30.0
 
 		# Load the shaders
-		self.flat_shader = FlatShader()
-		self.smooth_shader = SmoothShader()
+		self.flat_shader = mtk.FlatShader()
+		self.smooth_shader = mtk.SmoothShader()
 		self.shader = self.smooth_shader
 
 		# Initialise viewing parameters

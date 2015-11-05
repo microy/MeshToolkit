@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 
 #
@@ -11,7 +11,7 @@
 #
 import os
 import numpy as np
-import MeshToolkit
+import MeshToolkit as mtk
 
 
 #
@@ -26,10 +26,10 @@ def ReadObj( filename ) :
 	colors = []
 	texcoords = []
 	material = ""
-	
+
 	# Read each line in the file
 	for line in open( filename, "r" ) :
-		
+
 		# Empty line / Comment
 		if line.isspace() or line.startswith( '#' ) : continue
 
@@ -59,10 +59,9 @@ def ReadObj( filename ) :
 		# Texture filename
 		elif values[0] == 'mtllib' :
 			material = values[1]
-		
+
 	# Remap face indices
 	faces = np.array( faces ) - 1
 
 	# Return the final mesh
-	return MeshToolkit.Core.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, material, texcoords, [], normals )
-
+	return mtk.Mesh( os.path.splitext(os.path.basename(filename))[0], vertices, faces, colors, material, texcoords, [], normals )

@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 
 #
@@ -10,7 +10,7 @@
 # External dependencies
 #
 import numpy as np
-from MeshToolkit.Core.Curvature import Cotangent
+import MeshToolkit as mtk
 
 
 #
@@ -21,10 +21,10 @@ from MeshToolkit.Core.Curvature import Cotangent
 #   ...
 #
 def UniformLaplacianSmoothing( mesh, iteration, diffusion ) :
-	
+
 	# Convert neighbor list to numpy array for fancy indexing
 	neighbors =  [ np.array(list(v)) for v in mesh.neighbor_vertices ]
-	
+
 	# Get neighbor vertex number
 	neighbor_number = np.array( [ len(i) for i in neighbors ] ).reshape(-1,1)
 
@@ -33,16 +33,16 @@ def UniformLaplacianSmoothing( mesh, iteration, diffusion ) :
 
 	# Iteration steps
 	for i in range( iteration ) :
-		
+
 		# Compute average position of neighbor vertices
 		displacement  = [ (mesh.vertices[neighbors[v]]).sum(axis=0) for v in range( len(mesh.vertices) ) ] / neighbor_number
-		
+
 		# Get the difference with the original center vertex
 		displacement -= mesh.vertices
-		
+
 		# Don't change border vertices
 		displacement[ border ] = 0
-		
+
 		# Update vertex position
 		mesh.vertices += diffusion * displacement
 
@@ -57,13 +57,13 @@ def UniformLaplacianSmoothing( mesh, iteration, diffusion ) :
 #     Proceedings of SIGGRAPH '99
 #
 def NormalizedCurvatureFlowSmoothing( mesh, iteration, diffusion ) :
-	
+
 	# Get border vertices
 	border = mesh.GetBorderVertices()
 
 	# Iteration steps
 	for i in range( iteration ) :
-		
+
 		# Create an indexed view of the triangles
 		tris = mesh.vertices[ mesh.faces ]
 
@@ -73,7 +73,7 @@ def NormalizedCurvatureFlowSmoothing( mesh, iteration, diffusion ) :
 		w = tris[::,0] - tris[::,2]
 
 		# Compute the cotangent of the triangle angles
-		cotangent = np.array( [ Cotangent( u, -w ), Cotangent( v, -u ), Cotangent( w, -v ) ] ).T
+		cotangent = np.array( [ mtk.Cotangent( u, -w ), mtk.Cotangent( v, -u ), mtk.Cotangent( w, -v ) ] ).T
 
 		# Compute the voronoi area of the vertices in each face
 		vertex_weight = np.array( [ cotangent[::,2] + cotangent[::,1], cotangent[::,0] + cotangent[::,2],	cotangent[::,0] + cotangent[::,1]	] )
@@ -82,7 +82,7 @@ def NormalizedCurvatureFlowSmoothing( mesh, iteration, diffusion ) :
 		vertex_curvature = np.array( [ u * cotangent[::,2].reshape(-1,1) - w * cotangent[::,1].reshape(-1,1),
 						v * cotangent[::,0].reshape(-1,1) - u * cotangent[::,2].reshape(-1,1),
 						w * cotangent[::,1].reshape(-1,1) - v * cotangent[::,0].reshape(-1,1) ] )
-						
+
 		# Compute the normal curvature vector of each vertex
 		smoothed = np.zeros( mesh.vertices.shape )
 		weight = np.zeros( mesh.vertex_number )
@@ -97,9 +97,9 @@ def NormalizedCurvatureFlowSmoothing( mesh, iteration, diffusion ) :
 
 		# Get new vertex position
 		smoothed = diffusion * smoothed / weight.reshape(-1,1)
-		
+
 		# Don't change border vertices
 		smoothed[ border ] = 0
-		
+
 		# Update original vertices
 		mesh.vertices += smoothed

@@ -13,7 +13,7 @@ import sys
 import OpenGL
 import OpenGL.GL as gl
 import OpenGL.GLUT as glut
-import MeshToolkit
+import MeshToolkit as mtk
 
 
 #
@@ -34,7 +34,7 @@ class GlutViewer( object ) :
 		glut.glutCreateWindow( mesh.name )
 
 		# Mesh viewer
-		self.meshviewer = MeshToolkit.Viewer.MeshViewer()
+		self.meshviewer = mtk.MeshViewer()
 		self.meshviewer.InitialiseOpenGL( width, height )
 		self.meshviewer.LoadMesh( mesh )
 		self.antialiasing = True
