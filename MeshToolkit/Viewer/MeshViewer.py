@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 
 #
@@ -113,7 +113,7 @@ class MeshViewer( object ) :
 		gl.glVertexAttribPointer( 1, 3, gl.GL_FLOAT, gl.GL_FALSE, 0, None )
 
 		# Color buffer object
-		if len( colors ) : 
+		if len( colors ) :
 			self.color_enabled = True
 			self.color_buffer_id = gl.glGenBuffers( 1 )
 			gl.glBindBuffer( gl.GL_ARRAY_BUFFER, self.color_buffer_id )
@@ -229,19 +229,19 @@ class MeshViewer( object ) :
 		modelview_matrix = np.dot( self.trackball.transformation, self.modelview_matrix )
 
 		# Send the transformation matrix to the shader (as the normal matrix for shading)
-		gl.glUniformMatrix3fv( gl.glGetUniformLocation( self.shader, "Normal_Matrix" ),
+		gl.glUniformMatrix3fv( gl.glGetUniformLocation( self.shader, b'Normal_Matrix' ),
 			1, gl.GL_FALSE, np.array( self.trackball.transformation[ :3, :3 ] ) )
-			
+
 		# Senf the MVP matrix to the shader
-		gl.glUniformMatrix4fv( gl.glGetUniformLocation( self.shader, "MVP_Matrix" ),
+		gl.glUniformMatrix4fv( gl.glGetUniformLocation( self.shader, b'MVP_Matrix' ),
 			1, gl.GL_FALSE, np.dot( modelview_matrix, self.projection_matrix ) )
 
 		# Activate color in the shader if necessary
-		gl.glUniform1i( gl.glGetUniformLocation( self.shader, "color_enabled" ), self.color_enabled )
-		
+		gl.glUniform1i( gl.glGetUniformLocation( self.shader, b'color_enabled' ), self.color_enabled )
+
 		# Activate hidden lines in the shader for wireframe rendering
-		gl.glUniform1i( gl.glGetUniformLocation( self.shader, "wireframe_mode" ), wireframe_mode )
-		
+		gl.glUniform1i( gl.glGetUniformLocation( self.shader, b'wireframe_mode' ), wireframe_mode )
+
 		# Vertex array object
 		gl.glBindVertexArray( self.vertex_array_id )
 		gl.glBindBuffer( gl.GL_ELEMENT_ARRAY_BUFFER, self.face_buffer_id )
@@ -251,7 +251,7 @@ class MeshViewer( object ) :
 
 		# Release the vertex array object
 		gl.glBindVertexArray( 0 )
-		
+
 		# Release the shader program
 		gl.glUseProgram( 0 )
 
