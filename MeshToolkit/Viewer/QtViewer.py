@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 
 #
@@ -9,7 +9,6 @@
 #
 # External dependencies
 #
-import platform
 import sys
 import PySide as qt
 import PySide.QtCore as qtcore
@@ -32,11 +31,11 @@ class QtViewer( qtgui.QApplication ) :
 
 		# Initialize parent class
 		super( QtViewer, self ).__init__( sys.argv )
-		
+
 		# Show the widget used to display the mesh
 		self.qtopenglwidget = QtOpenGLWidget( mesh = mesh )
 		self.qtopenglwidget.show()
-		
+
 		# Enter Qt main loop
 		sys.exit( self.exec_() )
 
@@ -51,13 +50,13 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 	# Initialisation
 	#
 	def __init__( self, parent = None, mesh = None ) :
-		
+
 		# Initialise QGLWidget with multisampling enabled and OpenGL 3 core only
 		super( QtOpenGLWidget, self ).__init__( qtgl.QGLFormat( qtgl.QGL.SampleBuffers | qtgl.QGL.NoDeprecatedFunctions ), parent )
 
 		# Track mouse events
 		self.setMouseTracking( True )
-		
+
 		# Change the widget position and size
 		self.setGeometry( 100, 100, 1024, 768 )
 
@@ -71,16 +70,16 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 
 		# Create the mesh viewer
 		self.meshviewer = MeshToolkit.Viewer.MeshViewer()
-		
+
 		# OpenGL initialization
 		self.meshviewer.InitialiseOpenGL( self.width(), self.height() )
-		
+
 		# Mesh during initialization ?
 		if self.mesh :
-			
+
 			# Load the mesh
 			self.meshviewer.LoadMesh( self.mesh )
-			
+
 			# Set the window title
 			self.setWindowTitle( self.mesh.name )
 
@@ -157,10 +156,10 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 
 		# Escape
 		if event.key() == qtcore.Qt.Key_Escape :
-			
+
 			# Exit
 			self.close()
-			
+
 		# A
 		elif event.key() == qtcore.Qt.Key_A :
 
@@ -179,18 +178,6 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 			# Smooth shading
 			self.meshviewer.SetShader( 'Smooth' )
 
-		# I
-		elif event.key() == qtcore.Qt.Key_I :
-			
-			# Print system informations
-			print( 'System Informations...' )
-			print( '  Qt :        {}'.format( qtcore.__version__ ) )
-			print( '  Python :    {}'.format( platform.python_version() ) )
-			print( '  PySide :    {}'.format( qt.__version__ ) )
-
-			# Print OpenGL informations
-			self.meshviewer.PrintOpenGLInfo()
-			
 		# O
 		elif event.key() == qtcore.Qt.Key_O :
 
@@ -206,7 +193,7 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 
 			# Send the mesh to the OpenGL viewer
 			self.meshviewer.LoadMesh( self.mesh )
-			
+
 			# Set the window title
 			self.setWindowTitle( self.mesh.name )
 
@@ -268,7 +255,7 @@ class QtOpenGLWidget( qtgl.QGLWidget ) :
 
 			# Display the mesh with hidden line removal rendering
 			self.meshviewer.wireframe_mode = 2
-			
+
 		# Unmanaged key
 		else : return
 

@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 
 #
@@ -9,7 +9,6 @@
 #
 # External dependencies
 #
-import platform
 import sys
 import OpenGL
 import OpenGL.GL as gl
@@ -78,17 +77,6 @@ class GlutViewer( object ) :
 			# Smooth shading
 			self.meshviewer.SetShader( 'Smooth' )
 
-		# I
-		elif key in [ b'i', b'I' ] :
-
-			# Print system informations
-			print( 'System Informations...' )
-			print( '  Python :    {}'.format( platform.python_version() ) )
-			print( '  PyOpenGL :  {}'.format( OpenGL.__version__ ) )
-
-			# Print OpenGL informations
-			self.meshviewer.PrintOpenGLInfo()
-
 		# R
 		elif key in [ b'r', b'R' ] :
 
@@ -132,25 +120,25 @@ class GlutViewer( object ) :
 
 				# Trackball XY translation
 				self.meshviewer.trackball.MousePress( [ x, y ], 2 )
-		
+
 		# Button up
 		elif state == glut.GLUT_UP :
 
 			# Wheel up
 			if button == 3 :
 
-				# Trackball Z translation 
+				# Trackball Z translation
 				self.meshviewer.trackball.MouseWheel( 1 )
 
 			# Wheel down
 			elif button == 4 :
-				
-				# Trackball Z translation 
+
+				# Trackball Z translation
 				self.meshviewer.trackball.MouseWheel( -1 )
-				
+
 			# Mouse button released
 			else :
-				
+
 				# Stop motion
 				self.meshviewer.trackball.MouseRelease()
 

@@ -283,15 +283,3 @@ class MeshViewer( object ) :
 		self.projection_matrix[2,2] = - (far + near) / (far - near)
 		self.projection_matrix[2,3] = - 1.0
 		self.projection_matrix[3,2] = - 2.0 * near * far / (far - near)
-
-	#
-	# PrintInfo
-	#
-	def PrintOpenGLInfo( self ) :
-
-		# Display OpenGL driver informations
-		print( 'OpenGL Informations...' )
-		print( '  Vendor :    {}'.format( gl.glGetString( gl.GL_VENDOR ).decode( 'UTF-8' ) ) )
-		print( '  Renderer :  {}'.format( gl.glGetString( gl.GL_RENDERER ).decode( 'UTF-8' ) ) )
-		print( '  Version :   {}'.format( gl.glGetString( gl.GL_VERSION ).decode( 'UTF-8' ) ) )
-		print( '  Shader :    {}'.format( gl.glGetString( gl.GL_SHADING_LANGUAGE_VERSION ).decode( 'UTF-8' ) ) )
