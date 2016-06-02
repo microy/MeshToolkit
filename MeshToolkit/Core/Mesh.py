@@ -12,22 +12,30 @@ import numpy as np
 # The data are encapsulated into numpy arrays
 class Mesh( object ) :
 	# Initialisation
-	def __init__( self, name='', vertices=[], faces=[], colors=[], texture_name='', textures=[], face_normals=[], vertex_normals=[] ) :
+	def __init__( self, name=None, vertices=None, faces=None, colors=None, texture_name=None, textures=None, face_normals=None, vertex_normals=None ) :
 		# Mesh name
+		if name is None : name = ''
 		self.name = name
 		# Vertex array
+		if vertices is None : vertices = []
 		self.vertices = np.array( vertices )
 		# Face index array
+		if faces is None : faces = []
 		self.faces = np.array( faces )
 		# Per-vertex color array
+		if colors is None : colors = []
 		self.colors = np.array( colors )
 		# Texture filename
+		if texture_name is None : texture_name = ''
 		self.texture_name = texture_name
 		# Per-vertex texture coordinate array
+		if textures is None : textures = []
 		self.textures = np.array( textures )
 		# Per-face normal array
+		if face_normals is None : face_normals = []
 		self.face_normals = np.array( face_normals )
 		# Per-vertex normal array
+		if vertex_normals is None : vertex_normals = []
 		self.vertex_normals = np.array( vertex_normals )
 	# Return mesh informations
 	def __str__( self ) :
