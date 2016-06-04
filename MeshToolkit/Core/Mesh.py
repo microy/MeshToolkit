@@ -11,32 +11,32 @@ import numpy as np
 # Define a class representing a triangular mesh
 # The data are encapsulated into numpy arrays
 class Mesh( object ) :
+
 	# Initialisation
 	def __init__( self, name=None, vertices=None, faces=None, colors=None, texture_name=None, textures=None, face_normals=None, vertex_normals=None ) :
 		# Mesh name
-		if name is None : name = ''
-		self.name = name
+		self.name = '' if name is None else name
 		# Vertex array
-		if vertices is None : vertices = []
-		self.vertices = np.array( vertices )
+		self.vertices = [] if vertices is None else vertices
+		self.vertices = np.array( self.vertices )
 		# Face index array
-		if faces is None : faces = []
-		self.faces = np.array( faces )
+		self.faces = [] if faces is None else faces
+		self.faces = np.array( self.faces )
 		# Per-vertex color array
-		if colors is None : colors = []
-		self.colors = np.array( colors )
+		self.colors = [] if colors is None else colors
+		self.colors = np.array( self.colors )
 		# Texture filename
-		if texture_name is None : texture_name = ''
-		self.texture_name = texture_name
+		self.texture_name = '' if texture_name is None else texture_name
 		# Per-vertex texture coordinate array
-		if textures is None : textures = []
-		self.textures = np.array( textures )
+		self.textures = [] if textures is None else textures
+		self.textures = np.array( self.textures )
 		# Per-face normal array
-		if face_normals is None : face_normals = []
-		self.face_normals = np.array( face_normals )
+		self.face_normals = [] if face_normals is None else face_normals
+		self.face_normals = np.array( self.face_normals )
 		# Per-vertex normal array
-		if vertex_normals is None : vertex_normals = []
-		self.vertex_normals = np.array( vertex_normals )
+		self.vertex_normals = [] if vertex_normals is None else vertex_normals
+		self.vertex_normals = np.array( self.vertex_normals )
+
 	# Return mesh informations
 	def __str__( self ) :
 		info   = 'Mesh Informations...\n'
@@ -54,30 +54,37 @@ class Mesh( object ) :
 		if self.texture_name :
 			info  += '\n  Texture filename :   {}'.format( self.texture_name )
 		return info
+
 	# Vertex number
 	@property
 	def vertex_number( self ) :
 		return len( self.vertices )
+
 	# Face number
 	@property
 	def face_number( self ) :
 		return len( self.faces )
+
 	# Color number
 	@property
 	def color_number( self ) :
 		return len( self.colors )
+
 	# Texture number
 	@property
 	def texture_number( self ) :
 		return len( self.textures )
+
 	# face normal number
 	@property
 	def face_normal_number( self ) :
 		return len( self.face_normals )
+
 	# Vertex normal number
 	@property
 	def vertex_normal_number( self ) :
 		return len( self.vertex_normals )
+
 	# Compute normal vectors of the faces and vertices
 	def UpdateNormals( self ) :
 		# Create an indexed view of the triangles
@@ -98,6 +105,7 @@ class Mesh( object ) :
 			self.vertex_normals[:, i] += np.bincount( self.faces[:, 2], self.face_normals[:, i], minlength=self.vertex_number )
 		# Normalise the vertex normals
 		self.vertex_normals /= np.sqrt( ( self.vertex_normals ** 2 ).sum( axis=1 ) ).reshape( -1, 1 )
+
 	# Register neighborhood informations
 	def UpdateNeighbors( self ) :
 		# Initialization
@@ -116,6 +124,7 @@ class Mesh( object ) :
 			self.neighbor_vertices[ b ].add( c )
 			self.neighbor_vertices[ c ].add( a )
 			self.neighbor_vertices[ c ].add( b )
+
 	# Collect the mesh edges
 	def GetEdges( self ) :
 		# Edge dictionary
@@ -135,6 +144,7 @@ class Mesh( object ) :
 					edges[key]['face'] = []
 				edges[key]['face'].append( i )
 		return edges
+
 	# Tell which vertex is on a border
 	def GetBorderVertices( self ) :
 		# Initialize border vertex list
@@ -148,10 +158,12 @@ class Mesh( object ) :
 					break
 		# Return the border vertex list
 		return border_vertices
+
 	# Compute the axis-aligned bounding box
 	def GetAxisAlignedBoundingBox( self ) :
 		# Return the minimum point and the maximum point for each axis
 		return ( np.amin( self.vertices, axis = 0 ), np.amax( self.vertices, axis = 0 ) )
+
 	# Compute (an approximation of) the bounding sphere
 	def GetBoundingSphere( self ) :
 		# Compute axis-aligned bounding box
@@ -162,6 +174,7 @@ class Mesh( object ) :
 		radius = np.sqrt(((center - self.vertices) ** 2).sum(axis = 1)).max()
 		# Return result
 		return ( center, radius )
+
 	# Create a mesh from a regular grid
 	def CreateFromGrid( self, X, Y, Z ) :
 		# Import the vertices
